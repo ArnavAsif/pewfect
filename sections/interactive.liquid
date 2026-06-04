@@ -1,0 +1,2461 @@
+{% comment %}
+  ============================================================
+  Interactive Pet Showcase Section
+  File: sections/interactive-pet-showcase.liquid
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign section_title    = section.settings.section_title
+  assign section_subtitle = section.settings.section_subtitle
+  assign bg_color         = section.settings.background_color
+  assign active_pet       = section.settings.default_pet
+-%}
+
+<section
+  class="ips"
+  id="ips-{{ section.id }}"
+  aria-labelledby="ips-title-{{ section.id }}"
+  style="background: {{ bg_color }};"
+>
+
+  {%- comment %} ── Ambient background ── {% endcomment %}
+  <div class="ips__ambient" aria-hidden="true">
+    <div class="ips__ambient-blob ips__ambient-blob--1"></div>
+    <div class="ips__ambient-blob ips__ambient-blob--2"></div>
+    <div class="ips__ambient-blob ips__ambient-blob--3"></div>
+    <div class="ips__ambient-grid"></div>
+  </div>
+
+  {%- comment %} ── Header ── {% endcomment %}
+  <div class="ips__header">
+    <div class="ips__header-inner">
+      <div class="ips__eyebrow" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+        </svg>
+        <span>Interactive Experience</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+        </svg>
+      </div>
+      <h2 class="ips__title" id="ips-title-{{ section.id }}">
+        {{ section_title | default: 'Meet Our Happy Pets' }}
+      </h2>
+      <p class="ips__subtitle">
+        {{ section_subtitle | default: 'Hover over accessories to explore products made for your best friend' }}
+      </p>
+    </div>
+  </div>
+
+  {%- comment %} ── Pet Tab Switcher ── {% endcomment %}
+  <div class="ips__tabs" role="tablist" aria-label="Select a pet to explore">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'pet' -%}
+        <button
+          class="ips__tab{% if forloop.first %} is-active{% endif %}"
+          role="tab"
+          id="ips-tab-{{ block.id }}"
+          aria-controls="ips-panel-{{ block.id }}"
+          aria-selected="{{ forloop.first }}"
+          data-pet-id="{{ block.id }}"
+          data-accent="{{ block.settings.accent_color }}"
+          {{ block.shopify_attributes }}
+        >
+          {% comment %} <span class="ips__tab-icon" aria-hidden="true">
+            {%- case block.settings.pet_type -%}
+              {%- when 'dog' -%}🐶
+              {%- when 'cat' -%}🐱
+              {%- when 'bird' -%}🦜
+              {%- when 'fish' -%}🐠
+              {%- when 'rabbit' -%}🐰
+              {%- else -%}🐾
+            {%- endcase -%}
+          </span> {% endcomment %}
+          <span class="ips__tab-label">{{ block.settings.pet_name }}</span>
+          <span class="ips__tab-indicator" aria-hidden="true"></span>
+        </button>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- comment %} ── Main Stage ── {% endcomment %}
+  <div class="ips__stage" id="ips-stage-{{ section.id }}">
+
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'pet' -%}
+        {%- liquid
+          assign pet_name    = block.settings.pet_name
+          assign pet_image   = block.settings.pet_image
+          assign pet_type    = block.settings.pet_type
+          assign accent      = block.settings.accent_color
+          assign pet_desc    = block.settings.pet_description
+          assign pet_fact    = block.settings.fun_fact
+        -%}
+
+        <div
+          class="ips__panel{% if forloop.first %} is-active{% endif %}"
+          id="ips-panel-{{ block.id }}"
+          role="tabpanel"
+          aria-labelledby="ips-tab-{{ block.id }}"
+          data-pet-id="{{ block.id }}"
+          data-accent="{{ accent }}"
+          style="--ips-accent: {{ accent }};"
+        >
+
+          {%- comment %} ── Two-column layout ── {% endcomment %}
+          <div class="ips__layout">
+
+            {%- comment %} ── LEFT: Pet Stage ── {% endcomment %}
+            <div class="ips__pet-stage">
+
+              {%- comment %} ── Decorative ring ── {% endcomment %}
+              <div class="ips__pet-ring" aria-hidden="true">
+                <div class="ips__pet-ring-inner"></div>
+                <div class="ips__pet-ring-pulse"></div>
+                <div class="ips__pet-ring-dots">
+                  {%- for i in (1..8) -%}
+                    <span class="ips__ring-dot" style="--i: {{ forloop.index }};"></span>
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              {%- comment %} ── Pet Image Container ── {% endcomment %}
+              <div class="ips__pet-wrap" id="ips-pet-{{ block.id }}">
+
+                {%- comment %} ── Platform shadow ── {% endcomment %}
+                <div class="ips__pet-shadow" aria-hidden="true"></div>
+
+                {%- if pet_image != blank -%}
+                  <img
+                    class="ips__pet-img"
+                    src="{{ pet_image | image_url: width: 900 }}"
+                    srcset="
+                      {{ pet_image | image_url: width: 500 }} 500w,
+                      {{ pet_image | image_url: width: 800 }} 800w,
+                      {{ pet_image | image_url: width: 1100 }} 1100w
+                    "
+                    sizes="(max-width: 767px) 90vw, 50vw"
+                    alt="{{ pet_image.alt | default: pet_name | escape }}"
+                    loading="{{ forloop.first | ternary: 'eager', 'lazy' }}"
+                    decoding="async"
+                    width="{{ pet_image.width }}"
+                    height="{{ pet_image.height }}"
+                  >
+                {%- else -%}
+                  {%- comment %} Placeholder SVG per pet type ── {% endcomment %}
+                  <div class="ips__pet-placeholder" aria-label="{{ pet_name }} illustration">
+                    {%- case pet_type -%}
+                      {%- when 'dog' -%}
+                        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <defs>
+                            <radialGradient id="dogGrad-{{ block.id }}" cx="50%" cy="40%" r="55%">
+                              <stop offset="0%" stop-color="{{ accent }}22"/>
+                              <stop offset="100%" stop-color="{{ accent }}08"/>
+                            </radialGradient>
+                          </defs>
+                          <circle cx="200" cy="200" r="180" fill="url(#dogGrad-{{ block.id }})"/>
+                          <!-- Dog body -->
+                          <ellipse cx="200" cy="270" rx="90" ry="70" fill="#c8a882"/>
+                          <!-- Dog head -->
+                          <circle cx="200" cy="175" r="72" fill="#d4b896"/>
+                          <!-- Ears -->
+                          <ellipse cx="148" cy="140" rx="28" ry="42" fill="#b8966e" transform="rotate(-15 148 140)"/>
+                          <ellipse cx="252" cy="140" rx="28" ry="42" fill="#b8966e" transform="rotate(15 252 140)"/>
+                          <!-- Face -->
+                          <ellipse cx="185" cy="185" rx="10" ry="12" fill="#3d2b1f"/>
+                          <ellipse cx="215" cy="185" rx="10" ry="12" fill="#3d2b1f"/>
+                          <circle cx="187" cy="182" r="3" fill="#fff" opacity="0.8"/>
+                          <circle cx="217" cy="182" r="3" fill="#fff" opacity="0.8"/>
+                          <ellipse cx="200" cy="205" rx="20" ry="14" fill="#c17f5a"/>
+                          <ellipse cx="200" cy="210" rx="12" ry="7" fill="#e8a080"/>
+                          <!-- Nose -->
+                          <ellipse cx="200" cy="200" rx="10" ry="7" fill="#3d2b1f"/>
+                          <!-- Tail -->
+                          <path d="M285 250 Q340 200 330 160" stroke="#c8a882" stroke-width="18" fill="none" stroke-linecap="round"/>
+                          <!-- Paws -->
+                          <ellipse cx="160" cy="335" rx="30" ry="20" fill="#c8a882"/>
+                          <ellipse cx="240" cy="335" rx="30" ry="20" fill="#c8a882"/>
+                        </svg>
+                      {%- when 'cat' -%}
+                        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <defs>
+                            <radialGradient id="catGrad-{{ block.id }}" cx="50%" cy="40%" r="55%">
+                              <stop offset="0%" stop-color="{{ accent }}22"/>
+                              <stop offset="100%" stop-color="{{ accent }}08"/>
+                            </radialGradient>
+                          </defs>
+                          <circle cx="200" cy="200" r="180" fill="url(#catGrad-{{ block.id }})"/>
+                          <!-- Body -->
+                          <ellipse cx="200" cy="275" rx="80" ry="68" fill="#a0846a"/>
+                          <!-- Head -->
+                          <circle cx="200" cy="175" r="68" fill="#b8967a"/>
+                          <!-- Ears -->
+                          <polygon points="148,120 130,65 175,105" fill="#a0846a"/>
+                          <polygon points="252,120 270,65 225,105" fill="#a0846a"/>
+                          <polygon points="150,115 136,75 170,108" fill="#e8b4b0"/>
+                          <polygon points="250,115 264,75 230,108" fill="#e8b4b0"/>
+                          <!-- Eyes -->
+                          <ellipse cx="178" cy="175" rx="14" ry="16" fill="#2d5a27"/>
+                          <ellipse cx="222" cy="175" rx="14" ry="16" fill="#2d5a27"/>
+                          <ellipse cx="178" cy="175" rx="6" ry="14" fill="#1a1a1a"/>
+                          <ellipse cx="222" cy="175" rx="6" ry="14" fill="#1a1a1a"/>
+                          <circle cx="182" cy="170" r="3" fill="#fff" opacity="0.9"/>
+                          <circle cx="226" cy="170" r="3" fill="#fff" opacity="0.9"/>
+                          <!-- Nose -->
+                          <polygon points="200,198 194,208 206,208" fill="#d4756a"/>
+                          <!-- Whiskers -->
+                          <line x1="130" y1="205" x2="188" y2="210" stroke="#6b5040" stroke-width="1.5" opacity="0.6"/>
+                          <line x1="130" y1="215" x2="188" y2="215" stroke="#6b5040" stroke-width="1.5" opacity="0.6"/>
+                          <line x1="212" y1="210" x2="270" y2="205" stroke="#6b5040" stroke-width="1.5" opacity="0.6"/>
+                          <line x1="212" y1="215" x2="270" y2="215" stroke="#6b5040" stroke-width="1.5" opacity="0.6"/>
+                          <!-- Tail -->
+                          <path d="M275 300 Q330 260 320 200 Q310 160 290 170" stroke="#a0846a" stroke-width="16" fill="none" stroke-linecap="round"/>
+                          <!-- Paws -->
+                          <ellipse cx="165" cy="338" rx="28" ry="18" fill="#a0846a"/>
+                          <ellipse cx="235" cy="338" rx="28" ry="18" fill="#a0846a"/>
+                        </svg>
+                      {%- else -%}
+                        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <circle cx="200" cy="200" r="150" fill="{{ accent }}15" stroke="{{ accent }}30" stroke-width="2"/>
+                          <text x="200" y="220" text-anchor="middle" font-size="100" fill="{{ accent }}60">🐾</text>
+                        </svg>
+                      {%- endcase -%}
+                  </div>
+                {%- endif -%}
+
+                {%- comment %} ── Hotspot Pins ── {% endcomment %}
+                {%- assign hotspot_count = 0 -%}
+                {%- for inner_block in section.blocks -%}
+                  {%- if inner_block.type == 'hotspot' and inner_block.settings.parent_pet == block.id -%}
+                    {%- assign hotspot_count = hotspot_count | plus: 1 -%}
+                    {%- liquid
+                      assign hs_label    = inner_block.settings.hotspot_label
+                      assign hs_product  = inner_block.settings.hotspot_product
+                      assign hs_x        = inner_block.settings.position_x
+                      assign hs_y        = inner_block.settings.position_y
+                      assign hs_color    = inner_block.settings.hotspot_color
+                      assign hs_icon     = inner_block.settings.hotspot_icon
+                      assign hs_desc     = inner_block.settings.hotspot_description
+                      assign hs_price    = inner_block.settings.hotspot_price
+                      assign hs_link     = inner_block.settings.hotspot_link
+                      assign hs_img      = inner_block.settings.hotspot_product_image
+                      assign hs_index    = forloop.index
+                    -%}
+
+                    <div
+                      class="ips__hotspot"
+                      id="ips-hs-{{ inner_block.id }}"
+                      style="
+                        left: {{ hs_x }}%;
+                        top: {{ hs_y }}%;
+                        --hs-color: {{ hs_color }};
+                      "
+                      data-hotspot-id="{{ inner_block.id }}"
+                      data-index="{{ hotspot_count }}"
+                      {{ inner_block.shopify_attributes }}
+                    >
+                      {%- comment %} ── Pin button ── {% endcomment %}
+                      <button
+                        class="ips__pin"
+                        aria-label="View {{ hs_label | escape }} details"
+                        aria-expanded="false"
+                        aria-controls="ips-tooltip-{{ inner_block.id }}"
+                        type="button"
+                      >
+                        <span class="ips__pin-pulse" aria-hidden="true"></span>
+                        <span class="ips__pin-pulse ips__pin-pulse--2" aria-hidden="true"></span>
+                        <span class="ips__pin-core" aria-hidden="true">
+                          {%- case hs_icon -%}
+                            {%- when 'collar' -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                              </svg>
+                            {%- when 'toy' -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                              </svg>
+                            {%- when 'food' -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                                <line x1="6" y1="1" x2="6" y2="4"/>
+                                <line x1="10" y1="1" x2="10" y2="4"/>
+                                <line x1="14" y1="1" x2="14" y2="4"/>
+                              </svg>
+                            {%- when 'bed' -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <path d="M2 4v16M2 8h20v12H2"/>
+                                <path d="M2 14h20"/>
+                                <path d="M6 14v-4h4v4"/>
+                                <path d="M14 14v-4h4v4"/>
+                              </svg>
+                            {%- when 'medicine' -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <line x1="12" y1="9" x2="12" y2="15"/>
+                                <line x1="9" y1="12" x2="15" y2="12"/>
+                              </svg>
+                            {%- else -%}
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                              </svg>
+                          {%- endcase -%}
+                        </span>
+                        <span class="ips__pin-number" aria-hidden="true">{{ hotspot_count }}</span>
+                      </button>
+
+                      {%- comment %} ── Tooltip Card ── {% endcomment %}
+                      <div
+                        class="ips__tooltip"
+                        id="ips-tooltip-{{ inner_block.id }}"
+                        role="tooltip"
+                        aria-hidden="true"
+                      >
+                        <div class="ips__tooltip-inner">
+
+                          {%- comment %} Tooltip header ── {% endcomment %}
+                          <div class="ips__tooltip-header">
+                            <div class="ips__tooltip-tag" style="background: {{ hs_color }}20; color: {{ hs_color }};">
+                              {{ hs_icon | capitalize | default: 'Product' }}
+                            </div>
+                            <button
+                              class="ips__tooltip-close"
+                              aria-label="Close {{ hs_label | escape }} details"
+                              type="button"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                              </svg>
+                            </button>
+                          </div>
+
+                          {%- comment %} Tooltip image ── {% endcomment %}
+                          {%- if hs_img != blank -%}
+                            <div class="ips__tooltip-img-wrap">
+                              <img
+                                class="ips__tooltip-img"
+                                src="{{ hs_img | image_url: width: 300 }}"
+                                alt="{{ hs_img.alt | default: hs_label | escape }}"
+                                loading="lazy"
+                                decoding="async"
+                                width="{{ hs_img.width }}"
+                                height="{{ hs_img.height }}"
+                              >
+                            </div>
+                          {%- elsif hs_product != blank -%}
+                            <div class="ips__tooltip-img-wrap">
+                              <img
+                                class="ips__tooltip-img"
+                                src="{{ hs_product.featured_image | image_url: width: 300 }}"
+                                alt="{{ hs_product.featured_image.alt | default: hs_product.title | escape }}"
+                                loading="lazy"
+                                decoding="async"
+                              >
+                            </div>
+                          {%- else -%}
+                            <div class="ips__tooltip-img-placeholder" style="background: {{ hs_color }}15;" aria-hidden="true">
+                              <span style="font-size: 32px;">
+                                {%- case hs_icon -%}
+                                  {%- when 'collar' -%}🦮
+                                  {%- when 'toy' -%}🎾
+                                  {%- when 'food' -%}🍖
+                                  {%- when 'bed' -%}🛏️
+                                  {%- when 'medicine' -%}💊
+                                  {%- else -%}🐾
+                                {%- endcase -%}
+                              </span>
+                            </div>
+                          {%- endif -%}
+
+                          {%- comment %} Tooltip body ── {% endcomment %}
+                          <div class="ips__tooltip-body">
+                            <h4 class="ips__tooltip-title">
+                              {%- if hs_product != blank -%}
+                                {{ hs_product.title }}
+                              {%- else -%}
+                                {{ hs_label }}
+                              {%- endif -%}
+                            </h4>
+                            {%- if hs_desc != blank -%}
+                              <p class="ips__tooltip-desc">{{ hs_desc }}</p>
+                            {%- elsif hs_product != blank -%}
+                              <p class="ips__tooltip-desc">{{ hs_product.description | strip_html | truncate: 80 }}</p>
+                            {%- endif -%}
+
+                            <div class="ips__tooltip-footer">
+                              <div class="ips__tooltip-price">
+                                {%- if hs_product != blank -%}
+                                  {%- if hs_product.compare_at_price > hs_product.price -%}
+                                    <span class="ips__tooltip-price-compare">{{ hs_product.compare_at_price | money }}</span>
+                                  {%- endif -%}
+                                  <span class="ips__tooltip-price-main">{{ hs_product.price | money }}</span>
+                                {%- elsif hs_price != blank -%}
+                                  <span class="ips__tooltip-price-main">{{ hs_price }}</span>
+                                {%- endif -%}
+                              </div>
+                              {%- if hs_link != blank or hs_product != blank -%}
+                                <a
+                                  href="{{ hs_product.url | default: hs_link }}"
+                                  class="ips__tooltip-cta"
+                                  aria-label="Shop {{ hs_label | escape }}"
+                                >
+                                  <span>Shop Now</span>
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                  </svg>
+                                </a>
+                              {%- endif -%}
+                            </div>
+                          </div>
+
+                        </div>
+                        <div class="ips__tooltip-arrow" aria-hidden="true"></div>
+                      </div>
+
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+
+              </div>
+
+              {%- comment %} ── Fun fact bubble ── {% endcomment %}
+              {%- if pet_fact != blank -%}
+                <div class="ips__fact-bubble" aria-label="Fun fact about {{ pet_name | escape }}">
+                  <div class="ips__fact-icon" aria-hidden="true">💡</div>
+                  <p class="ips__fact-text">{{ pet_fact }}</p>
+                </div>
+              {%- endif -%}
+
+            </div>
+
+            {%- comment %} ── RIGHT: Info + Hotspot List ── {% endcomment %}
+            <div class="ips__info-panel">
+
+              {%- comment %} ── Pet identity ── {% endcomment %}
+              <div class="ips__pet-identity">
+                <div class="ips__pet-badge" style="background: {{ accent }}18; border-color: {{ accent }}30;">
+                  <span class="ips__pet-badge-dot" style="background: {{ accent }};"></span>
+                  <span class="ips__pet-badge-label">{{ pet_type | capitalize }}</span>
+                </div>
+                <h3 class="ips__pet-name">{{ pet_name }}</h3>
+                {%- if pet_desc != blank -%}
+                  <p class="ips__pet-desc">{{ pet_desc }}</p>
+                {%- endif -%}
+              </div>
+
+              {%- comment %} ── Accessory list ── {% endcomment %}
+              <div class="ips__accessory-list">
+                <div class="ips__accessory-list-header">
+                  <span class="ips__accessory-list-title">Explore Accessories</span>
+                  <span class="ips__accessory-count" aria-live="polite">
+                    {%- assign pet_hs_count = 0 -%}
+                    {%- for inner_block in section.blocks -%}
+                      {%- if inner_block.type == 'hotspot' and inner_block.settings.parent_pet == block.id -%}
+                        {%- assign pet_hs_count = pet_hs_count | plus: 1 -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {{ pet_hs_count }} items
+                  </span>
+                </div>
+
+                <div class="ips__accessory-items">
+                  {%- assign item_idx = 0 -%}
+                  {%- for inner_block in section.blocks -%}
+                    {%- if inner_block.type == 'hotspot' and inner_block.settings.parent_pet == block.id -%}
+                      {%- assign item_idx = item_idx | plus: 1 -%}
+                      <div
+                        class="ips__accessory-item"
+                        data-hotspot-target="{{ inner_block.id }}"
+                        style="--hs-color: {{ inner_block.settings.hotspot_color }};"
+                        tabindex="0"
+                        role="button"
+                        aria-label="Highlight {{ inner_block.settings.hotspot_label | escape }} on pet"
+                      >
+                        <div class="ips__accessory-num" style="background: {{ inner_block.settings.hotspot_color }}18; color: {{ inner_block.settings.hotspot_color }};">
+                          {{ item_idx }}
+                        </div>
+                        <div class="ips__accessory-content">
+                          <span class="ips__accessory-name">{{ inner_block.settings.hotspot_label }}</span>
+                          {%- if inner_block.settings.hotspot_price != blank or inner_block.settings.hotspot_product != blank -%}
+                            <span class="ips__accessory-price">
+                              {%- if inner_block.settings.hotspot_product != blank -%}
+                                {{ inner_block.settings.hotspot_product.price | money }}
+                              {%- else -%}
+                                {{ inner_block.settings.hotspot_price }}
+                              {%- endif -%}
+                            </span>
+                          {%- endif -%}
+                        </div>
+                        <div class="ips__accessory-arrow" aria-hidden="true">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                          </svg>
+                        </div>
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              {%- comment %} ── Shop all CTA ── {% endcomment %}
+              {%- if block.settings.shop_all_link != blank -%}
+                <a
+                  href="{{ block.settings.shop_all_link }}"
+                  class="ips__shop-all"
+                  style="--ips-accent: {{ accent }};"
+                  aria-label="Shop all {{ pet_name | escape }} products"
+                >
+                  <span class="ips__shop-all-text">Shop All {{ pet_name }} Products</span>
+                  <span class="ips__shop-all-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                </a>
+              {%- endif -%}
+
+            </div>
+          </div>
+
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- comment %} ── Empty state ── {% endcomment %}
+    {%- if section.blocks.size == 0 -%}
+      <div class="ips__empty">
+        <div class="ips__empty-icon">🐾</div>
+        <h3>Add Your First Pet</h3>
+        <p>Use the section editor to add pets and hotspot accessories.</p>
+      </div>
+    {%- endif -%}
+
+  </div>
+
+</section>
+
+<style>
+/* ════════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }},
+#ips-{{ section.id }} * {
+  box-sizing: border-box;
+}
+
+/* ════════════════════════════════════════════════════
+   SECTION BASE
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} {
+  --ips-accent: #FF7A35;
+  --ips-radius: 24px;
+  --ips-pad: clamp(20px, 5vw, 80px);
+  --ips-transition: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ips-spring: 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  position: relative;
+  width: 100%;
+  padding: clamp(56px, 9vw, 110px) 0;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ════════════════════════════════════════════════════
+   AMBIENT BG
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+#ips-{{ section.id }} .ips__ambient-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0;
+  transition: background 0.8s ease, opacity 0.8s ease;
+}
+
+#ips-{{ section.id }} .ips__ambient-blob--1 {
+  width: 600px; height: 600px;
+  top: -200px; left: -150px;
+  background: var(--ips-accent);
+  opacity: 0.06;
+}
+
+#ips-{{ section.id }} .ips__ambient-blob--2 {
+  width: 500px; height: 500px;
+  bottom: -150px; right: -100px;
+  background: var(--ips-accent);
+  opacity: 0.05;
+}
+
+#ips-{{ section.id }} .ips__ambient-blob--3 {
+  width: 300px; height: 300px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--ips-accent);
+  opacity: 0.04;
+}
+
+#ips-{{ section.id }} .ips__ambient-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ════════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 var(--ips-pad);
+  margin-bottom: clamp(28px, 4vw, 50px);
+}
+
+#ips-{{ section.id }} .ips__header-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+#ips-{{ section.id }} .ips__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ips-accent);
+  margin-bottom: 14px;
+  padding: 6px 16px;
+  background: var(--ips-accent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ips-accent) 15%, transparent), color-mix(in srgb, var(--ips-accent) 8%, transparent));
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ips-accent) 25%, transparent);
+}
+
+#ips-{{ section.id }} .ips__title {
+  font-size: clamp(30px, 4.5vw, 56px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  margin: 0 0 14px;
+}
+
+#ips-{{ section.id }} .ips__subtitle {
+  font-size: clamp(15px, 1.5vw, 18px);
+  color: #7a6e65;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__tabs {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 var(--ips-pad);
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+
+#ips-{{ section.id }} .ips__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 2px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #6b6056;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--ips-transition),
+    border-color var(--ips-transition),
+    color var(--ips-transition),
+    transform 0.3s var(--ips-spring),
+    box-shadow var(--ips-transition);
+  font-family: inherit;
+  will-change: transform;
+}
+
+#ips-{{ section.id }} .ips__tab:hover {
+  border-color: var(--ips-accent, rgba(0,0,0,0.15));
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+#ips-{{ section.id }} .ips__tab.is-active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+}
+
+#ips-{{ section.id }} .ips__tab:focus-visible {
+  outline: 3px solid var(--ips-accent);
+  outline-offset: 3px;
+}
+
+#ips-{{ section.id }} .ips__tab-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+#ips-{{ section.id }} .ips__tab-label {
+  white-space: nowrap;
+}
+
+#ips-{{ section.id }} .ips__tab-indicator {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #1a1a1a;
+  transition: transform 0.3s var(--ips-spring);
+}
+
+#ips-{{ section.id }} .ips__tab.is-active .ips__tab-indicator {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ════════════════════════════════════════════════════
+   STAGE + PANELS
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__stage {
+  position: relative;
+  z-index: 2;
+  padding: 0 var(--ips-pad);
+}
+
+#ips-{{ section.id }} .ips__panel {
+  display: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s var(--ips-spring);
+}
+
+#ips-{{ section.id }} .ips__panel.is-active {
+  display: block;
+}
+
+#ips-{{ section.id }} .ips__panel.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ════════════════════════════════════════════════════
+   LAYOUT (2 col)
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════════════════
+   PET STAGE (left)
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__pet-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Decorative ring */
+#ips-{{ section.id }} .ips__pet-ring {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#ips-{{ section.id }} .ips__pet-ring-inner {
+  width: min(75%, 500px);
+  height: min(75%, 500px);
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--ips-accent) 20%, transparent);
+  animation: ips-spin-{{ section.id }} 30s linear infinite;
+}
+
+@keyframes ips-spin-{{ section.id }} {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+#ips-{{ section.id }} .ips__pet-ring-pulse {
+  position: absolute;
+  width: min(85%, 560px);
+  height: min(85%, 560px);
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--ips-accent) 12%, transparent);
+  animation: ips-pulse-ring-{{ section.id }} 3s ease-in-out infinite;
+}
+
+@keyframes ips-pulse-ring-{{ section.id }} {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.6; }
+}
+
+/* Dot ring */
+#ips-{{ section.id }} .ips__pet-ring-dots {
+  position: absolute;
+  width: min(88%, 600px);
+  height: min(88%, 600px);
+}
+
+#ips-{{ section.id }} .ips__ring-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ips-accent);
+  opacity: 0.25;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  transform: rotate(calc(var(--i) * 45deg)) translateX(min(42vw, 295px)) translate(-50%, -50%);
+}
+
+/* Pet wrap */
+#ips-{{ section.id }} .ips__pet-wrap {
+  position: relative;
+  width: min(90%, 540px);
+  aspect-ratio: 4/5;
+  z-index: 2;
+}
+
+#ips-{{ section.id }} .ips__pet-shadow {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 65%;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.2), transparent 70%);
+  filter: blur(10px);
+  border-radius: 50%;
+  z-index: 0;
+  animation: ips-shadow-{{ section.id }} 4s ease-in-out infinite;
+}
+
+@keyframes ips-shadow-{{ section.id }} {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.7; }
+  50% { transform: translateX(-50%) scaleX(0.85); opacity: 0.4; }
+}
+
+#ips-{{ section.id }} .ips__pet-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  position: relative;
+  z-index: 1;
+  animation: ips-float-{{ section.id }} 4s ease-in-out infinite;
+  will-change: transform;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));
+}
+
+@keyframes ips-float-{{ section.id }} {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+#ips-{{ section.id }} .ips__pet-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ips-float-{{ section.id }} 4s ease-in-out infinite;
+  will-change: transform;
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,0.1));
+}
+
+#ips-{{ section.id }} .ips__pet-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fun fact */
+#ips-{{ section.id }} .ips__fact-bubble {
+  position: absolute;
+  bottom: -20px;
+  left: -16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 16px;
+  padding: 12px 14px;
+  max-width: 220px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.1),
+    0 2px 8px rgba(0,0,0,0.06);
+  z-index: 5;
+  animation: ips-fact-{{ section.id }} 0.6s var(--ips-spring) 0.8s both;
+}
+
+@keyframes ips-fact-{{ section.id }} {
+  from { opacity: 0; transform: translateY(16px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#ips-{{ section.id }} .ips__fact-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+#ips-{{ section.id }} .ips__fact-text {
+  font-size: 12px;
+  color: #4a4540;
+  line-height: 1.5;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ════════════════════════════════════════════════════
+   HOTSPOTS
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__hotspot {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+}
+
+/* Pin */
+#ips-{{ section.id }} .ips__pin {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--hs-color, var(--ips-accent));
+  border: 3px solid rgba(255,255,255,0.95);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.2),
+    0 0 0 0 var(--hs-color, var(--ips-accent));
+  transition:
+    transform var(--ips-spring),
+    box-shadow 0.3s ease;
+  will-change: transform;
+  z-index: 2;
+  padding: 0;
+  font-family: inherit;
+}
+
+#ips-{{ section.id }} .ips__pin:hover,
+#ips-{{ section.id }} .ips__pin[aria-expanded="true"] {
+  transform: scale(1.2);
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.25),
+    0 0 0 6px color-mix(in srgb, var(--hs-color, var(--ips-accent)) 30%, transparent);
+}
+
+#ips-{{ section.id }} .ips__pin:focus-visible {
+  outline: 3px solid var(--hs-color, var(--ips-accent));
+  outline-offset: 4px;
+}
+
+/* Pin pulse rings */
+#ips-{{ section.id }} .ips__pin-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--hs-color, var(--ips-accent));
+  opacity: 0;
+  animation: ips-pin-pulse-{{ section.id }} 2.4s ease-out infinite;
+}
+
+#ips-{{ section.id }} .ips__pin-pulse--2 {
+  animation-delay: 1.2s;
+}
+
+@keyframes ips-pin-pulse-{{ section.id }} {
+  0%   { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+#ips-{{ section.id }} .ips__pin-core {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+#ips-{{ section.id }} .ips__pin-number {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--hs-color, var(--ips-accent));
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: 1.5px solid color-mix(in srgb, var(--hs-color, var(--ips-accent)) 20%, transparent);
+}
+
+/* ════════════════════════════════════════════════════
+   TOOLTIP
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__tooltip {
+  position: absolute;
+  left: calc(100% + 16px);
+  top: 50%;
+  transform: translateY(-50%) scale(0.88) translateX(-8px);
+  width: 260px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 100;
+  transition:
+    opacity 0.38s ease,
+    transform 0.42s var(--ips-spring),
+    visibility 0.38s;
+  will-change: transform, opacity;
+}
+
+#ips-{{ section.id }} .ips__tooltip.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1) translateX(0);
+  pointer-events: all;
+}
+
+/* Flip to left if near right edge */
+#ips-{{ section.id }} .ips__tooltip.flip-left {
+  left: auto;
+  right: calc(100% + 16px);
+  transform: translateY(-50%) scale(0.88) translateX(8px);
+}
+
+#ips-{{ section.id }} .ips__tooltip.flip-left.is-open {
+  transform: translateY(-50%) scale(1) translateX(0);
+}
+
+/* Flip arrow accordingly */
+#ips-{{ section.id }} .ips__tooltip.flip-left .ips__tooltip-arrow {
+  left: auto;
+  right: -7px;
+  transform: translateY(-50%) rotate(135deg);
+}
+
+#ips-{{ section.id }} .ips__tooltip-inner {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0,0,0,0.16),
+    0 8px 24px rgba(0,0,0,0.1),
+    0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* Arrow */
+#ips-{{ section.id }} .ips__tooltip-arrow {
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-45deg);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-left: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  box-shadow: -2px 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Tooltip header */
+#ips-{{ section.id }} .ips__tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 0;
+}
+
+#ips-{{ section.id }} .ips__tooltip-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+#ips-{{ section.id }} .ips__tooltip-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.06);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6056;
+  transition: background 0.25s ease, transform 0.25s ease;
+  padding: 0;
+  font-family: inherit;
+}
+
+#ips-{{ section.id }} .ips__tooltip-close:hover {
+  background: rgba(0,0,0,0.12);
+  transform: rotate(90deg);
+}
+
+/* Tooltip image */
+#ips-{{ section.id }} .ips__tooltip-img-wrap {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  margin-top: 10px;
+  background: #f5f3ef;
+}
+
+#ips-{{ section.id }} .ips__tooltip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.0);
+  transition: transform 0.5s ease;
+}
+
+#ips-{{ section.id }} .ips__tooltip.is-open .ips__tooltip-img {
+  transform: scale(1.04);
+}
+
+#ips-{{ section.id }} .ips__tooltip-img-placeholder {
+  width: 100%;
+  height: 140px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+}
+
+/* Tooltip body */
+#ips-{{ section.id }} .ips__tooltip-body {
+  padding: 14px 14px 14px;
+}
+
+#ips-{{ section.id }} .ips__tooltip-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+#ips-{{ section.id }} .ips__tooltip-desc {
+  font-size: 12px;
+  color: #7a6e65;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+#ips-{{ section.id }} .ips__tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#ips-{{ section.id }} .ips__tooltip-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#ips-{{ section.id }} .ips__tooltip-price-main {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+#ips-{{ section.id }} .ips__tooltip-price-compare {
+  font-size: 12px;
+  color: #b0a89e;
+  text-decoration: line-through;
+}
+
+/* CTA */
+#ips-{{ section.id }} .ips__tooltip-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  background: var(--hs-color, var(--ips-accent));
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  transition:
+    transform 0.28s var(--ips-spring),
+    box-shadow 0.28s ease,
+    filter 0.28s ease;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+#ips-{{ section.id }} .ips__tooltip-cta:hover {
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  filter: brightness(1.06);
+}
+
+/* ════════════════════════════════════════════════════
+   INFO PANEL (right)
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 32px);
+}
+
+/* Pet identity */
+#ips-{{ section.id }} .ips__pet-identity {}
+
+#ips-{{ section.id }} .ips__pet-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1.5px solid;
+  margin-bottom: 12px;
+}
+
+#ips-{{ section.id }} .ips__pet-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+#ips-{{ section.id }} .ips__pet-badge-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
+#ips-{{ section.id }} .ips__pet-name {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0 0 10px;
+}
+
+#ips-{{ section.id }} .ips__pet-desc {
+  font-size: clamp(14px, 1.3vw, 16px);
+  color: #7a6e65;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Accessory list */
+#ips-{{ section.id }} .ips__accessory-list {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(0,0,0,0.07);
+  border-radius: var(--ips-radius);
+  overflow: hidden;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.05),
+    0 1px 4px rgba(0,0,0,0.04);
+}
+
+#ips-{{ section.id }} .ips__accessory-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+#ips-{{ section.id }} .ips__accessory-list-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4a4540;
+}
+
+#ips-{{ section.id }} .ips__accessory-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b0a89e;
+}
+
+#ips-{{ section.id }} .ips__accessory-items {
+  padding: 8px;
+}
+
+#ips-{{ section.id }} .ips__accessory-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition:
+    background 0.28s ease,
+    transform 0.3s var(--ips-spring);
+  will-change: transform;
+  border: 1.5px solid transparent;
+}
+
+#ips-{{ section.id }} .ips__accessory-item:hover,
+#ips-{{ section.id }} .ips__accessory-item.is-highlighted {
+  background: rgba(0,0,0,0.04);
+  border-color: var(--hs-color, rgba(0,0,0,0.1));
+  transform: translateX(4px);
+}
+
+#ips-{{ section.id }} .ips__accessory-item:focus-visible {
+  outline: 3px solid var(--hs-color, var(--ips-accent));
+  outline-offset: 2px;
+}
+
+#ips-{{ section.id }} .ips__accessory-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+#ips-{{ section.id }} .ips__accessory-content {
+  flex: 1;
+  min-width: 0;
+}
+
+#ips-{{ section.id }} .ips__accessory-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+#ips-{{ section.id }} .ips__accessory-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--hs-color, var(--ips-accent));
+}
+
+#ips-{{ section.id }} .ips__accessory-arrow {
+  color: #c8c0b6;
+  flex-shrink: 0;
+  transition: transform 0.28s var(--ips-spring), color 0.28s ease;
+}
+
+#ips-{{ section.id }} .ips__accessory-item:hover .ips__accessory-arrow,
+#ips-{{ section.id }} .ips__accessory-item.is-highlighted .ips__accessory-arrow {
+  transform: translateX(4px);
+  color: var(--hs-color, var(--ips-accent));
+}
+
+/* Shop all */
+#ips-{{ section.id }} .ips__shop-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  background: linear-gradient(
+    135deg,
+    var(--ips-accent) 0%,
+    color-mix(in srgb, var(--ips-accent) 85%, #000) 100%
+  );
+  color: #fff;
+  text-decoration: none;
+  border-radius: 16px;
+  transition:
+    transform 0.3s var(--ips-spring),
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
+  will-change: transform;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  overflow: hidden;
+  position: relative;
+}
+
+#ips-{{ section.id }} .ips__shop-all::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+}
+
+#ips-{{ section.id }} .ips__shop-all:hover::before {
+  transform: translateX(120%);
+}
+
+#ips-{{ section.id }} .ips__shop-all:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.22);
+  filter: brightness(1.05);
+}
+
+#ips-{{ section.id }} .ips__shop-all:focus-visible {
+  outline: 3px solid var(--ips-accent);
+  outline-offset: 3px;
+}
+
+#ips-{{ section.id }} .ips__shop-all-text {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+#ips-{{ section.id }} .ips__shop-all-icon {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s var(--ips-spring);
+}
+
+#ips-{{ section.id }} .ips__shop-all:hover .ips__shop-all-icon {
+  transform: translateX(5px);
+}
+
+/* ════════════════════════════════════════════════════
+   EMPTY STATE
+════════════════════════════════════════════════════ */
+#ips-{{ section.id }} .ips__empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #9e8f7f;
+}
+
+#ips-{{ section.id }} .ips__empty-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+#ips-{{ section.id }} .ips__empty h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #3a3530;
+  margin: 0 0 8px;
+}
+
+#ips-{{ section.id }} .ips__empty p {
+  font-size: 15px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE — TABLET
+════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  #ips-{{ section.id }} .ips__layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  #ips-{{ section.id }} .ips__pet-stage {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  #ips-{{ section.id }} .ips__pet-wrap {
+    width: min(80%, 440px);
+  }
+
+  #ips-{{ section.id }} .ips__fact-bubble {
+    display: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE
+════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  #ips-{{ section.id }} .ips__tabs {
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  #ips-{{ section.id }} .ips__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  #ips-{{ section.id }} .ips__tab {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  #ips-{{ section.id }} .ips__pet-wrap {
+    width: min(95%, 340px);
+    aspect-ratio: 3/4;
+  }
+
+  /* Smaller hotspot pins on mobile */
+  #ips-{{ section.id }} .ips__pin {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Tooltip positioning for mobile */
+  #ips-{{ section.id }} .ips__tooltip {
+    position: fixed;
+    bottom: 20px;
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    width: calc(100vw - 40px);
+    max-width: 340px;
+    transform: translateX(-50%) scale(0.9) translateY(20px) !important;
+  }
+
+  #ips-{{ section.id }} .ips__tooltip.is-open {
+    transform: translateX(-50%) scale(1) translateY(0) !important;
+  }
+
+  #ips-{{ section.id }} .ips__tooltip-arrow {
+    display: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   REDUCED MOTION
+════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  #ips-{{ section.id }} .ips__pet-img,
+  #ips-{{ section.id }} .ips__pet-placeholder,
+  #ips-{{ section.id }} .ips__pet-shadow,
+  #ips-{{ section.id }} .ips__pet-ring-inner,
+  #ips-{{ section.id }} .ips__pet-ring-pulse,
+  #ips-{{ section.id }} .ips__pin-pulse,
+  #ips-{{ section.id }} .ips__pin-pulse--2 {
+    animation: none !important;
+  }
+
+  #ips-{{ section.id }} .ips__panel {
+    transition: opacity 0.2s ease !important;
+  }
+
+  #ips-{{ section.id }} .ips__tooltip {
+    transition: opacity 0.2s ease, visibility 0.2s !important;
+    transform: translateY(-50%) !important;
+  }
+
+  #ips-{{ section.id }} .ips__tooltip.is-open {
+    transform: translateY(-50%) !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  var SID      = '{{ section.id }}';
+  var GSAP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  var ST_SRC   = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+
+  /* ── Load script ── */
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+      var s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     MAIN INIT
+  ════════════════════════════════════════════ */
+  function init() {
+    var section  = document.getElementById('ips-' + SID);
+    if (!section) return;
+
+    var gsap = window.gsap;
+    var ST   = window.ScrollTrigger;
+    var pref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isMob = window.matchMedia('(max-width: 767px)').matches;
+
+    if (ST && gsap) gsap.registerPlugin(ST);
+
+    /* ── DOM refs ── */
+    var tabs      = section.querySelectorAll('.ips__tab');
+    var panels    = section.querySelectorAll('.ips__panel');
+    var header    = section.querySelector('.ips__header');
+    var tabsWrap  = section.querySelector('.ips__tabs');
+    var ambBlobs  = section.querySelectorAll('.ips__ambient-blob');
+    var activeAcc = null; /* currently highlighted accessory item */
+
+    /* ════════════════════════════════════════
+       ACCENT COLOR PROPAGATION
+    ════════════════════════════════════════ */
+    function applyAccent(color) {
+      section.style.setProperty('--ips-accent', color);
+      ambBlobs.forEach(function (b) { b.style.background = color; });
+    }
+
+    /* ════════════════════════════════════════
+       TAB SWITCHING
+    ════════════════════════════════════════ */
+    function switchPet(targetTab) {
+      if (targetTab.classList.contains('is-active')) return;
+
+      /* Close any open tooltips */
+      section.querySelectorAll('.ips__tooltip.is-open').forEach(closeTooltip);
+
+      /* Update tab states */
+      tabs.forEach(function (t) {
+        t.classList.remove('is-active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      targetTab.classList.add('is-active');
+      targetTab.setAttribute('aria-selected', 'true');
+
+      /* Accent color update */
+      var accent = targetTab.dataset.accent;
+      if (accent) applyAccent(accent);
+
+      /* Panel switch */
+      var targetPanelId = targetTab.getAttribute('aria-controls');
+      var targetPanel   = document.getElementById(targetPanelId);
+
+      panels.forEach(function (panel) {
+        if (panel !== targetPanel) {
+          if (gsap && !pref) {
+            gsap.to(panel, {
+              opacity: 0,
+              y: -12,
+              duration: 0.3,
+              ease: 'power2.in',
+              onComplete: function () {
+                panel.classList.remove('is-active', 'is-visible');
+                panel.style.opacity = '';
+                panel.style.transform = '';
+              }
+            });
+          } else {
+            panel.classList.remove('is-active', 'is-visible');
+          }
+        }
+      });
+
+      if (targetPanel) {
+        if (gsap && !pref) {
+          gsap.set(targetPanel, { opacity: 0, y: 20 });
+          targetPanel.classList.add('is-active');
+
+          requestAnimationFrame(function () {
+            gsap.to(targetPanel, {
+              opacity: 1,
+              y: 0,
+              duration: 0.55,
+              ease: 'power3.out',
+              onStart: function () {
+                targetPanel.classList.add('is-visible');
+              }
+            });
+
+            /* Stagger hotspot pins in */
+            var pins = targetPanel.querySelectorAll('.ips__pin');
+            gsap.fromTo(pins,
+              { scale: 0, opacity: 0 },
+              {
+                scale: 1,
+                opacity: 1,
+                duration: 0.45,
+                stagger: 0.08,
+                ease: 'back.out(2)',
+                delay: 0.2
+              }
+            );
+
+            /* Accessory items in */
+            var accItems = targetPanel.querySelectorAll('.ips__accessory-item');
+            gsap.fromTo(accItems,
+              { x: -16, opacity: 0 },
+              {
+                x: 0,
+                opacity: 1,
+                duration: 0.4,
+                stagger: 0.06,
+                ease: 'power2.out',
+                delay: 0.25
+              }
+            );
+          });
+        } else {
+          targetPanel.classList.add('is-active', 'is-visible');
+        }
+      }
+    }
+
+    /* Tab click */
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { switchPet(tab); });
+    });
+
+    /* Init first panel */
+    var firstPanel = section.querySelector('.ips__panel.is-active');
+    if (firstPanel) {
+      requestAnimationFrame(function () {
+        firstPanel.classList.add('is-visible');
+        var firstTab = section.querySelector('.ips__tab.is-active');
+        if (firstTab && firstTab.dataset.accent) applyAccent(firstTab.dataset.accent);
+      });
+    }
+
+    /* ════════════════════════════════════════
+       TOOLTIP SYSTEM
+    ════════════════════════════════════════ */
+    var openTooltipEl = null;
+
+    function openTooltip(hotspotEl, pin) {
+      var tooltip = hotspotEl.querySelector('.ips__tooltip');
+      if (!tooltip) return;
+      if (tooltip === openTooltipEl) return;
+
+      /* Close existing */
+      if (openTooltipEl) closeTooltip(openTooltipEl);
+
+      /* Flip detection */
+      var rect = hotspotEl.getBoundingClientRect();
+      var viewW = window.innerWidth;
+      if (rect.left > viewW * 0.62) {
+        tooltip.classList.add('flip-left');
+      } else {
+        tooltip.classList.remove('flip-left');
+      }
+
+      /* Vertical flip — if near bottom */
+      var tooltipH = 340;
+      if (rect.top > window.innerHeight - tooltipH - 60) {
+        tooltip.style.top = 'auto';
+        tooltip.style.bottom = '-12px';
+        tooltip.style.transform = tooltip.classList.contains('flip-left')
+          ? 'translateY(0) scale(0.88) translateX(8px)'
+          : 'translateY(0) scale(0.88) translateX(-8px)';
+      } else {
+        tooltip.style.top   = '';
+        tooltip.style.bottom = '';
+        tooltip.style.transform = '';
+      }
+
+      tooltip.classList.add('is-open');
+      tooltip.removeAttribute('aria-hidden');
+      if (pin) pin.setAttribute('aria-expanded', 'true');
+
+      openTooltipEl = tooltip;
+
+      /* GSAP entrance */
+      if (gsap && !pref) {
+        var img = tooltip.querySelector('.ips__tooltip-img');
+        if (img) {
+          gsap.fromTo(img,
+            { scale: 1.1, opacity: 0 },
+            { scale: 1.04, opacity: 1, duration: 0.55, ease: 'power2.out', delay: 0.15 }
+          );
+        }
+      }
+
+      /* Highlight accessory item in list */
+      highlightAccessoryItem(hotspotEl.dataset.hotspotId);
+    }
+
+    function closeTooltip(tooltipOrHotspot) {
+      var tooltip = tooltipOrHotspot.classList.contains('ips__tooltip')
+        ? tooltipOrHotspot
+        : tooltipOrHotspot.querySelector('.ips__tooltip');
+
+      if (!tooltip || !tooltip.classList.contains('is-open')) return;
+
+      tooltip.classList.remove('is-open');
+      tooltip.setAttribute('aria-hidden', 'true');
+
+      var pin = tooltip.closest('.ips__hotspot')
+        && tooltip.closest('.ips__hotspot').querySelector('.ips__pin');
+      if (pin) pin.setAttribute('aria-expanded', 'false');
+
+      if (tooltip === openTooltipEl) openTooltipEl = null;
+
+      /* Un-highlight accessory item */
+      unhighlightAllAccessoryItems();
+    }
+
+    /* ════════════════════════════════════════
+       ACCESSORY HIGHLIGHT SYNC
+    ════════════════════════════════════════ */
+    function highlightAccessoryItem(hotspotId) {
+      unhighlightAllAccessoryItems();
+      var item = section.querySelector('.ips__accessory-item[data-hotspot-target="' + hotspotId + '"]');
+      if (!item) return;
+      item.classList.add('is-highlighted');
+      activeAcc = item;
+
+      /* Scroll into view inside list */
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function unhighlightAllAccessoryItems() {
+      section.querySelectorAll('.ips__accessory-item.is-highlighted').forEach(function (el) {
+        el.classList.remove('is-highlighted');
+      });
+      activeAcc = null;
+    }
+
+    /* ════════════════════════════════════════
+       HOTSPOT EVENTS
+    ════════════════════════════════════════ */
+    function initHotspots() {
+      var hotspots = section.querySelectorAll('.ips__hotspot');
+
+      hotspots.forEach(function (hotspot) {
+        var pin     = hotspot.querySelector('.ips__pin');
+        var tooltip = hotspot.querySelector('.ips__tooltip');
+        var closeBtn= hotspot.querySelector('.ips__tooltip-close');
+
+        if (!pin || !tooltip) return;
+
+        /* Desktop: hover */
+        if (!isMob) {
+          var hoverTimer;
+
+          hotspot.addEventListener('mouseenter', function () {
+            clearTimeout(hoverTimer);
+            openTooltip(hotspot, pin);
+
+            /* Wiggle pin with GSAP */
+            if (gsap && !pref) {
+              gsap.to(pin, {
+                rotation: 15,
+                duration: 0.15,
+                ease: 'power2.out',
+                yoyo: true,
+                repeat: 1,
+                onComplete: function () { gsap.set(pin, { rotation: 0 }); }
+              });
+            }
+          });
+
+          hotspot.addEventListener('mouseleave', function () {
+            hoverTimer = setTimeout(function () {
+              closeTooltip(hotspot);
+            }, 250);
+          });
+
+          tooltip.addEventListener('mouseenter', function () {
+            clearTimeout(hoverTimer);
+          });
+
+          tooltip.addEventListener('mouseleave', function () {
+            hoverTimer = setTimeout(function () {
+              closeTooltip(hotspot);
+            }, 250);
+          });
+        }
+
+        /* Always: click/tap toggle */
+        pin.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (tooltip.classList.contains('is-open')) {
+            closeTooltip(hotspot);
+          } else {
+            openTooltip(hotspot, pin);
+          }
+        });
+
+        /* Close button */
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            closeTooltip(hotspot);
+          });
+        }
+
+        /* Keyboard */
+        pin.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (tooltip.classList.contains('is-open')) {
+              closeTooltip(hotspot);
+            } else {
+              openTooltip(hotspot, pin);
+            }
+          }
+          if (e.key === 'Escape') {
+            closeTooltip(hotspot);
+            pin.focus();
+          }
+        });
+      });
+    }
+
+    initHotspots();
+
+    /* Close on outside click */
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.ips__hotspot') && !e.target.closest('.ips__accessory-item')) {
+        if (openTooltipEl) {
+          var hs = openTooltipEl.closest('.ips__hotspot');
+          if (hs) closeTooltip(hs);
+        }
+        unhighlightAllAccessoryItems();
+      }
+    });
+
+    /* Escape key global */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && openTooltipEl) {
+        var hs = openTooltipEl.closest('.ips__hotspot');
+        if (hs) {
+          closeTooltip(hs);
+          var pin = hs.querySelector('.ips__pin');
+          if (pin) pin.focus();
+        }
+      }
+    });
+
+    /* ════════════════════════════════════════
+       ACCESSORY ITEM → HOTSPOT TRIGGER
+    ════════════════════════════════════════ */
+    section.querySelectorAll('.ips__accessory-item').forEach(function (item) {
+      function triggerFromItem() {
+        var hotspotId = item.dataset.hotspotTarget;
+        var hotspot   = section.querySelector('.ips__hotspot[data-hotspot-id="' + hotspotId + '"]');
+
+        if (!hotspot) return;
+
+        var pin = hotspot.querySelector('.ips__pin');
+
+        /* GSAP: bounce the pin */
+        if (gsap && !pref) {
+          gsap.fromTo(pin,
+            { scale: 1 },
+            {
+              scale: 1.5,
+              duration: 0.2,
+              ease: 'power2.out',
+              yoyo: true,
+              repeat: 1,
+              onComplete: function () { gsap.set(pin, { scale: 1 }); }
+            }
+          );
+        }
+
+        openTooltip(hotspot, pin);
+
+        /* Scroll pin into view on mobile */
+        if (isMob) {
+          hotspot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      item.addEventListener('click', triggerFromItem);
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          triggerFromItem();
+        }
+      });
+
+      /* Desktop: hover highlight */
+      if (!isMob) {
+        item.addEventListener('mouseenter', function () {
+          var hotspotId = item.dataset.hotspotTarget;
+          var hotspot   = section.querySelector('.ips__hotspot[data-hotspot-id="' + hotspotId + '"]');
+          if (!hotspot) return;
+          var pin = hotspot.querySelector('.ips__pin');
+
+          if (gsap && !pref) {
+            gsap.to(pin, { scale: 1.25, duration: 0.3, ease: 'back.out(2)' });
+          }
+
+          highlightAccessoryItem(hotspotId);
+        });
+
+        item.addEventListener('mouseleave', function () {
+          var hotspotId = item.dataset.hotspotTarget;
+          var hotspot   = section.querySelector('.ips__hotspot[data-hotspot-id="' + hotspotId + '"]');
+          if (!hotspot) return;
+          var pin = hotspot.querySelector('.ips__pin');
+
+          if (gsap && !pref && !openTooltipEl) {
+            gsap.to(pin, { scale: 1, duration: 0.3, ease: 'power2.out' });
+            unhighlightAllAccessoryItems();
+          }
+        });
+      }
+    });
+
+    /* ════════════════════════════════════════
+       SCROLL ENTRANCE ANIMATION
+    ════════════════════════════════════════ */
+    if (gsap && ST && !pref) {
+
+      /* Header */
+      if (header) {
+        var hEls = header.querySelectorAll('.ips__eyebrow, .ips__title, .ips__subtitle');
+        gsap.fromTo(hEls,
+          { y: 24, opacity: 0 },
+          {
+            y: 0, opacity: 1,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: header,
+              start: 'top 88%',
+              once: true
+            }
+          }
+        );
+      }
+
+      /* Tabs */
+      if (tabsWrap) {
+        var tabEls = tabsWrap.querySelectorAll('.ips__tab');
+        gsap.fromTo(tabEls,
+          { y: 18, opacity: 0 },
+          {
+            y: 0, opacity: 1,
+            duration: 0.55,
+            stagger: 0.07,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: tabsWrap,
+              start: 'top 88%',
+              once: true
+            }
+          }
+        );
+      }
+
+      /* Active panel entrance */
+      var activePanel = section.querySelector('.ips__panel.is-active');
+      if (activePanel) {
+        gsap.fromTo(activePanel,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1, y: 0,
+            duration: 0.75,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: activePanel,
+              start: 'top 85%',
+              once: true,
+              onEnter: function () { activePanel.classList.add('is-visible'); }
+            }
+          }
+        );
+
+        /* Hotspot pins stagger */
+        var initPins = activePanel.querySelectorAll('.ips__pin');
+        gsap.fromTo(initPins,
+          { scale: 0, opacity: 0 },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: 'back.out(2.5)',
+            scrollTrigger: {
+              trigger: activePanel,
+              start: 'top 80%',
+              once: true
+            }
+          }
+        );
+
+        /* Pet image */
+        var petImg = activePanel.querySelector('.ips__pet-img, .ips__pet-placeholder');
+        if (petImg) {
+          gsap.fromTo(petImg,
+            { scale: 0.9, opacity: 0 },
+            {
+              scale: 1, opacity: 1,
+              duration: 0.85,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: activePanel,
+                start: 'top 82%',
+                once: true
+              }
+            }
+          );
+        }
+
+        /* Info panel items */
+        var infoEls = activePanel.querySelectorAll(
+          '.ips__pet-badge, .ips__pet-name, .ips__pet-desc, .ips__accessory-list, .ips__shop-all'
+        );
+        gsap.fromTo(infoEls,
+          { x: 24, opacity: 0 },
+          {
+            x: 0, opacity: 1,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: activePanel,
+              start: 'top 82%',
+              once: true
+            }
+          }
+        );
+      }
+    }
+
+  } /* end init */
+
+  /* ── Bootstrap ── */
+  loadScript(GSAP_SRC)
+    .then(function () { return loadScript(ST_SRC); })
+    .then(function () {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+          requestAnimationFrame(function () { requestAnimationFrame(init); });
+        });
+      } else {
+        requestAnimationFrame(function () { requestAnimationFrame(init); });
+      }
+    })
+    .catch(function () {
+      /* No GSAP: still init without animations */
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🐾 Pet Showcase",
+  "tag": "section",
+  "class": "section-pet-showcase",
+  "max_blocks": 25,
+  "settings": [
+    {
+      "type": "header",
+      "content": "✍️ Section Text"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Title",
+      "default": "Meet Our Happy Pets"
+    },
+    {
+      "type": "textarea",
+      "id": "section_subtitle",
+      "label": "Subtitle",
+      "default": "Hover over the pins to explore accessories made for your best friend"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#F8F5F0"
+    },
+    {
+      "type": "select",
+      "id": "default_pet",
+      "label": "Default Active Pet",
+      "info": "First pet in list is always default. This setting is reserved for future use.",
+      "options": [
+        { "value": "first", "label": "First pet in list" }
+      ],
+      "default": "first"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pet",
+      "name": "🐾 Pet",
+      "settings": [
+        {
+          "type": "header",
+          "content": "🐶 Pet Details"
+        },
+        {
+          "type": "select",
+          "id": "pet_type",
+          "label": "Pet Type",
+          "options": [
+            { "value": "dog",    "label": "Dog 🐶" },
+            { "value": "cat",    "label": "Cat 🐱" },
+            { "value": "bird",   "label": "Bird 🦜" },
+            { "value": "fish",   "label": "Fish 🐠" },
+            { "value": "rabbit", "label": "Rabbit 🐰" },
+            { "value": "other",  "label": "Other 🐾" }
+          ],
+          "default": "dog"
+        },
+        {
+          "type": "text",
+          "id": "pet_name",
+          "label": "Pet Name",
+          "default": "Max the Dog"
+        },
+        {
+          "type": "textarea",
+          "id": "pet_description",
+          "label": "Pet Description",
+          "default": "Playful, loyal, and full of energy. Max loves every accessory we carry."
+        },
+        {
+          "type": "text",
+          "id": "fun_fact",
+          "label": "Fun Fact Bubble",
+          "default": "Dogs have a sense of smell 40x stronger than humans!",
+          "info": "Short fun fact shown as a floating bubble. Leave blank to hide."
+        },
+        {
+          "type": "image_picker",
+          "id": "pet_image",
+          "label": "Pet Image",
+          "info": "Use a PNG with transparent background for best results. Min 800×900px."
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Accent Color",
+          "default": "#FF7A35",
+          "info": "Used for glow, tab indicator, and CTA button."
+        },
+        {
+          "type": "url",
+          "id": "shop_all_link",
+          "label": "Shop All Link",
+          "info": "Link to this pet's collection page."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "name": "📍 Accessory Pin",
+      "settings": [
+        {
+          "type": "header",
+          "content": "🔗 Link to Pet"
+        },
+        {
+          "type": "text",
+          "id": "parent_pet",
+          "label": "Parent Pet Block ID",
+          "info": "⚠️ Copy the block ID of the pet this pin belongs to. Find it in the URL when clicking the pet block in the editor.",
+        },
+        {
+          "type": "header",
+          "content": "📍 Pin Position"
+        },
+        {
+          "type": "range",
+          "id": "position_x",
+          "label": "Horizontal Position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "default": 30,
+          "info": "% from left of the pet image container."
+        },
+        {
+          "type": "range",
+          "id": "position_y",
+          "label": "Vertical Position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "default": 25,
+          "info": "% from top of the pet image container."
+        },
+        {
+          "type": "header",
+          "content": "🏷️ Content"
+        },
+        {
+          "type": "text",
+          "id": "hotspot_label",
+          "label": "Label",
+          "default": "Collar"
+        },
+        {
+          "type": "textarea",
+          "id": "hotspot_description",
+          "label": "Description",
+          "default": "Comfortable, stylish and durable. Perfect for everyday wear.",
+          "info": "Short description shown in the tooltip card."
+        },
+        {
+          "type": "select",
+          "id": "hotspot_icon",
+          "label": "Icon",
+          "options": [
+            { "value": "collar",   "label": "Collar / Accessory" },
+            { "value": "toy",      "label": "Toy" },
+            { "value": "food",     "label": "Food / Treat" },
+            { "value": "bed",      "label": "Bed / Rest" },
+            { "value": "medicine", "label": "Health / Medicine" },
+            { "value": "default",  "label": "General (info)" }
+          ],
+          "default": "collar"
+        },
+        {
+          "type": "color",
+          "id": "hotspot_color",
+          "label": "Pin & Accent Color",
+          "default": "#FFA45B"
+        },
+        {
+          "type": "header",
+          "content": "🛍️ Product"
+        },
+        {
+          "type": "product",
+          "id": "hotspot_product",
+          "label": "Link to Product",
+          "info": "If selected, product title, image and price will be used automatically."
+        },
+        {
+          "type": "image_picker",
+          "id": "hotspot_product_image",
+          "label": "Custom Tooltip Image",
+          "info": "Override the product image. Leave blank to use product image."
+        },
+        {
+          "type": "text",
+          "id": "hotspot_price",
+          "label": "Manual Price",
+          "default": "$24.99",
+          "info": "Shown only if no product is linked."
+        },
+        {
+          "type": "url",
+          "id": "hotspot_link",
+          "label": "Manual Link",
+          "info": "Used only if no product is linked."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "🐾 Pet Showcase",
+      "category": "Interactive",
+      "blocks": [
+        {
+          "type": "pet",
+          "settings": {
+            "pet_type": "dog",
+            "pet_name": "Max the Dog",
+            "pet_description": "Playful, loyal, and full of energy. Max loves every accessory we carry.",
+            "fun_fact": "Dogs can smell 40× better than humans!",
+            "accent_color": "#FF7A35"
+          }
+        },
+        {
+          "type": "pet",
+          "settings": {
+            "pet_type": "cat",
+            "pet_name": "Luna the Cat",
+            "pet_description": "Graceful, curious, and always in style. Luna handpicks only the finest.",
+            "fun_fact": "Cats sleep 12–16 hours every single day.",
+            "accent_color": "#B08CFF"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

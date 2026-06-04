@@ -1,0 +1,1119 @@
+
+{%- liquid
+  assign desktop_image        = section.settings.desktop_image
+  assign mobile_image         = section.settings.mobile_image
+  assign heading              = section.settings.heading
+  assign subheading           = section.settings.subheading
+  assign button_text          = section.settings.button_text
+  assign button_link          = section.settings.button_link
+  assign overlay_color        = section.settings.overlay_color
+  assign overlay_opacity      = section.settings.overlay_opacity
+  assign desktop_heading_size = section.settings.desktop_heading_size
+  assign mobile_heading_size  = section.settings.mobile_heading_size
+  assign desktop_sub_size     = section.settings.desktop_sub_size
+  assign mobile_sub_size      = section.settings.mobile_sub_size
+  assign content_align        = section.settings.content_alignment
+  assign show_scroll          = section.settings.show_scroll_indicator
+  assign show_decorative      = section.settings.show_decorative_elements
+  assign text_color           = section.settings.text_color
+  assign image_position       = section.settings.image_position
+-%}
+
+<section
+  class="hero-pet"
+  id="hero-pet-{{ section.id }}"
+  aria-label="{{ heading | escape }}"
+  data-section-id="{{ section.id }}"
+>
+
+  {%- comment %} ══ Background Layer ══ {% endcomment %}
+  <div class="hero-pet__bg" aria-hidden="true">
+
+    {%- comment %} Desktop image ── {% endcomment %}
+    {%- if desktop_image != blank -%}
+      {{- desktop_image
+          | image_url: width: 2000
+          | image_tag:
+              class: 'hero-pet__bg-img hero-pet__bg-img--desktop',
+              loading: 'eager',
+              fetchpriority: 'high',
+              decoding: 'async',
+              alt: '',
+              style: 'object-position: ' | append: image_position
+      -}}
+
+      {%- comment %} Blurred LQIP placeholder ── {% endcomment %}
+      {{- desktop_image
+          | image_url: width: 80
+          | image_tag:
+              class: 'hero-pet__bg-img hero-pet__bg-img--desktop hero-pet__bg-img--lqip',
+              loading: 'eager',
+              decoding: 'async',
+              alt: '',
+              style: 'object-position: ' | append: image_position
+      -}}
+    {%- else -%}
+      <div class="hero-pet__bg-fallback"></div>
+    {%- endif -%}
+
+    {%- comment %} Mobile image ── {% endcomment %}
+    {%- if mobile_image != blank -%}
+      {{- mobile_image
+          | image_url: width: 1000
+          | image_tag:
+              class: 'hero-pet__bg-img hero-pet__bg-img--mobile',
+              loading: 'eager',
+              fetchpriority: 'high',
+              decoding: 'async',
+              alt: '',
+              style: 'object-position: center center'
+      -}}
+    {%- elsif desktop_image != blank -%}
+      {{- desktop_image
+          | image_url: width: 1000
+          | image_tag:
+              class: 'hero-pet__bg-img hero-pet__bg-img--mobile',
+              loading: 'eager',
+              fetchpriority: 'high',
+              decoding: 'async',
+              alt: '',
+              style: 'object-position: center center'
+      -}}
+    {%- endif -%}
+
+    {%- comment %} ── Overlay ── {% endcomment %}
+    <div
+      class="hero-pet__overlay"
+      style="background-color: {{ overlay_color }}; opacity: {{ overlay_opacity | divided_by: 100.0 }};"
+      aria-hidden="true"
+    ></div>
+
+    {%- comment %} ── Gradient for text readability ── {% endcomment %}
+    <div class="hero-pet__gradient" aria-hidden="true"></div>
+
+  </div>
+
+  {%- comment %} ══ Decorative Elements ══ {% endcomment %}
+  {%- if show_decorative -%}
+    <div class="hero-pet__decoratives" aria-hidden="true">
+      <div class="hero-pet__blob hero-pet__blob--1"></div>
+      <div class="hero-pet__blob hero-pet__blob--2"></div>
+      <div class="hero-pet__blob hero-pet__blob--3"></div>
+
+      <svg class="hero-pet__paw hero-pet__paw--1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <ellipse cx="30" cy="20" rx="12" ry="14" fill="currentColor"/>
+        <ellipse cx="55" cy="15" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="75" cy="25" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="85" cy="48" rx="9" ry="11" fill="currentColor"/>
+        <path d="M15 55 Q50 35 85 55 Q90 80 50 90 Q10 80 15 55Z" fill="currentColor"/>
+      </svg>
+
+      <svg class="hero-pet__paw hero-pet__paw--2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <ellipse cx="30" cy="20" rx="12" ry="14" fill="currentColor"/>
+        <ellipse cx="55" cy="15" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="75" cy="25" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="85" cy="48" rx="9" ry="11" fill="currentColor"/>
+        <path d="M15 55 Q50 35 85 55 Q90 80 50 90 Q10 80 15 55Z" fill="currentColor"/>
+      </svg>
+
+      <svg class="hero-pet__paw hero-pet__paw--3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <ellipse cx="30" cy="20" rx="12" ry="14" fill="currentColor"/>
+        <ellipse cx="55" cy="15" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="75" cy="25" rx="10" ry="12" fill="currentColor"/>
+        <ellipse cx="85" cy="48" rx="9" ry="11" fill="currentColor"/>
+        <path d="M15 55 Q50 35 85 55 Q90 80 50 90 Q10 80 15 55Z" fill="currentColor"/>
+      </svg>
+
+      <div class="hero-pet__circle hero-pet__circle--1"></div>
+      <div class="hero-pet__circle hero-pet__circle--2"></div>
+      <div class="hero-pet__circle hero-pet__circle--3"></div>
+    </div>
+  {%- endif -%}
+
+  {%- comment %} ══ Main Content ══ {% endcomment %}
+  <div class="hero-pet__container hero-pet__container--{{ content_align }}">
+    <div class="hero-pet__content">
+
+      {%- if heading != blank -%}
+        <h1
+          class="hero-pet__heading hero-pet__heading--{{ content_align }}"
+          style="color: {{ text_color }};"
+        >
+          {%- assign words = heading | split: ' ' -%}
+          {%- for word in words -%}
+            <span class="hero-pet__word" aria-hidden="true">
+              <span class="hero-pet__word-inner">{{ word }}</span>
+            </span>
+            {%- unless forloop.last -%}
+              <span class="hero-pet__word-space" aria-hidden="true">&nbsp;</span>
+            {%- endunless -%}
+          {%- endfor -%}
+          <span class="sr-only">{{ heading }}</span>
+        </h1>
+      {%- endif -%}
+
+      {%- if subheading != blank -%}
+        <p class="hero-pet__subheading" style="color: {{ text_color }};">
+          {{ subheading }}
+        </p>
+      {%- endif -%}
+
+      {%- if button_text != blank -%}
+        <div class="hero-pet__cta-wrap">
+          <a
+            href="{{ button_link | default: '#' }}"
+            class="hero-pet__cta"
+            aria-label="{{ button_text | escape }}"
+          >
+            <span class="hero-pet__cta-text">{{ button_text }}</span>
+            <span class="hero-pet__cta-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </a>
+
+          {%- if section.settings.show_secondary_badge -%}
+            <div class="hero-pet__badge" aria-label="{{ section.settings.badge_text | escape }}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span>{{ section.settings.badge_text }}</span>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {%- comment %} ── Scroll Indicator ── {% endcomment %}
+  {%- if show_scroll -%}
+    <div class="hero-pet__scroll" aria-hidden="true">
+      <div class="hero-pet__scroll-mouse">
+        <div class="hero-pet__scroll-wheel"></div>
+      </div>
+      <span class="hero-pet__scroll-label">Scroll</span>
+    </div>
+  {%- endif -%}
+
+</section>
+
+{%- comment %} ── Resource hints for LCP ── {% endcomment %}
+{%- if desktop_image != blank -%}
+  <link rel="preload" as="image" href="{{ desktop_image | image_url: width: 2000 }}" media="(min-width: 768px)">
+{%- endif -%}
+{%- if mobile_image != blank -%}
+  <link rel="preload" as="image" href="{{ mobile_image | image_url: width: 1000 }}" media="(max-width: 767px)">
+{%- endif -%}
+
+<style>
+  /* ══ Reset ══ */
+  #hero-pet-{{ section.id }},
+  #hero-pet-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  /* ══ Screen-reader only ══ */
+  #hero-pet-{{ section.id }} .sr-only {
+    position: absolute !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important; border: 0 !important;
+  }
+
+  /* ══ CSS Variables ══ */
+  #hero-pet-{{ section.id }} {
+    --heading-size-desktop: {{ desktop_heading_size }}px;
+    --heading-size-mobile:  {{ mobile_heading_size }}px;
+    --sub-size-desktop:     {{ desktop_sub_size }}px;
+    --sub-size-mobile:      {{ mobile_sub_size }}px;
+  }
+
+  /* ════════════════════════════════════════
+     HERO BASE
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 500px;
+    max-height: 1080px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    isolation: isolate;
+    background: #1a1a1a; /* prevents white flash before images load */
+  }
+
+  /* ════════════════════════════════════════
+     BACKGROUND WRAPPER
+     — NEVER move this element with parallax.
+       It has overflow:hidden; moving it reveals
+       the page background (white gap bug).
+       Parallax is applied to the INNER images.
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} .hero-pet__bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;   /* clips the oversized inner images */
+    z-index: 0;
+  }
+
+  /* ════════════════════════════════════════
+     BACKGROUND IMAGES
+     — Use <img> with object-fit so the browser
+       can decode/decode them independently.
+     — Extended top/height buffer so parallax
+       travel (max ~10% of section height) never
+       exposes the clip boundary.
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} .hero-pet__bg-img {
+    position: absolute;
+    /* 15% buffer on all sides for parallax travel */
+    top: 0;
+    left: 0;
+    width: 110%;
+    height: 130%;  /* 15% top + 100% + 15% bottom */
+    object-fit: cover;
+    object-position: {{ image_position }};
+    display: block;
+    transform-origin: center center;
+    /* will-change added by JS only during animation */
+  }
+
+  /* Desktop shown by default */
+  #hero-pet-{{ section.id }} .hero-pet__bg-img--desktop { z-index: 2; }
+
+  /* LQIP sits under the real image; JS fades it out after load */
+  #hero-pet-{{ section.id }} .hero-pet__bg-img--lqip {
+    z-index: 1;
+    filter: blur(12px);
+    transform: scale(1.06) translateZ(0); /* counteract blur edge leak */
+    transition: opacity 0.5s ease;
+  }
+
+  /* Mobile hidden by default */
+  #hero-pet-{{ section.id }} .hero-pet__bg-img--mobile {
+    display: none;
+    z-index: 2;
+    object-position: center center;
+  }
+
+  /* Fallback gradient when no image */
+  #hero-pet-{{ section.id }} .hero-pet__bg-fallback {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  }
+
+  /* ── Overlay ── */
+  #hero-pet-{{ section.id }} .hero-pet__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ── Gradient for text contrast ── */
+  #hero-pet-{{ section.id }} .hero-pet__gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      rgba(0,0,0,0.40) 0%,
+      rgba(0,0,0,0.18) 50%,
+      rgba(0,0,0,0.02) 100%
+    );
+  }
+
+  /* ════════════════════════════════════════
+     DECORATIVES
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} .hero-pet__decoratives {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* Blobs */
+  #hero-pet-{{ section.id }} .hero-pet__blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0;  /* JS animates these in */
+    mix-blend-mode: screen;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__blob--1 {
+    width: clamp(200px, 30vw, 450px); height: clamp(200px, 30vw, 450px);
+    background: radial-gradient(circle, #ffb347, #ffcc02);
+    top: -10%; left: -8%;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__blob--2 {
+    width: clamp(160px, 22vw, 380px); height: clamp(160px, 22vw, 380px);
+    background: radial-gradient(circle, #4fc3f7, #81d4fa);
+    bottom: -8%; right: -5%;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__blob--3 {
+    width: clamp(100px, 14vw, 260px); height: clamp(100px, 14vw, 260px);
+    background: radial-gradient(circle, #ce93d8, #f48fb1);
+    top: 40%; right: 15%;
+  }
+
+  /* Paw prints */
+  #hero-pet-{{ section.id }} .hero-pet__paw {
+    position: absolute; opacity: 0;  /* JS animates */
+  }
+  #hero-pet-{{ section.id }} .hero-pet__paw--1 {
+    width: clamp(55px,7vw,120px); height: clamp(55px,7vw,120px);
+    top: 10%; right: 10%; color: #ff7043; transform: rotate(25deg);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__paw--2 {
+    width: clamp(35px,4.5vw,85px); height: clamp(35px,4.5vw,85px);
+    bottom: 20%; right: 25%; color: #fdd835; transform: rotate(-15deg);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__paw--3 {
+    width: clamp(45px,5.5vw,100px); height: clamp(45px,5.5vw,100px);
+    top: 55%; left: 5%; color: #29b6f6; transform: rotate(10deg);
+  }
+
+  /* Circles */
+  #hero-pet-{{ section.id }} .hero-pet__circle {
+    position: absolute; border-radius: 9999px;
+    border: 2px solid rgba(255,255,255,0.14);
+    opacity: 0;  /* JS animates */
+  }
+  #hero-pet-{{ section.id }} .hero-pet__circle--1 { width:80px; height:80px; top:15%; left:15%; }
+  #hero-pet-{{ section.id }} .hero-pet__circle--2 { width:50px; height:50px; bottom:22%; left:8%; }
+  #hero-pet-{{ section.id }} .hero-pet__circle--3 {
+    width:120px; height:120px; top:8%; right:28%;
+    border-color: rgba(255,220,50,0.16);
+  }
+
+  /* ════════════════════════════════════════
+     CONTENT
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} .hero-pet__container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 80px);
+    display: flex;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__container--left   { justify-content: flex-start; }
+  #hero-pet-{{ section.id }} .hero-pet__container--center { justify-content: center; text-align: center; }
+  #hero-pet-{{ section.id }} .hero-pet__container--right  { justify-content: flex-end; text-align: right; }
+
+  #hero-pet-{{ section.id }} .hero-pet__content {
+    max-width: 660px;
+    display: flex; flex-direction: column;
+    gap: clamp(14px, 2.2vw, 26px);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__container--center .hero-pet__content { align-items: center; }
+  #hero-pet-{{ section.id }} .hero-pet__container--right  .hero-pet__content { align-items: flex-end; }
+
+  /* ── Heading ── */
+  #hero-pet-{{ section.id }} .hero-pet__heading {
+    font-size: var(--heading-size-desktop);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.22), 0 1px 4px rgba(0,0,0,0.14);
+  }
+  /* Heading alignment matches container ─ FIX for hardcoded center */
+  #hero-pet-{{ section.id }} .hero-pet__heading--left   { justify-content: flex-start; }
+  #hero-pet-{{ section.id }} .hero-pet__heading--center { justify-content: center; }
+  #hero-pet-{{ section.id }} .hero-pet__heading--right  { justify-content: flex-end; }
+
+  #hero-pet-{{ section.id }} .hero-pet__word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__word-inner {
+    display: inline-block;
+    /* Start hidden; JS reveals with animation */
+    opacity: 0;
+    transform: translateY(105%);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__word-space {
+    display: inline-block; width: 0.28em;
+  }
+
+  /* ── Subheading ── */
+  #hero-pet-{{ section.id }} .hero-pet__subheading {
+    font-size: var(--sub-size-desktop);
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 500px;
+    opacity: 0;      /* JS reveals */
+    transform: translateY(18px);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.20);
+  }
+
+  /* ── CTA Wrap ── */
+  #hero-pet-{{ section.id }} .hero-pet__cta-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: clamp(4px, 1vw, 10px);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__container--center .hero-pet__cta-wrap { justify-content: center; }
+  #hero-pet-{{ section.id }} .hero-pet__container--right  .hero-pet__cta-wrap { justify-content: flex-end; }
+
+  /* ── CTA Button ── */
+  #hero-pet-{{ section.id }} .hero-pet__cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: clamp(13px,1.8vw,17px) clamp(26px,3vw,42px);
+    background: linear-gradient(135deg, #ff7043 0%, #ff9800 55%, #ffc107 100%);
+    color: #fff;
+    text-decoration: none;
+    font-size: clamp(14px,1.5vw,17px);
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow:
+      0 8px 30px rgba(255,112,67,0.42),
+      0 2px 8px rgba(0,0,0,0.14),
+      inset 0 1px 0 rgba(255,255,255,0.22);
+    transition:
+      transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+      box-shadow 0.28s ease;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    white-space: nowrap;
+    /* Initial hidden state; JS reveals */
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #ff9800 0%, #ffc107 55%, #ff7043 100%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    border-radius: inherit;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__cta:hover::before,
+  #hero-pet-{{ section.id }} .hero-pet__cta:focus-visible::before { opacity: 1; }
+  #hero-pet-{{ section.id }} .hero-pet__cta:hover,
+  #hero-pet-{{ section.id }} .hero-pet__cta:focus-visible {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow:
+      0 16px 44px rgba(255,112,67,0.50),
+      0 4px 14px rgba(0,0,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.28);
+    outline: 3px solid rgba(255,200,50,0.65);
+    outline-offset: 3px;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__cta:active { transform: scale(0.97); }
+
+  #hero-pet-{{ section.id }} .hero-pet__cta-text,
+  #hero-pet-{{ section.id }} .hero-pet__cta-icon { position: relative; z-index: 1; }
+
+  #hero-pet-{{ section.id }} .hero-pet__cta-icon {
+    display: flex; align-items: center;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #hero-pet-{{ section.id }} .hero-pet__cta:hover .hero-pet__cta-icon { transform: translateX(4px); }
+
+  /* ── Badge ── */
+  #hero-pet-{{ section.id }} .hero-pet__badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 999px;
+    padding: 8px 15px;
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    opacity: 0; transform: translateX(-14px); /* JS reveals */
+  }
+  #hero-pet-{{ section.id }} .hero-pet__badge svg { color: #ffd740; flex-shrink: 0; }
+
+  /* ════════════════════════════════════════
+     SCROLL INDICATOR
+  ════════════════════════════════════════ */
+  #hero-pet-{{ section.id }} .hero-pet__scroll {
+    position: absolute;
+    bottom: clamp(18px,3vw,36px);
+    left: 50%; transform: translateX(-50%);
+    z-index: 10;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    opacity: 0;  /* JS reveals after other elements */
+  }
+  #hero-pet-{{ section.id }} .hero-pet__scroll-mouse {
+    width: 24px; height: 38px;
+    border: 2.5px solid rgba(255,255,255,0.65);
+    border-radius: 999px;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding-top: 6px;
+  }
+  #hero-pet-{{ section.id }} .hero-pet__scroll-wheel {
+    width: 3.5px; height: 7px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 999px;
+    animation: scrollWheel-{{ section.id }} 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollWheel-{{ section.id }} {
+    0%   { transform: translateY(0);    opacity: 1; }
+    75%  { transform: translateY(11px); opacity: 0; }
+    100% { transform: translateY(0);    opacity: 0; }
+  }
+  #hero-pet-{{ section.id }} .hero-pet__scroll-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  /* ════════════════════════════════════════
+     MOBILE  (≤ 767px)
+  ════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    #hero-pet-{{ section.id }} .hero-pet__bg-img--desktop { display: none; }
+    #hero-pet-{{ section.id }} .hero-pet__bg-img--lqip    { display: none; }
+    #hero-pet-{{ section.id }} .hero-pet__bg-img--mobile  { display: block; }
+
+    #hero-pet-{{ section.id }} .hero-pet__heading {
+      font-size: var(--heading-size-mobile);
+      justify-content: center !important;
+    }
+    #hero-pet-{{ section.id }} .hero-pet__subheading {
+      font-size: var(--sub-size-mobile);
+      text-align: center;
+    }
+    #hero-pet-{{ section.id }} .hero-pet__container {
+      justify-content: center !important;
+      text-align: center !important;
+      padding: clamp(16px,5vw,32px);
+    }
+    #hero-pet-{{ section.id }} .hero-pet__content { align-items: center !important; }
+    #hero-pet-{{ section.id }} .hero-pet__cta-wrap {
+      justify-content: center !important;
+      flex-direction: column; align-items: center; gap: 12px;
+    }
+    #hero-pet-{{ section.id }} .hero-pet__blob--3 { display: none; }
+    #hero-pet-{{ section.id }} .hero-pet__gradient {
+      background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.52) 100%);
+    }
+  }
+
+  /* ── Tablet ── */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #hero-pet-{{ section.id }} .hero-pet__content { max-width: 560px; }
+  }
+
+  /* ════════════════════════════════════════
+     REDUCED MOTION
+  ════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    #hero-pet-{{ section.id }} .hero-pet__scroll-wheel { animation: none; }
+    #hero-pet-{{ section.id }} .hero-pet__cta { transition: box-shadow 0.2s ease; }
+
+    /* Show everything immediately — no entrance animations */
+    #hero-pet-{{ section.id }} .hero-pet__word-inner,
+    #hero-pet-{{ section.id }} .hero-pet__subheading,
+    #hero-pet-{{ section.id }} .hero-pet__cta,
+    #hero-pet-{{ section.id }} .hero-pet__badge,
+    #hero-pet-{{ section.id }} .hero-pet__scroll,
+    #hero-pet-{{ section.id }} .hero-pet__blob,
+    #hero-pet-{{ section.id }} .hero-pet__paw,
+    #hero-pet-{{ section.id }} .hero-pet__circle {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  var SID      = '{{ section.id }}';
+  var GSAP_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  var ST_CDN   = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+
+  /* ────────────────────────────────────────
+     Utilities
+  ──────────────────────────────────────── */
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+      var s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  /* Make all content instantly visible (fallback / reduced-motion) */
+  function showAll(hero) {
+    if (!hero) return;
+    hero.querySelectorAll(
+      '.hero-pet__word-inner, .hero-pet__subheading, ' +
+      '.hero-pet__cta, .hero-pet__badge, .hero-pet__scroll, ' +
+      '.hero-pet__blob, .hero-pet__paw, .hero-pet__circle'
+    ).forEach(function (el) {
+      el.style.cssText += 'opacity:1!important;transform:none!important;';
+    });
+  }
+
+  /* ────────────────────────────────────────
+     LQIP fade-out
+     Fades the blurred placeholder once the
+     full-res desktop image has decoded.
+  ──────────────────────────────────────── */
+  function initLqip(hero) {
+    var lqip    = hero.querySelector('.hero-pet__bg-img--lqip');
+    var realImg = hero.querySelector('.hero-pet__bg-img--desktop:not(.hero-pet__bg-img--lqip)');
+    if (!lqip || !realImg) return;
+
+    function hideLqip() { lqip.style.opacity = '0'; }
+
+    if (realImg.complete && realImg.naturalWidth) {
+      hideLqip();
+    } else {
+      realImg.addEventListener('load', hideLqip, { once: true });
+    }
+  }
+
+  /* ────────────────────────────────────────
+     Main animation init
+  ──────────────────────────────────────── */
+  function init() {
+    var hero = document.getElementById('hero-pet-' + SID);
+    if (!hero || !window.gsap) { showAll(hero); return; }
+
+    var gsap = window.gsap;
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) { showAll(hero); return; }
+
+    /* Register ScrollTrigger if available */
+    if (window.ScrollTrigger) gsap.registerPlugin(window.ScrollTrigger);
+
+    /* ── Collect targets ── */
+    var isMobile   = window.matchMedia('(max-width: 767px)').matches;
+    /* PARALLAX TARGET: the actual image(s), NOT the bg wrapper */
+    var bgImg      = isMobile
+                       ? hero.querySelector('.hero-pet__bg-img--mobile')
+                       : hero.querySelector('.hero-pet__bg-img--desktop:not(.hero-pet__bg-img--lqip)');
+    var words      = hero.querySelectorAll('.hero-pet__word-inner');
+    var subheading = hero.querySelector('.hero-pet__subheading');
+    var cta        = hero.querySelector('.hero-pet__cta');
+    var badge      = hero.querySelector('.hero-pet__badge');
+    var blobs      = hero.querySelectorAll('.hero-pet__blob');
+    var paws       = hero.querySelectorAll('.hero-pet__paw');
+    var circles    = hero.querySelectorAll('.hero-pet__circle');
+    var scrollEl   = hero.querySelector('.hero-pet__scroll');
+    var contentEl  = hero.querySelector('.hero-pet__content');
+
+    /* ── Kick off LQIP fade ── */
+    initLqip(hero);
+
+    /* ── Set will-change before animations ── */
+    if (bgImg)      bgImg.style.willChange      = 'transform';
+    if (contentEl)  contentEl.style.willChange  = 'transform, opacity';
+
+    /* ── Initial states (CSS already hides most via opacity:0) ── */
+    if (bgImg) gsap.set(bgImg, { scale: 1.10 });
+
+    /* ── Entrance timeline ── */
+    var tl = gsap.timeline({
+      delay: 0.08,
+      defaults: { ease: 'power3.out' },
+      onComplete: function () {
+        /* Remove will-change after entrance to save GPU memory */
+        if (bgImg)     bgImg.style.willChange     = 'auto';
+        if (contentEl) contentEl.style.willChange = 'auto';
+      }
+    });
+
+    /* bg Ken-Burns zoom */
+    if (bgImg) {
+      tl.to(bgImg, { scale: 1, duration: 2.2, ease: 'power2.out' }, 0);
+    }
+
+    /* Words stagger up */
+    if (words.length) {
+      tl.to(words, { y: '0%', opacity: 1, duration: 0.72, stagger: 0.06 }, 0.20);
+    }
+
+    /* Subheading */
+    if (subheading) {
+      tl.to(subheading, { y: 0, opacity: 1, duration: 0.65 }, 0.66);
+    }
+
+    /* CTA pop */
+    if (cta) {
+      tl.to(cta, { scale: 1, opacity: 1, duration: 0.58, ease: 'back.out(1.8)' }, 0.88);
+    }
+
+    /* Badge slide */
+    if (badge) {
+      tl.to(badge, { x: 0, opacity: 1, duration: 0.50 }, 0.98);
+    }
+
+    /* Blobs / paws / circles fade in gently */
+    if (blobs.length) tl.to(blobs,   { opacity: 0.30, duration: 1.2 }, 0.60);
+    if (paws.length)  tl.to(paws,    { opacity: 0.15, duration: 1.0 }, 0.70);
+    if (circles.length) tl.to(circles, { opacity: 1, duration: 1.0 }, 0.80);
+
+    /* Scroll indicator — comes in LAST so it doesn't clash with
+       its own ScrollTrigger fade-out below */
+    if (scrollEl) {
+      tl.to(scrollEl, { y: 0, opacity: 1, duration: 0.50 }, 1.20);
+    }
+
+    /* ── Floating idle animations ── */
+    blobs.forEach(function (b, i) {
+      gsap.to(b, {
+        y: '+=' + (16 + i * 7), x: '+=' + (8 + i * 3),
+        rotation: '+=' + (6 + i * 3),
+        duration: 6 + i * 1.6, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, delay: i * 0.6
+      });
+    });
+    paws.forEach(function (p, i) {
+      gsap.to(p, {
+        y: '+=' + (10 + i * 4),
+        rotation: '+=' + (i % 2 === 0 ? 8 : -8),
+        scale: 1.06,
+        duration: 4.5 + i * 1.1, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, delay: i * 0.45
+      });
+    });
+    circles.forEach(function (c, i) {
+      gsap.to(c, {
+        scale: 1.18, opacity: 0.45,
+        duration: 5 + i * 1.4, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, delay: i * 0.35
+      });
+    });
+
+    /* ────────────────────────────────────────
+       ScrollTrigger effects
+       KEY FIX: parallax on bgImg (the inner
+       image), NOT on .hero-pet__bg (the
+       clipping wrapper). Moving the wrapper
+       exposes the page background causing the
+       white-gap-on-scroll-back bug.
+    ──────────────────────────────────────── */
+    if (window.ScrollTrigger && bgImg) {
+      /* Parallax — image drifts down as hero scrolls out.
+         bgImg height is 130% of hero, top starts at -15%.
+         yPercent: 10  →  travel = 10% × 130% ≈ 13% of hero.
+         Buffer at top = 15% of hero  →  fully within bounds. */
+      gsap.to(bgImg, {
+        yPercent: 10,
+        ease: 'none',
+        scrollTrigger: {
+          id: 'parallax-' + SID,
+          trigger: hero,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.6
+        }
+      });
+
+      /* Content subtle upward drift */
+      if (contentEl) {
+        gsap.to(contentEl, {
+          yPercent: 8, opacity: 0.55,
+          ease: 'none',
+          scrollTrigger: {
+            id: 'content-' + SID,
+            trigger: hero,
+            start: 'top top',
+            end: '55% top',
+            scrub: 1.0
+          }
+        });
+      }
+
+      /* Scroll indicator fades out quickly — only runs AFTER entrance
+         tl has revealed it, so no conflict with opacity: 0 start. */
+      if (scrollEl) {
+        gsap.to(scrollEl, {
+          opacity: 0,
+          ease: 'none',
+          scrollTrigger: {
+            id: 'scrollind-' + SID,
+            trigger: hero,
+            start: 'top top',
+            end: '10% top',
+            scrub: true
+          }
+        });
+      }
+    }
+
+    /* ── CTA icon hover (GSAP for spring feel) ── */
+    var ctaIcon = cta && cta.querySelector('.hero-pet__cta-icon');
+    if (cta && ctaIcon) {
+      cta.addEventListener('mouseenter', function () {
+        gsap.to(ctaIcon, { x: 5, duration: 0.3, ease: 'back.out(2)' });
+      });
+      cta.addEventListener('mouseleave', function () {
+        gsap.to(ctaIcon, { x: 0, duration: 0.25, ease: 'power2.out' });
+      });
+    }
+  }
+
+  /* ────────────────────────────────────────
+     Cleanup helper for theme editor reloads
+  ──────────────────────────────────────── */
+  function cleanup() {
+    if (window.ScrollTrigger) {
+      ['parallax','content','scrollind'].forEach(function (prefix) {
+        var st = window.ScrollTrigger.getById(prefix + '-' + SID);
+        if (st) st.kill();
+      });
+    }
+  }
+
+  /* ────────────────────────────────────────
+     Bootstrap
+  ──────────────────────────────────────── */
+  function boot() {
+    loadScript(GSAP_CDN)
+      .then(function () { return loadScript(ST_CDN); })
+      .then(function () {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            requestAnimationFrame(function () { requestAnimationFrame(init); });
+          });
+        } else {
+          requestAnimationFrame(function () { requestAnimationFrame(init); });
+        }
+      })
+      .catch(function () {
+        showAll(document.getElementById('hero-pet-' + SID));
+      });
+  }
+
+  /* Theme editor live-reload support */
+  if (window.Shopify && window.Shopify.designMode) {
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId === SID) { cleanup(); boot(); }
+    });
+    document.addEventListener('shopify:section:unload', function (e) {
+      if (e.detail && e.detail.sectionId === SID) { cleanup(); }
+    });
+  }
+
+  boot();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🐾 Pet Hero",
+  "tag": "section",
+  "class": "section-pet-hero",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "🖼️ Background Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Background Image",
+      "info": "Best: 1920×1080px landscape. JPG or WebP recommended."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Background Image",
+      "info": "Best: 800×1100px portrait. Leave blank to reuse desktop image."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image Focus Point",
+      "info": "Controls which part of the image stays centred.",
+      "options": [
+        { "value": "center center", "label": "Center (default)" },
+        { "value": "center top",    "label": "Top" },
+        { "value": "center bottom", "label": "Bottom" },
+        { "value": "left center",   "label": "Left" },
+        { "value": "right center",  "label": "Right" },
+        { "value": "left top",      "label": "Top Left" },
+        { "value": "right top",     "label": "Top Right" },
+        { "value": "left bottom",   "label": "Bottom Left" },
+        { "value": "right bottom",  "label": "Bottom Right" }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "header",
+      "content": "✍️ Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your Pet Deserves the Best"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Premium food, toys & accessories — delivered with love 🐶🐱"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "⭐ Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_badge",
+      "label": "Show Badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Trusted by 50k+ pet parents"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0, "max": 85, "step": 5, "unit": "%",
+      "default": 30,
+      "info": "Increase if text is hard to read over your image."
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content Alignment",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right",  "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Desktop Font Sizes"
+    },
+    {
+      "type": "range",
+      "id": "desktop_heading_size",
+      "label": "Heading Size",
+      "min": 32, "max": 96, "step": 2, "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "desktop_sub_size",
+      "label": "Subheading Size",
+      "min": 14, "max": 30, "step": 1, "unit": "px",
+      "default": 19
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile Font Sizes"
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_size",
+      "label": "Heading Size",
+      "min": 22, "max": 60, "step": 2, "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "mobile_sub_size",
+      "label": "Subheading Size",
+      "min": 12, "max": 22, "step": 1, "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "✨ Extras"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_decorative_elements",
+      "label": "Show Decorative Elements",
+      "default": true,
+      "info": "Floating paw prints, blobs and circles."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show Scroll Indicator",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pet Hero",
+      "category": "Hero"
+    }
+  ]
+}
+{% endschema %}

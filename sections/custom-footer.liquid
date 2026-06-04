@@ -1,0 +1,1411 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  SECTION  : Premium Pet Shop Footer                              ║
+  ║  Style    : Modern Editorial / D2C Brand                         ║
+  ║  Version  : 2.0.0                                                ║
+  ║  Deps     : GSAP 3.12 + ScrollTrigger (CDN, deferred)           ║
+  ║                                                                  ║
+  ║  FEATURES                                                        ║
+  ║  • Fully block-based — all columns editable in Theme Editor      ║
+  ║  • Newsletter signup with inline validation                      ║
+  ║  • Social media icon links                                       ║
+  ║  • Payment icons row                                             ║
+  ║  • GSAP scroll-reveal on enter                                   ║
+  ║  • Mobile-first stacked accordion columns                        ║
+  ║  • Full accessibility (aria, focus, reduced-motion)              ║
+  ╚══════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+{%- liquid
+  assign s    = section.settings
+  assign sid  = 'pf-' | append: section.id
+
+  assign bg_top     = s.bg_top    | default: '#1C1917'
+  assign bg_bottom  = s.bg_bottom | default: '#141210'
+  assign text_main  = s.text_main | default: '#F5F0E8'
+  assign text_muted = s.text_muted | default: '#A39E96'
+  assign accent     = s.accent_color | default: '#D97757'
+  assign border_col = s.border_color | default: '#2E2924'
+
+  assign show_newsletter = s.show_newsletter
+  assign show_social     = s.show_social
+  assign show_payment    = s.show_payment
+  assign show_badge      = s.show_trust_badge
+
+  assign logo_img  = s.logo_image
+  assign logo_text = s.logo_text | default: shop.name
+-%}
+
+<footer
+  id="{{ sid }}"
+  class="pf"
+  role="contentinfo"
+  aria-label="Site footer"
+>
+
+  {%- comment %} ══ PRE-FOOTER NEWSLETTER BAND ══ {% endcomment %}
+  {%- if show_newsletter %}
+    <div class="pf__newsletter-band" data-pf-reveal>
+      <div class="pf__newsletter-inner">
+
+        <div class="pf__newsletter-copy">
+          {%- if s.newsletter_eyebrow != blank %}
+            <p class="pf__newsletter-eyebrow">{{ s.newsletter_eyebrow }}</p>
+          {%- endif %}
+          <h2 class="pf__newsletter-heading">
+            {{ s.newsletter_heading | default: 'Join the Pet Parent Club' }}
+          </h2>
+          {%- if s.newsletter_subtext != blank %}
+            <p class="pf__newsletter-sub">{{ s.newsletter_subtext }}</p>
+          {%- endif %}
+        </div>
+
+        <div class="pf__newsletter-form-wrap">
+  {%- assign form_id = sid | append: '-nl-form' -%}
+  
+  {%- form 'customer', id: form_id, class: 'pf__newsletter-form' -%}
+    <input type="hidden" name="contact[tags]" value="newsletter">
+
+    <div class="pf__nl-field-wrap">
+      <label for="{{ sid }}-nl-email" class="pf__nl-label visually-hidden">
+        Email address
+      </label>
+      <input
+        id="{{ sid }}-nl-email"
+        class="pf__nl-input"
+        type="email"
+        name="contact[email]"
+        placeholder="{{ s.newsletter_placeholder | default: 'Your email address' }}"
+        autocomplete="email"
+        required
+        aria-required="true"
+        aria-label="Email address for newsletter"
+      >
+      <button type="submit" class="pf__nl-btn" aria-label="Subscribe to newsletter">
+        <span class="pf__nl-btn-text">
+          {{ s.newsletter_btn_text | default: 'Subscribe' }}
+        </span>
+        <span class="pf__nl-btn-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    {%- if form.posted_successfully? -%}
+      <p class="pf__nl-success" role="status" aria-live="polite">
+        <span aria-hidden="true">✓</span>
+        {{ s.newsletter_success | default: "You're in! Welcome to the pack 🐾" }}
+      </p>
+    {%- endif -%}
+
+    {%- if form.errors -%}
+      <p class="pf__nl-error" role="alert" aria-live="assertive">
+        <span aria-hidden="true">⚠</span>
+        {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+      </p>
+    {%- endif -%}
+
+    {%- if s.newsletter_disclaimer != blank -%}
+      <p class="pf__nl-disclaimer">{{ s.newsletter_disclaimer }}</p>
+    {%- endif -%}
+  {%- endform -%}
+</div>
+
+      </div>
+    </div>
+  {%- endif %}
+
+  {%- comment %} ══ MAIN FOOTER BODY ══ {% endcomment %}
+  <div class="pf__body">
+    <div class="pf__container">
+
+      {%- comment %} ── Brand column ── {% endcomment %}
+      <div class="pf__brand-col" data-pf-reveal>
+
+        {%- comment %} Logo {% endcomment %}
+        <a
+          href="{{ routes.root_url }}"
+          class="pf__logo-link"
+          aria-label="{{ logo_text }} — Home"
+        >
+          {%- if logo_img != blank %}
+            {{
+              logo_img
+              | image_url: width: 280
+              | image_tag:
+                loading: 'lazy',
+                widths:  '140, 200, 280',
+                alt:     logo_text,
+                class:   'pf__logo-img'
+            }}
+          {%- else %}
+            <span class="pf__logo-text">{{ logo_text }}</span>
+          {%- endif %}
+        </a>
+
+        {%- comment %} Brand tagline {% endcomment %}
+        {%- if s.brand_tagline != blank %}
+          <p class="pf__brand-tagline">{{ s.brand_tagline }}</p>
+        {%- endif %}
+
+        {%- comment %} Social icons {% endcomment %}
+        {%- if show_social %}
+          <div class="pf__social" aria-label="Social media links">
+            {%- assign social_platforms = 'instagram,facebook,tiktok,twitter,youtube,pinterest' | split: ',' %}
+
+            {%- for platform in social_platforms %}
+              {%- assign setting_key = platform | append: '_url' %}
+              {%- assign platform_url = s[setting_key] %}
+
+              {%- if platform_url != blank %}
+                <a
+                  href="{{ platform_url }}"
+                  class="pf__social-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="{{ platform | capitalize }} — opens in new tab"
+                >
+                  {%- case platform %}
+
+                    {%- when 'instagram' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"
+                              stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="4"
+                                stroke="currentColor" stroke-width="2"/>
+                        <circle cx="17.5" cy="6.5" r="1"
+                                fill="currentColor"/>
+                      </svg>
+
+                    {%- when 'facebook' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+
+                    {%- when 'tiktok' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12Z"
+                              stroke="currentColor" stroke-width="2"/>
+                        <path d="M15 5V15.5C15 17.433 13.433 19 11.5 19C9.567 19 8 17.433 8 15.5C8 13.567 9.567 12 11.5 12"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round"/>
+                        <path d="M15 5C15 5 16 7 19 7"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round"/>
+                      </svg>
+
+                    {%- when 'twitter' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M4 4L20 20M4 20L20 4"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round"/>
+                        <path d="M3 5H8L21 19H16L3 5Z"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linejoin="round"/>
+                      </svg>
+
+                    {%- when 'youtube' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect x="2" y="5" width="20" height="14" rx="4"
+                              stroke="currentColor" stroke-width="2"/>
+                        <path d="M10 9L15 12L10 15V9Z"
+                              fill="currentColor"/>
+                      </svg>
+
+                    {%- when 'pinterest' %}
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                           xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"
+                                stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 7C9.23858 7 7 9.23858 7 12C7 14.1253 8.33457 15.9479 10.2166 16.6624C10.1683 16.2539 10.1243 15.6189 10.2362 15.1675C10.3369 14.7584 10.8744 12.5378 10.8744 12.5378C10.8744 12.5378 10.7135 12.2157 10.7135 11.7407C10.7135 10.9988 11.1525 10.4392 11.6958 10.4392C12.1577 10.4392 12.3805 10.7854 12.3805 11.2003C12.3805 11.6624 12.0858 12.3571 11.9327 13.001C11.8053 13.5408 12.2049 13.9791 12.7369 13.9791C13.7008 13.9791 14.4388 12.9589 14.4388 11.4815C14.4388 10.171 13.4937 9.25 12.0272 9.25C10.3378 9.25 9.34375 10.5213 9.34375 11.8356C9.34375 12.2986 9.51776 12.7962 9.73819 13.0541"
+                              stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round"/>
+                      </svg>
+
+                  {%- endcase %}
+                </a>
+              {%- endif %}
+            {%- endfor %}
+          </div>
+        {%- endif %}
+
+        {%- comment %} Trust badge {% endcomment %}
+        {%- if show_badge %}
+          <div class="pf__trust-badge" aria-label="Trust indicators">
+            <div class="pf__trust-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                   aria-hidden="true">
+                <path d="M12 2L3 7V12C3 16.418 7.03 20.592 12 22C16.97 20.592 21 16.418 21 12V7L12 2Z"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linejoin="round"/>
+                <path d="M9 12L11 14L15 10"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Vet Approved</span>
+            </div>
+            <div class="pf__trust-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                   aria-hidden="true">
+                <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Free Shipping $50+</span>
+            </div>
+            <div class="pf__trust-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                   aria-hidden="true">
+                <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9 21 9 15 12 15C15 15 15 21 15 21M9 21H15"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>30-Day Returns</span>
+            </div>
+          </div>
+        {%- endif %}
+
+      </div>{%- comment %} /.pf__brand-col {% endcomment %}
+
+      {%- comment %} ── Link columns (blocks) ── {% endcomment %}
+      <nav class="pf__nav-cols" aria-label="Footer navigation">
+
+        {%- for block in section.blocks %}
+          {%- if block.type == 'link_column' %}
+            {%- assign b = block.settings %}
+
+            <div
+              class="pf__nav-col"
+              data-pf-reveal
+              data-pf-delay="{{ forloop.index0 | times: 80 }}"
+              {{ block.shopify_attributes }}
+            >
+              <button
+                class="pf__nav-col-toggle"
+                aria-expanded="false"
+                aria-controls="{{ sid }}-col-{{ forloop.index }}"
+                data-pf-col-toggle
+              >
+                <span class="pf__nav-col-heading">
+                  {{ b.column_heading | default: 'Column' }}
+                </span>
+                <span class="pf__nav-col-chevron" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 9L12 15L18 9"
+                          stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+
+              <ul
+                id="{{ sid }}-col-{{ forloop.index }}"
+                class="pf__nav-list"
+                role="list"
+              >
+                {%- for i in (1..8) %}
+                  {%- assign link_text_key = 'link_' | append: i | append: '_text' %}
+                  {%- assign link_url_key  = 'link_' | append: i | append: '_url' %}
+                  {%- assign link_text = b[link_text_key] %}
+                  {%- assign link_url  = b[link_url_key] %}
+
+                  {%- if link_text != blank %}
+                    <li class="pf__nav-item">
+                      <a
+                        href="{{ link_url | default: '#' }}"
+                        class="pf__nav-link"
+                      >
+                        {{ link_text }}
+                      </a>
+                    </li>
+                  {%- endif %}
+                {%- endfor %}
+              </ul>
+
+            </div>
+          {%- endif %}
+        {%- endfor %}
+
+      </nav>{%- comment %} /.pf__nav-cols {% endcomment %}
+
+    </div>{%- comment %} /.pf__container {% endcomment %}
+  </div>{%- comment %} /.pf__body {% endcomment %}
+
+  {%- comment %} ══ BOTTOM BAR ══ {% endcomment %}
+  <div class="pf__bottom" data-pf-reveal>
+    <div class="pf__bottom-inner">
+
+      {%- comment %} Copyright {% endcomment %}
+      <p class="pf__copyright">
+        &copy; {{ 'now' | date: '%Y' }}
+        {{ s.copyright_text | default: shop.name }}
+        {%- if s.copyright_suffix != blank %}
+          — {{ s.copyright_suffix }}
+        {%- endif %}
+      </p>
+
+      {%- comment %} Legal links {% endcomment %}
+      <nav class="pf__legal-links" aria-label="Legal links">
+        {%- if s.policy_privacy_url != blank %}
+          <a href="{{ s.policy_privacy_url }}" class="pf__legal-link">Privacy Policy</a>
+        {%- else %}
+          {%- if shop.privacy_policy != blank %}
+            <a href="{{ shop.privacy_policy.url }}" class="pf__legal-link">Privacy Policy</a>
+          {%- endif %}
+        {%- endif %}
+
+        {%- if s.policy_terms_url != blank %}
+          <a href="{{ s.policy_terms_url }}" class="pf__legal-link">Terms of Service</a>
+        {%- else %}
+          {%- if shop.terms_of_service != blank %}
+            <a href="{{ shop.terms_of_service.url }}" class="pf__legal-link">Terms of Service</a>
+          {%- endif %}
+        {%- endif %}
+
+        {%- if s.policy_shipping_url != blank %}
+          <a href="{{ s.policy_shipping_url }}" class="pf__legal-link">Shipping Policy</a>
+        {%- else %}
+          {%- if shop.shipping_policy != blank %}
+            <a href="{{ shop.shipping_policy.url }}" class="pf__legal-link">Shipping</a>
+          {%- endif %}
+        {%- endif %}
+
+        {%- if s.policy_refund_url != blank %}
+          <a href="{{ s.policy_refund_url }}" class="pf__legal-link">Refund Policy</a>
+        {%- else %}
+          {%- if shop.refund_policy != blank %}
+            <a href="{{ shop.refund_policy.url }}" class="pf__legal-link">Refunds</a>
+          {%- endif %}
+        {%- endif %}
+      </nav>
+
+      {%- comment %} Payment icons {% endcomment %}
+      {%- if show_payment %}
+        <div class="pf__payment" aria-label="Accepted payment methods">
+          {%- for type in shop.enabled_payment_types %}
+            {{ type | payment_type_svg_tag: class: 'pf__payment-icon' }}
+          {%- endfor %}
+        </div>
+      {%- endif %}
+
+    </div>{%- comment %} /.pf__bottom-inner {% endcomment %}
+  </div>{%- comment %} /.pf__bottom {% endcomment %}
+
+  {%- comment %} ══ DECORATIVE PET PATTERN ══ {% endcomment %}
+  {%- if s.show_paw_pattern %}
+    <div class="pf__paw-pattern" aria-hidden="true">
+      {%- for i in (1..12) %}
+        <span class="pf__paw">🐾</span>
+      {%- endfor %}
+    </div>
+  {%- endif %}
+
+</footer>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   STYLES
+══════════════════════════════════════════════════════════ {% endcomment %}
+<style>
+
+/* ── Utility ─────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ── CSS custom properties ───────────────────────────────── */
+#{{ sid }} {
+  --pf-bg-top:      {{ bg_top }};
+  --pf-bg-bottom:   {{ bg_bottom }};
+  --pf-text:        {{ text_main }};
+  --pf-muted:       {{ text_muted }};
+  --pf-accent:      {{ accent }};
+  --pf-border:      {{ border_col }};
+  --pf-radius:      14px;
+  --pf-radius-sm:   8px;
+  --pf-gap:         clamp(32px, 4vw, 56px);
+  --pf-pad-h:       clamp(20px, 5vw, 72px);
+  --pf-ease:        cubic-bezier(0.22, 1, 0.36, 1);
+  --pf-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Base footer ──────────────────────────────────────────── */
+#{{ sid }} {
+  background-color: var(--pf-bg-top);
+  color:            var(--pf-text);
+  font-family:      inherit;
+  position:         relative;
+  overflow:         hidden;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEWSLETTER BAND
+══════════════════════════════════════════════════════════ */
+.pf__newsletter-band {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--pf-accent) 18%, var(--pf-bg-top)),
+    color-mix(in srgb, var(--pf-accent) 8%,  var(--pf-bg-top))
+  );
+  border-bottom: 1px solid var(--pf-border);
+  padding: clamp(40px, 6vw, 72px) var(--pf-pad-h);
+}
+.pf__newsletter-inner {
+  max-width:       1600px;
+  margin:          0 auto;
+  display:         grid;
+  grid-template-columns: 1fr 1fr;
+  gap:             clamp(32px, 5vw, 72px);
+  align-items:     center;
+}
+.pf__newsletter-eyebrow {
+  font-size:      0.74rem;
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--pf-accent);
+  margin:         0 0 12px;
+}
+.pf__newsletter-heading {
+  font-size:      clamp(1.55rem, 2.8vw, 2.4rem);
+  font-weight:    800;
+  color:          var(--pf-text);
+  line-height:    1.18;
+  letter-spacing: -0.02em;
+  margin:         0 0 10px;
+  text-wrap:      balance;
+}
+.pf__newsletter-sub {
+  font-size:   clamp(0.88rem, 1.3vw, 1rem);
+  color:       var(--pf-muted);
+  line-height: 1.65;
+  margin:      0;
+}
+
+/* Form */
+.pf__nl-field-wrap {
+  display:       flex;
+  gap:           0;
+  border-radius: var(--pf-radius);
+  overflow:      hidden;
+  box-shadow:    0 4px 24px rgba(0,0,0,0.18);
+  border:        1.5px solid var(--pf-border);
+  transition:    border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.pf__nl-field-wrap:focus-within {
+  border-color: var(--pf-accent);
+  box-shadow:   0 4px 24px rgba(0,0,0,0.18),
+                0 0 0 3px color-mix(in srgb, var(--pf-accent) 25%, transparent);
+}
+.pf__nl-input {
+  flex:             1;
+  min-width:        0;
+  padding:          14px 20px;
+  background:       rgba(255,255,255,0.06);
+  border:           none;
+  outline:          none;
+  color:            var(--pf-accent);
+  font-size:        0.95rem;
+  font-family:      inherit;
+}
+.pf__nl-input::placeholder { color: var(--pf-muted); }
+.pf__nl-btn {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            8px;
+  padding:        14px 22px;
+  background:     var(--pf-accent);
+  color:          #fff;
+  font-size:      0.90rem;
+  font-weight:    700;
+  letter-spacing: 0.04em;
+  border:         none;
+  cursor:         pointer;
+  white-space:    nowrap;
+  transition:     background 0.25s ease, transform 0.25s var(--pf-ease-spring);
+  flex-shrink:    0;
+}
+.pf__nl-btn:hover  { background: color-mix(in srgb, var(--pf-accent) 85%, #fff); }
+.pf__nl-btn:active { transform: scale(0.97); }
+.pf__nl-btn:focus-visible {
+  outline:        3px solid #fff;
+  outline-offset: -3px;
+}
+.pf__nl-btn-icon { display:flex; align-items:center; }
+
+.pf__nl-success {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  margin-top:  12px;
+  font-size:   0.88rem;
+  font-weight: 600;
+  color:       #6DB87A;
+}
+.pf__nl-error {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  margin-top:  12px;
+  font-size:   0.88rem;
+  font-weight: 600;
+  color:       #E07070;
+}
+.pf__nl-disclaimer {
+  margin-top: 10px;
+  font-size:  0.74rem;
+  color:      var(--pf-muted);
+  line-height:1.55;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FOOTER BODY
+══════════════════════════════════════════════════════════ */
+.pf__body {
+  padding: clamp(52px, 7vw, 96px) var(--pf-pad-h);
+  border-bottom: 1px solid var(--pf-border);
+}
+.pf__container {
+  max-width:             1600px;
+  margin:                0 auto;
+  display:               grid;
+  grid-template-columns: 280px 1fr;
+  gap:                   var(--pf-gap);
+  align-items:           start;
+}
+
+/* ── Brand column ─────────────────────────────────────── */
+.pf__brand-col {
+  display:        flex;
+  flex-direction: column;
+  gap:            24px;
+}
+.pf__logo-link {
+  display:         inline-flex;
+  align-items:     center;
+  text-decoration: none;
+  width:           fit-content;
+}
+.pf__logo-img {
+  max-width:  160px;
+  max-height: 52px;
+  object-fit: contain;
+  display:    block;
+}
+.pf__logo-text {
+  font-size:      1.5rem;
+  font-weight:    800;
+  color:          var(--pf-text);
+  letter-spacing: -0.02em;
+  line-height:    1;
+}
+.pf__brand-tagline {
+  font-size:   0.90rem;
+  color:       var(--pf-muted);
+  line-height: 1.65;
+  margin:      0;
+  max-width:   240px;
+}
+
+/* Social */
+.pf__social {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  flex-wrap:   wrap;
+}
+.pf__social-link {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           38px;
+  height:          38px;
+  border-radius:   var(--pf-radius-sm);
+  color:           var(--pf-muted);
+  border:          1px solid var(--pf-border);
+  text-decoration: none;
+  transition:
+    color       0.25s ease,
+    border-color 0.25s ease,
+    background  0.25s ease,
+    transform   0.25s var(--pf-ease-spring);
+}
+.pf__social-link:hover,
+.pf__social-link:focus-visible {
+  color:        var(--pf-accent);
+  border-color: var(--pf-accent);
+  background:   color-mix(in srgb, var(--pf-accent) 10%, transparent);
+  transform:    translateY(-2px);
+  outline:      none;
+}
+.pf__social-link:focus-visible {
+  outline:        2px solid var(--pf-accent);
+  outline-offset: 2px;
+}
+
+/* Trust badge */
+.pf__trust-badge {
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+.pf__trust-item {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  font-size:   0.80rem;
+  font-weight: 500;
+  color:       var(--pf-muted);
+}
+.pf__trust-item svg { color: var(--pf-accent); flex-shrink: 0; }
+
+/* ── Nav columns ──────────────────────────────────────── */
+.pf__nav-cols {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap:                   clamp(24px, 3vw, 48px);
+}
+.pf__nav-col { display: flex; flex-direction: column; }
+
+.pf__nav-col-toggle {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             8px;
+  background:      none;
+  border:          none;
+  padding:         0 0 16px;
+  cursor:          default;
+  width:           100%;
+  text-align:      left;
+}
+.pf__nav-col-heading {
+  font-size:      0.80rem;
+  font-weight:    700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color:          var(--pf-text);
+  display:        block;
+}
+.pf__nav-col-chevron {
+  display:    none; /* visible on mobile */
+  color:      var(--pf-muted);
+  transition: transform 0.30s ease;
+  flex-shrink:0;
+}
+
+.pf__nav-list {
+  list-style:     none;
+  margin:         0;
+  padding:        0;
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+.pf__nav-item {}
+.pf__nav-link {
+  font-size:       0.88rem;
+  color:           var(--pf-muted);
+  text-decoration: none;
+  font-weight:     400;
+  line-height:     1.4;
+  display:         inline-block;
+  position:        relative;
+  transition:      color 0.25s ease, transform 0.25s ease;
+}
+.pf__nav-link::after {
+  content:    '';
+  position:   absolute;
+  left:       0;
+  bottom:     -2px;
+  width:      0;
+  height:     1px;
+  background: var(--pf-accent);
+  transition: width 0.30s ease;
+}
+.pf__nav-link:hover,
+.pf__nav-link:focus-visible {
+  color:   var(--pf-text);
+  outline: none;
+  transform: translateX(3px);
+}
+.pf__nav-link:hover::after,
+.pf__nav-link:focus-visible::after {
+  width: 100%;
+}
+.pf__nav-link:focus-visible {
+  outline:        2px solid var(--pf-accent);
+  outline-offset: 3px;
+  border-radius:  2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BOTTOM BAR
+══════════════════════════════════════════════════════════ */
+.pf__bottom {
+  background: var(--pf-bg-bottom);
+  padding:    clamp(18px, 3vw, 26px) var(--pf-pad-h);
+}
+.pf__bottom-inner {
+  max-width:       1260px;
+  margin:          0 auto;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             20px;
+  flex-wrap:       wrap;
+}
+.pf__copyright {
+  font-size:   0.80rem;
+  color:       var(--pf-muted);
+  margin:      0;
+  font-weight: 400;
+}
+.pf__legal-links {
+  display:     flex;
+  align-items: center;
+  gap:         20px;
+  flex-wrap:   wrap;
+}
+.pf__legal-link {
+  font-size:       0.78rem;
+  color:           var(--pf-muted);
+  text-decoration: none;
+  transition:      color 0.25s ease;
+  white-space:     nowrap;
+}
+.pf__legal-link:hover,
+.pf__legal-link:focus-visible {
+  color:   var(--pf-text);
+  outline: none;
+}
+.pf__legal-link:focus-visible {
+  outline:        2px solid var(--pf-accent);
+  outline-offset: 2px;
+  border-radius:  2px;
+}
+
+/* Payment icons */
+.pf__payment {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  flex-wrap:   wrap;
+}
+.pf__payment-icon {
+  height:        24px;
+  width:         auto;
+  border-radius: 4px;
+  opacity:       0.65;
+  filter:        grayscale(0.3);
+  transition:    opacity 0.25s ease;
+}
+.pf__payment-icon:hover { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════
+   PAW PATTERN
+══════════════════════════════════════════════════════════ */
+.pf__paw-pattern {
+  position:       absolute;
+  top:            0;
+  right:          0;
+  bottom:         0;
+  width:          200px;
+  display:        flex;
+  flex-wrap:      wrap;
+  gap:            0;
+  opacity:        0.025;
+  pointer-events: none;
+  overflow:       hidden;
+  align-content:  flex-start;
+  padding:        20px;
+  user-select:    none;
+}
+.pf__paw {
+  font-size:  1.8rem;
+  line-height:1.5;
+  transform:  rotate({{ 'now' | date: '%S' | modulo: 30 | minus: 15 }}deg);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Tablet  ≤ 1024px
+══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .pf__container {
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+  }
+  .pf__newsletter-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile  ≤ 767px
+══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .pf__container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .pf__brand-col { align-items: flex-start; }
+  .pf__brand-tagline { max-width: 100%; }
+
+  /* Nav accordion */
+  .pf__nav-cols {
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--pf-border);
+  }
+  .pf__nav-col {
+    border-bottom: 1px solid var(--pf-border);
+  }
+  .pf__nav-col-toggle {
+    cursor:  pointer;
+    padding: 16px 0;
+  }
+  .pf__nav-col-chevron { display: flex; }
+
+  .pf__nav-list {
+    max-height:  0;
+    overflow:    hidden;
+    gap:         0;
+    transition:  max-height 0.40s ease, padding 0.30s ease;
+    padding-bottom: 0;
+  }
+  .pf__nav-col--open .pf__nav-list {
+    max-height:     400px;
+    padding-bottom: 16px;
+  }
+  .pf__nav-col--open .pf__nav-col-chevron svg {
+    transform: rotate(180deg);
+  }
+  .pf__nav-item { padding: 6px 0; }
+
+  /* Bottom bar */
+  .pf__bottom-inner {
+    flex-direction:  column;
+    align-items:     flex-start;
+    gap:             14px;
+  }
+  .pf__legal-links { gap: 14px; }
+  .pf__payment { justify-content: flex-start; }
+
+  /* Newsletter */
+  .pf__nl-btn-text { display: none; }
+  .pf__nl-btn {
+    padding: 14px 18px;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pf__nav-link,
+  .pf__social-link,
+  .pf__nl-btn,
+  .pf__paw-pattern {
+    transition:  none !important;
+    animation:   none !important;
+  }
+  [data-pf-reveal] {
+    opacity:   1 !important;
+    transform: none !important;
+  }
+}
+</style>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   JAVASCRIPT
+══════════════════════════════════════════════════════════ {% endcomment %}
+
+<script>
+/* ── Load GSAP once per page ─────────────────────────────── */
+(function () {
+  if (window.__pfGsap) return;
+  window.__pfGsap = 'loading';
+  const G = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  const S = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+  function load(src, cb) {
+    const el = document.createElement('script');
+    el.src   = src; el.defer = true; el.onload = cb;
+    document.head.appendChild(el);
+  }
+  load(G, () => load(S, () => {
+    window.__pfGsap = 'ready';
+    document.dispatchEvent(new CustomEvent('pf:gsap-ready'));
+  }));
+}());
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  const noMotion = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const isMobile = () => window.matchMedia('(max-width:767px)').matches;
+  const $ = (sel, ctx) => (ctx || document).querySelector(sel);
+  const $$ = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
+
+  const footer = document.getElementById('{{ sid }}');
+  if (!footer) return;
+
+  /* ══════════════════════════════════════════════════════
+     MOBILE ACCORDION
+  ══════════════════════════════════════════════════════ */
+  function initAccordion() {
+    const toggles = $$('[data-pf-col-toggle]', footer);
+
+    toggles.forEach(toggle => {
+      const col    = toggle.closest('.pf__nav-col');
+      const listId = toggle.getAttribute('aria-controls');
+      const list   = document.getElementById(listId);
+      if (!col || !list) return;
+
+      toggle.addEventListener('click', () => {
+        if (!isMobile()) return; /* accordion on mobile only */
+
+        const isOpen = col.classList.contains('pf__nav-col--open');
+
+        /* Close all others */
+        $$('.pf__nav-col--open', footer).forEach(openCol => {
+          if (openCol !== col) {
+            openCol.classList.remove('pf__nav-col--open');
+            openCol.querySelector('[data-pf-col-toggle]')
+                   ?.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        col.classList.toggle('pf__nav-col--open', !isOpen);
+        toggle.setAttribute('aria-expanded', String(!isOpen));
+      });
+
+      /* On desktop: always show list */
+      function ensureDesktopVisible() {
+        if (!isMobile()) {
+          list.style.maxHeight = '';
+          list.style.paddingBottom = '';
+        }
+      }
+      window.addEventListener('resize', ensureDesktopVisible, { passive: true });
+      ensureDesktopVisible();
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     GSAP SCROLL REVEAL
+  ══════════════════════════════════════════════════════ */
+  function initGsap() {
+    if (!window.gsap || noMotion()) {
+      $$('[data-pf-reveal]', footer).forEach(el => {
+        el.style.opacity   = '1';
+        el.style.transform = 'none';
+      });
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const revealEls = $$('[data-pf-reveal]', footer);
+
+    revealEls.forEach(el => {
+      const delay = parseInt(el.dataset.pfDelay || 0) / 1000;
+
+      gsap.set(el, { opacity: 0, y: 32 });
+
+      gsap.to(el, {
+        opacity:  1,
+        y:        0,
+        duration: 0.75,
+        delay:    delay,
+        ease:     'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start:   'top 88%',
+          once:    true,
+        },
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     NEWSLETTER INLINE VALIDATION
+  ══════════════════════════════════════════════════════ */
+  function initNewsletter() {
+    const form  = $('.pf__newsletter-form', footer);
+    const input = $('.pf__nl-input', footer);
+    if (!form || !input) return;
+
+    input.addEventListener('invalid', e => {
+      e.preventDefault();
+      input.setAttribute('aria-invalid', 'true');
+    });
+    input.addEventListener('input', () => {
+      input.removeAttribute('aria-invalid');
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════ */
+  function boot() {
+    initAccordion();
+    initNewsletter();
+
+    if (window.__pfGsap === 'ready') {
+      initGsap();
+    } else {
+      document.addEventListener('pf:gsap-ready', initGsap, { once: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  /* Theme editor */
+  document.addEventListener('shopify:section:load', e => {
+    if (e.detail.sectionId === '{{ section.id }}') boot();
+  });
+
+}());
+</script>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   SCHEMA
+══════════════════════════════════════════════════════════ {% endcomment %}
+{% schema %}
+{
+  "name": "🐾 Footer",
+  "tag":  "footer",
+  "class":"section-footer",
+  "limit": 1,
+
+  "settings": [
+
+    {
+      "type":    "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "bg_top",
+      "label":   "Footer Background",
+      "default": "#1C1917"
+    },
+    {
+      "type":    "color",
+      "id":      "bg_bottom",
+      "label":   "Bottom Bar Background",
+      "default": "#141210"
+    },
+    {
+      "type":    "color",
+      "id":      "text_main",
+      "label":   "Primary Text",
+      "default": "#F5F0E8"
+    },
+    {
+      "type":    "color",
+      "id":      "text_muted",
+      "label":   "Muted / Secondary Text",
+      "default": "#A39E96"
+    },
+    {
+      "type":    "color",
+      "id":      "accent_color",
+      "label":   "Accent Color",
+      "default": "#D97757"
+    },
+    {
+      "type":    "color",
+      "id":      "border_color",
+      "label":   "Border Color",
+      "default": "#2E2924"
+    },
+
+    {
+      "type":    "header",
+      "content": "🏷 Brand"
+    },
+    {
+      "type":  "image_picker",
+      "id":    "logo_image",
+      "label": "Logo Image",
+      "info":  "Recommended: SVG or PNG, max 320 × 100 px"
+    },
+    {
+      "type":    "text",
+      "id":      "logo_text",
+      "label":   "Logo Text (fallback)",
+      "info":    "Used when no image is set."
+    },
+    {
+      "type":    "textarea",
+      "id":      "brand_tagline",
+      "label":   "Brand Tagline",
+      "default": "Premium care products for happy, healthy pets. Loved by over 50,000 pet parents."
+    },
+
+    {
+      "type":    "header",
+      "content": "📧 Newsletter"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_newsletter",
+      "label":   "Show Newsletter Band",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_eyebrow",
+      "label":   "Newsletter Eyebrow",
+      "default": "Stay in the Loop"
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_heading",
+      "label":   "Newsletter Heading",
+      "default": "Join the Pet Parent Club"
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_subtext",
+      "label":   "Newsletter Subtext",
+      "default": "Get expert tips, exclusive deals, and first access to new arrivals."
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_placeholder",
+      "label":   "Input Placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_btn_text",
+      "label":   "Subscribe Button Text",
+      "default": "Subscribe"
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_success",
+      "label":   "Success Message",
+      "default": "You're in! Welcome to the pack 🐾"
+    },
+    {
+      "type":    "text",
+      "id":      "newsletter_disclaimer",
+      "label":   "Disclaimer Text (optional)",
+      "default": "No spam, ever. Unsubscribe anytime."
+    },
+
+    {
+      "type":    "header",
+      "content": "📱 Social Media"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_social",
+      "label":   "Show Social Icons",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id":   "instagram_url",
+      "label":"Instagram URL"
+    },
+    {
+      "type": "url",
+      "id":   "facebook_url",
+      "label":"Facebook URL"
+    },
+    {
+      "type": "url",
+      "id":   "tiktok_url",
+      "label":"TikTok URL"
+    },
+    {
+      "type": "url",
+      "id":   "twitter_url",
+      "label":"X / Twitter URL"
+    },
+    {
+      "type": "url",
+      "id":   "youtube_url",
+      "label":"YouTube URL"
+    },
+    {
+      "type": "url",
+      "id":   "pinterest_url",
+      "label":"Pinterest URL"
+    },
+
+    {
+      "type":    "header",
+      "content": "✅ Trust & Payment"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_trust_badge",
+      "label":   "Show Trust Badges",
+      "default": true
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_payment",
+      "label":   "Show Payment Icons",
+      "default": true
+    },
+
+    {
+      "type":    "header",
+      "content": "⚖️ Legal / Bottom Bar"
+    },
+    {
+      "type":    "text",
+      "id":      "copyright_text",
+      "label":   "Copyright Name",
+      "info":    "Defaults to your shop name."
+    },
+    {
+      "type":    "text",
+      "id":      "copyright_suffix",
+      "label":   "Copyright Suffix (optional)",
+      "default": "All rights reserved."
+    },
+    {
+      "type":  "url",
+      "id":    "policy_privacy_url",
+      "label": "Privacy Policy URL (override)"
+    },
+    {
+      "type":  "url",
+      "id":    "policy_terms_url",
+      "label": "Terms of Service URL (override)"
+    },
+    {
+      "type":  "url",
+      "id":    "policy_shipping_url",
+      "label": "Shipping Policy URL (override)"
+    },
+    {
+      "type":  "url",
+      "id":    "policy_refund_url",
+      "label": "Refund Policy URL (override)"
+    },
+
+    {
+      "type":    "header",
+      "content": "✨ Extras"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_paw_pattern",
+      "label":   "Show Decorative Paw Pattern",
+      "default": true
+    }
+
+  ],
+
+  "blocks": [
+    {
+      "type":  "link_column",
+      "name":  "🔗 Link Column",
+      "limit": 4,
+      "settings": [
+        {
+          "type":    "text",
+          "id":      "column_heading",
+          "label":   "Column Heading",
+          "default": "Shop"
+        },
+        { "type":"header", "content": "Links" },
+        { "type":"text", "id":"link_1_text", "label":"Link 1 Text", "default":"All Products" },
+        { "type":"url",  "id":"link_1_url",  "label":"Link 1 URL"  },
+        { "type":"text", "id":"link_2_text", "label":"Link 2 Text", "default":"Dog Supplies"  },
+        { "type":"url",  "id":"link_2_url",  "label":"Link 2 URL"  },
+        { "type":"text", "id":"link_3_text", "label":"Link 3 Text", "default":"Cat Supplies"  },
+        { "type":"url",  "id":"link_3_url",  "label":"Link 3 URL"  },
+        { "type":"text", "id":"link_4_text", "label":"Link 4 Text", "default":"New Arrivals"  },
+        { "type":"url",  "id":"link_4_url",  "label":"Link 4 URL"  },
+        { "type":"text", "id":"link_5_text", "label":"Link 5 Text"  },
+        { "type":"url",  "id":"link_5_url",  "label":"Link 5 URL"  },
+        { "type":"text", "id":"link_6_text", "label":"Link 6 Text"  },
+        { "type":"url",  "id":"link_6_url",  "label":"Link 6 URL"  },
+        { "type":"text", "id":"link_7_text", "label":"Link 7 Text"  },
+        { "type":"url",  "id":"link_7_url",  "label":"Link 7 URL"  },
+        { "type":"text", "id":"link_8_text", "label":"Link 8 Text"  },
+        { "type":"url",  "id":"link_8_url",  "label":"Link 8 URL"  }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "🐾 Footer",
+      "blocks": [
+        {
+          "type": "link_column",
+          "settings": {
+            "column_heading": "Shop",
+            "link_1_text": "All Products",
+            "link_2_text": "Dog Supplies",
+            "link_3_text": "Cat Supplies",
+            "link_4_text": "New Arrivals",
+            "link_5_text": "Sale"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "column_heading": "Pet Care",
+            "link_1_text": "Grooming Tips",
+            "link_2_text": "Feeding Guides",
+            "link_3_text": "Training Advice",
+            "link_4_text": "Health Basics",
+            "link_5_text": "Blog"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "column_heading": "Support",
+            "link_1_text": "Track My Order",
+            "link_2_text": "Returns & Exchanges",
+            "link_3_text": "Shipping Info",
+            "link_4_text": "FAQs",
+            "link_5_text": "Contact Us"
+          }
+        },
+        {
+          "type": "link_column",
+          "settings": {
+            "column_heading": "Company",
+            "link_1_text": "Our Story",
+            "link_2_text": "Vet Partners",
+            "link_3_text": "Sustainability",
+            "link_4_text": "Careers",
+            "link_5_text": "Press"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

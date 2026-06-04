@@ -1,0 +1,1481 @@
+{% comment %}
+  ============================================================
+  Premium Pet Shop — Featured Categories Section
+  File: sections/featured-categories.liquid
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign section_title    = section.settings.section_title
+  assign section_subtitle = section.settings.section_subtitle
+  assign bg_color         = section.settings.background_color
+  assign layout_style     = section.settings.layout_style
+  assign show_icons       = section.settings.show_icons
+  assign enable_glow      = section.settings.enable_glow
+-%}
+
+<section
+  class="fcat"
+  id="fcat-{{ section.id }}"
+  aria-labelledby="fcat-title-{{ section.id }}"
+  style="background-color: {{ bg_color }};"
+>
+
+  {%- comment %} ── Section Header ── {% endcomment %}
+  <div class="fcat__header">
+    {%- if section_title != blank -%}
+      <div class="fcat__eyebrow" aria-hidden="true">
+        <span class="fcat__eyebrow-line"></span>
+        <span class="fcat__eyebrow-text">Our Collections</span>
+        <span class="fcat__eyebrow-line"></span>
+      </div>
+      <h2
+        class="fcat__title"
+        id="fcat-title-{{ section.id }}"
+      >
+        {{ section_title }}
+      </h2>
+    {%- endif -%}
+    {%- if section_subtitle != blank -%}
+      <p class="fcat__subtitle">{{ section_subtitle }}</p>
+    {%- endif -%}
+  </div>
+
+  {%- comment %} ── Cards Grid ── {% endcomment %}
+  <div
+    class="fcat__track-wrap"
+    role="region"
+    aria-label="Pet categories"
+  >
+    <div
+      class="fcat__grid fcat__grid--{{ layout_style }}"
+      id="fcat-grid-{{ section.id }}"
+    >
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign cat_name   = block.settings.category_name
+          assign cat_image  = block.settings.category_image
+          assign cat_link   = block.settings.category_link
+          assign cat_desc   = block.settings.category_description
+          assign cat_glow   = block.settings.glow_color
+          assign cat_badge  = block.settings.badge_text
+          assign cat_count  = block.settings.product_count
+          assign text_pos   = block.settings.text_position
+          assign card_size  = block.settings.card_size
+        -%}
+
+        <div
+          class="fcat__item fcat__item--{{ block.id }} fcat__item--size-{{ card_size }}"
+          data-glow="{{ cat_glow }}"
+          data-category="{{ cat_name | downcase | replace: ' ', '-' }}"
+          data-block-id="{{ block.id }}"
+          {{ block.shopify_attributes }}
+        >
+          <a
+            href="{{ cat_link | default: '#' }}"
+            class="fcat__card"
+            aria-label="Browse {{ cat_name | escape }} category"
+            tabindex="0"
+          >
+
+            {%- comment %} ── Card Image ── {% endcomment %}
+            <div class="fcat__card-media">
+              {%- if cat_image != blank -%}
+                <img
+                  class="fcat__card-img"
+                  src="{{ cat_image | image_url: width: 800 }}"
+                  srcset="
+                    {{ cat_image | image_url: width: 400 }} 400w,
+                    {{ cat_image | image_url: width: 700 }} 700w,
+                    {{ cat_image | image_url: width: 1000 }} 1000w
+                  "
+                  sizes="(max-width: 767px) 80vw, (max-width: 1023px) 33vw, 22vw"
+                  alt="{{ cat_image.alt | default: cat_name | escape }}"
+                  loading="lazy"
+                  decoding="async"
+                  width="{{ cat_image.width }}"
+                  height="{{ cat_image.height }}"
+                >
+              {%- else -%}
+                <div
+                  class="fcat__card-img-placeholder"
+                  style="background: {{ block.settings.placeholder_color }};"
+                  aria-hidden="true"
+                ></div>
+              {%- endif -%}
+
+              {%- comment %} ── Glow border ring ── {% endcomment %}
+              {%- if enable_glow -%}
+                <div
+                  class="fcat__card-glow-ring"
+                  style="--glow: {{ cat_glow }};"
+                  aria-hidden="true"
+                ></div>
+              {%- endif -%}
+
+              {%- comment %} ── Overlays ── {% endcomment %}
+              <div class="fcat__card-overlay" aria-hidden="true"></div>
+              <div class="fcat__card-glass" aria-hidden="true"></div>
+            </div>
+
+            {%- comment %} ── Card Body ── {% endcomment %}
+            <div class="fcat__card-body fcat__card-body--{{ text_pos }}">
+
+              {%- comment %} ── Icon ── {% endcomment %}
+              {%- if show_icons -%}
+                <div class="fcat__card-icon" aria-hidden="true">
+                  {%- case cat_name | downcase -%}
+                    {%- when 'dog', 'dogs' -%}
+                      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 8c0-2 2-4 4-4h2l2-2h4l2 2h2c2 0 4 2 4 4v2l2 2v4l-2 2v4c0 1-.9 2-2 2h-2v2H12v-2h-2c-1.1 0-2-.9-2-2v-4L6 16v-4l-2-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                        <circle cx="20" cy="12" r="1.5" fill="currentColor"/>
+                        <path d="M13 18s1 2 3 2 3-2 3-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                      </svg>
+                    {%- when 'cat', 'cats' -%}
+                      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 6l4 6H8c0 4 2 8 8 10 6-2 8-6 8-10h-2l4-6v10c0 5-4 10-10 10S6 21 6 16V6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="13" cy="15" r="1.5" fill="currentColor"/>
+                        <circle cx="19" cy="15" r="1.5" fill="currentColor"/>
+                        <path d="M14 19s.8 1.5 2 1.5 2-1.5 2-1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                    {%- when 'fish' -%}
+                      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 16c0 0 4-8 14-8s12 6 12 6-2 2-4 2c-1 0-2-.5-2-.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M4 16c0 0 4 8 14 8s12-6 12-6-2-2-4-2c-1 0-2 .5-2 .5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <path d="M4 16L0 10v12l4-6z" fill="currentColor"/>
+                        <circle cx="24" cy="13" r="1.5" fill="currentColor"/>
+                      </svg>
+                    {%- when 'bird', 'birds' -%}
+                      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 6c-5 0-9 4-9 9 0 3 1.5 5.5 4 7l-2 4h14l-2-4c2.5-1.5 4-4 4-7 0-5-4-9-9-9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="14" cy="13" r="1.5" fill="currentColor"/>
+                        <path d="M13 17l3-2 3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M6 8c-2-1-4 0-4 0s1 3 4 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                    {%- else -%}
+                      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="10" width="24" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M10 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <circle cx="16" cy="18" r="3" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M16 15v-2M16 23v-2M13 18H11M21 18h-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                  {%- endcase -%}
+                </div>
+              {%- endif -%}
+
+              <div class="fcat__card-text">
+                <h3 class="fcat__card-name">{{ cat_name }}</h3>
+                {%- if cat_desc != blank -%}
+                  <p class="fcat__card-desc">{{ cat_desc }}</p>
+                {%- endif -%}
+                <div class="fcat__card-cta" aria-hidden="true">
+                  <span class="fcat__card-cta-text">Shop Now</span>
+                  <span class="fcat__card-cta-arrow">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              {%- comment %} ── Badges ── {% endcomment %}
+              <div class="fcat__card-badges" aria-hidden="true">
+                {%- if cat_badge != blank -%}
+                  <span class="fcat__card-badge fcat__card-badge--promo">
+                    {{ cat_badge }}
+                  </span>
+                {%- endif -%}
+                {%- if cat_count != blank -%}
+                  <span class="fcat__card-badge fcat__card-badge--count">
+                    {{ cat_count }}
+                  </span>
+                {%- endif -%}
+              </div>
+
+            </div>
+
+            {%- comment %} ── Shimmer overlay (hover shine) ── {% endcomment %}
+            <div class="fcat__card-shine" aria-hidden="true"></div>
+
+          </a>
+        </div>
+
+      {%- else -%}
+        {%- comment %} ── Placeholder cards when no blocks ── {% endcomment %}
+        {%- assign placeholder_cats = 'Dog,Cat,Fish,Bird,Accessories' | split: ',' -%}
+        {%- assign placeholder_glows = '#FFA45B,#B08CFF,#4ED6FF,#7CFFB2,#FFD36E' | split: ',' -%}
+        {%- for name in placeholder_cats -%}
+          <div
+            class="fcat__item"
+            data-glow="{{ placeholder_glows[forloop.index0] }}"
+          >
+            <a href="#" class="fcat__card" aria-label="Browse {{ name }} category">
+              <div class="fcat__card-media">
+                <div
+                  class="fcat__card-img-placeholder"
+                  style="background: linear-gradient(135deg, #e8e4dc, #d4cfc6);"
+                ></div>
+                <div class="fcat__card-overlay"></div>
+              </div>
+              <div class="fcat__card-body fcat__card-body--bottom-left">
+                <div class="fcat__card-text">
+                  <h3 class="fcat__card-name">{{ name }}</h3>
+                </div>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment %} ── Mobile scroll indicators ── {% endcomment %}
+    <div class="fcat__scroll-dots" aria-hidden="true" id="fcat-dots-{{ section.id }}">
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          <button
+            class="fcat__scroll-dot{% if forloop.first %} is-active{% endif %}"
+            aria-label="Go to {{ block.settings.category_name }} category"
+            data-index="{{ forloop.index0 }}"
+          ></button>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..5) -%}
+          <button
+            class="fcat__scroll-dot{% if forloop.first %} is-active{% endif %}"
+            aria-label="Go to category {{ i }}"
+            data-index="{{ forloop.index0 }}"
+          ></button>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+
+</section>
+
+<style>
+/* ════════════════════════════════════════════════
+   RESET + VARIABLES
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }},
+#fcat-{{ section.id }} * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+#fcat-{{ section.id }} {
+  --fcat-radius:       {{ section.settings.card_radius }}px;
+  --fcat-gap:          clamp(12px, 1.8vw, 22px);
+  --fcat-card-height:  clamp(300px, 38vw, 520px);
+  --fcat-pad:          clamp(28px, 5vw, 80px);
+  --fcat-duration:     0.55s;
+  --fcat-ease:         cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ════════════════════════════════════════════════
+   SECTION WRAPPER
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} {
+  position: relative;
+  width: 100%;
+  padding: clamp(48px, 8vw, 96px) 0;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} .fcat__header {
+  text-align: center;
+  padding: 0 var(--fcat-pad);
+  margin-bottom: clamp(32px, 5vw, 60px);
+}
+
+#fcat-{{ section.id }} .fcat__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+#fcat-{{ section.id }} .fcat__eyebrow-line {
+  display: block;
+  width: 36px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #b5a99a, transparent);
+  border-radius: 99px;
+}
+
+#fcat-{{ section.id }} .fcat__eyebrow-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #9e8f7f;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#fcat-{{ section.id }} .fcat__title {
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin-bottom: 14px;
+}
+
+#fcat-{{ section.id }} .fcat__subtitle {
+  font-size: clamp(15px, 1.5vw, 18px);
+  font-weight: 400;
+  color: #6b6056;
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ════════════════════════════════════════════════
+   TRACK WRAP
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} .fcat__track-wrap {
+  position: relative;
+  padding: 0 var(--fcat-pad);
+}
+
+/* ════════════════════════════════════════════════
+   GRID — DESKTOP LAYOUTS
+════════════════════════════════════════════════ */
+
+/* Layout: 5 equal columns */
+#fcat-{{ section.id }} .fcat__grid--five-col {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--fcat-gap);
+}
+
+/* Layout: 3+2 stagger */
+#fcat-{{ section.id }} .fcat__grid--stagger {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: auto auto;
+  gap: var(--fcat-gap);
+}
+
+#fcat-{{ section.id }} .fcat__grid--stagger .fcat__item:nth-child(1) { grid-column: 1 / 3; }
+#fcat-{{ section.id }} .fcat__grid--stagger .fcat__item:nth-child(2) { grid-column: 3 / 5; }
+#fcat-{{ section.id }} .fcat__grid--stagger .fcat__item:nth-child(3) { grid-column: 5 / 7; }
+#fcat-{{ section.id }} .fcat__grid--stagger .fcat__item:nth-child(4) { grid-column: 1 / 4; }
+#fcat-{{ section.id }} .fcat__grid--stagger .fcat__item:nth-child(5) { grid-column: 4 / 7; }
+
+/* Layout: Masonry-style */
+#fcat-{{ section.id }} .fcat__grid--masonry {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, var(--fcat-card-height));
+  gap: var(--fcat-gap);
+}
+
+#fcat-{{ section.id }} .fcat__grid--masonry .fcat__item:nth-child(1) {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+
+#fcat-{{ section.id }} .fcat__grid--masonry .fcat__item:nth-child(1) .fcat__card {
+  height: 100%;
+}
+
+/* ════════════════════════════════════════════════
+   CARD ITEM
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} .fcat__item {
+  position: relative;
+  /* Initial state for GSAP scroll animation */
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+#fcat-{{ section.id }} .fcat__card {
+  display: block;
+  position: relative;
+  height: var(--fcat-card-height);
+  border-radius: var(--fcat-radius);
+  overflow: hidden;
+  text-decoration: none;
+  outline: none;
+  /* Clip the glow ring inside */
+  isolation: isolate;
+  /* GPU hint */
+  will-change: transform, box-shadow;
+  transition:
+    transform var(--fcat-duration) var(--fcat-ease),
+    box-shadow var(--fcat-duration) var(--fcat-ease);
+  /* Base shadow */
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.06),
+    0 8px 32px rgba(0,0,0,0.08);
+}
+
+/* Size variants */
+#fcat-{{ section.id }} .fcat__item--size-tall .fcat__card {
+  --fcat-card-height: clamp(380px, 48vw, 640px);
+}
+
+#fcat-{{ section.id }} .fcat__item--size-short .fcat__card {
+  --fcat-card-height: clamp(240px, 28vw, 400px);
+}
+
+/* ── Media Layer ── */
+#fcat-{{ section.id }} .fcat__card-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+#fcat-{{ section.id }} .fcat__card-img,
+#fcat-{{ section.id }} .fcat__card-img-placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.0);
+  will-change: transform, filter;
+  transition:
+    transform 0.65s var(--fcat-ease),
+    filter 0.55s ease;
+}
+
+#fcat-{{ section.id }} .fcat__card-img-placeholder {
+  display: block;
+}
+
+/* ── Gradient overlay ── */
+#fcat-{{ section.id }} .fcat__card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    170deg,
+    rgba(0,0,0,0.0)  0%,
+    rgba(0,0,0,0.05) 40%,
+    rgba(0,0,0,0.50) 100%
+  );
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+/* ── Glass shimmer layer ── */
+#fcat-{{ section.id }} .fcat__card-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.04) 0%,
+    transparent 60%
+  );
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* ── Glow ring ── */
+#fcat-{{ section.id }} .fcat__card-glow-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--fcat-radius) + 2px);
+  border: 2.5px solid transparent;
+  background: transparent;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.4s ease, box-shadow 0.4s ease;
+  pointer-events: none;
+}
+
+/* ── Shine overlay ── */
+#fcat-{{ section.id }} .fcat__card-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  border-radius: inherit;
+  background: linear-gradient(
+    125deg,
+    rgba(255,255,255,0.0)  0%,
+    rgba(255,255,255,0.12) 45%,
+    rgba(255,255,255,0.0)  100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════
+   CARD BODY + TEXT
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} .fcat__card-body {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: clamp(16px, 2.2vw, 26px);
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+#fcat-{{ section.id }} .fcat__card-body--bottom-left {
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+#fcat-{{ section.id }} .fcat__card-body--center {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#fcat-{{ section.id }} .fcat__card-body--top-left {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* ── Icon ── */
+#fcat-{{ section.id }} .fcat__card-icon {
+  width: clamp(32px, 3.5vw, 44px);
+  height: clamp(32px, 3.5vw, 44px);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: auto;
+  padding: 7px;
+  transition: transform 0.4s var(--fcat-ease), background 0.4s ease;
+}
+
+#fcat-{{ section.id }} .fcat__card-body--center .fcat__card-icon {
+  margin-bottom: 14px;
+}
+
+#fcat-{{ section.id }} .fcat__card-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Text ── */
+#fcat-{{ section.id }} .fcat__card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transform: translateY(4px);
+  transition: transform 0.45s var(--fcat-ease);
+  will-change: transform;
+}
+
+#fcat-{{ section.id }} .fcat__card-name {
+  font-size: clamp(18px, 2.2vw, 26px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.25);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#fcat-{{ section.id }} .fcat__card-desc {
+  font-size: clamp(12px, 1.2vw, 14px);
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s ease 0.05s,
+    transform 0.4s var(--fcat-ease) 0.05s;
+}
+
+/* ── CTA ── */
+#fcat-{{ section.id }} .fcat__card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.4s ease 0.08s,
+    transform 0.4s var(--fcat-ease) 0.08s;
+}
+
+#fcat-{{ section.id }} .fcat__card-cta-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#fcat-{{ section.id }} .fcat__card-cta-arrow {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  transition: transform 0.3s var(--fcat-ease);
+}
+
+/* ── Badges ── */
+#fcat-{{ section.id }} .fcat__card-badges {
+  position: absolute;
+  top: clamp(12px, 1.5vw, 18px);
+  right: clamp(12px, 1.5vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 6;
+}
+
+#fcat-{{ section.id }} .fcat__card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  pointer-events: none;
+}
+
+#fcat-{{ section.id }} .fcat__card-badge--promo {
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #fff;
+}
+
+#fcat-{{ section.id }} .fcat__card-badge--count {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+}
+
+/* ════════════════════════════════════════════════
+   HOVER STATES (DESKTOP ONLY)
+════════════════════════════════════════════════ */
+@media (hover: hover) and (pointer: fine) {
+
+  /* Card lift */
+  #fcat-{{ section.id }} .fcat__card:hover,
+  #fcat-{{ section.id }} .fcat__card:focus-visible {
+    transform: scale(1.035) translateY(-4px);
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.18),
+      0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  /* Image zoom */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-img,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-img {
+    transform: scale(1.08);
+    filter: brightness(1.08) saturate(1.05);
+  }
+
+  /* Overlay deepen */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-overlay,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-overlay {
+    opacity: 1.2;
+  }
+
+  /* Glass on */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-glass,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-glass {
+    opacity: 1;
+  }
+
+  /* Text slide up */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-text,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-text {
+    transform: translateY(-4px);
+  }
+
+  /* Desc + CTA reveal */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-desc,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-cta,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-cta-arrow,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Icon pop */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-icon,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-icon {
+    transform: scale(1.1) rotate(-4deg);
+    background: rgba(255,255,255,0.25);
+  }
+
+  /* Shine sweep */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-shine,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-shine {
+    transform: translateX(200%);
+  }
+
+  /* Glow ring */
+  #fcat-{{ section.id }} .fcat__card:hover .fcat__card-glow-ring,
+  #fcat-{{ section.id }} .fcat__card:focus-visible .fcat__card-glow-ring {
+    opacity: 1;
+    border-color: var(--glow, #FFA45B);
+    box-shadow:
+      0 0 0 1px var(--glow, #FFA45B),
+      0 0 20px rgba(var(--glow, #FFA45B), 0.4),
+      inset 0 0 20px rgba(var(--glow, #FFA45B), 0.04);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   SCROLL DOTS (mobile)
+════════════════════════════════════════════════ */
+#fcat-{{ section.id }} .fcat__scroll-dots {
+  display: none;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+#fcat-{{ section.id }} .fcat__scroll-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #d4cfc6;
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+#fcat-{{ section.id }} .fcat__scroll-dot.is-active {
+  width: 24px;
+  background: #6b6056;
+}
+
+/* ════════════════════════════════════════════════
+   RESPONSIVE — TABLET
+════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  #fcat-{{ section.id }} .fcat__grid--five-col,
+  #fcat-{{ section.id }} .fcat__grid--stagger,
+  #fcat-{{ section.id }} .fcat__grid--masonry {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: unset;
+  }
+
+  /* Reset stagger/masonry item spans on tablet */
+  #fcat-{{ section.id }} .fcat__grid--stagger .fcat__item,
+  #fcat-{{ section.id }} .fcat__grid--masonry .fcat__item {
+    grid-column: unset !important;
+    grid-row: unset !important;
+  }
+
+  #fcat-{{ section.id }} .fcat__grid--masonry .fcat__item:nth-child(1) .fcat__card {
+    height: var(--fcat-card-height);
+  }
+
+  #fcat-{{ section.id }} {
+    --fcat-card-height: clamp(260px, 36vw, 420px);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   RESPONSIVE — MOBILE
+════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  #fcat-{{ section.id }} {
+    --fcat-card-height: 260px;
+    padding-bottom: clamp(32px, 6vw, 60px);
+  }
+
+  #fcat-{{ section.id }} .fcat__track-wrap {
+    padding: 0;
+  }
+
+  /* Convert to horizontal swipe */
+  #fcat-{{ section.id }} .fcat__grid {
+    display: flex !important;
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 14px;
+    padding: 8px clamp(16px, 5vw, 28px) 16px;
+  }
+
+  #fcat-{{ section.id }} .fcat__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  #fcat-{{ section.id }} .fcat__item {
+    flex: 0 0 72vw;
+    max-width: 300px;
+    scroll-snap-align: start;
+    /* Reset stagger/masonry span */
+    grid-column: unset !important;
+    grid-row: unset !important;
+  }
+
+  #fcat-{{ section.id }} .fcat__card {
+    height: var(--fcat-card-height);
+  }
+
+  /* Show dots on mobile */
+  #fcat-{{ section.id }} .fcat__scroll-dots {
+    display: flex;
+  }
+
+  /* Force some initial items visible on mobile (no GSAP on mobile) */
+  #fcat-{{ section.id }} .fcat__item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Tap feedback */
+  #fcat-{{ section.id }} .fcat__card:active {
+    transform: scale(0.97);
+    box-shadow:
+      0 10px 32px rgba(0,0,0,0.16),
+      0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Always show CTA on mobile */
+  #fcat-{{ section.id }} .fcat__card-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #fcat-{{ section.id }} .fcat__card-text {
+    transform: translateY(0);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   REDUCED MOTION
+════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  #fcat-{{ section.id }} .fcat__card,
+  #fcat-{{ section.id }} .fcat__card-img,
+  #fcat-{{ section.id }} .fcat__card-text,
+  #fcat-{{ section.id }} .fcat__card-desc,
+  #fcat-{{ section.id }} .fcat__card-cta,
+  #fcat-{{ section.id }} .fcat__card-shine,
+  #fcat-{{ section.id }} .fcat__card-glow-ring {
+    transition: none !important;
+  }
+
+  #fcat-{{ section.id }} .fcat__item {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  var SECTION_ID = '{{ section.id }}';
+  var GSAP_SRC   = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  var ST_SRC     = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+
+  /* ── Load script helper ── */
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+      var s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  /* ── Show all (fallback) ── */
+  function revealAll() {
+    var section = document.getElementById('fcat-' + SECTION_ID);
+    if (!section) return;
+    section.querySelectorAll('.fcat__item').forEach(function (el) {
+      el.style.cssText += 'opacity:1!important;transform:none!important;';
+    });
+  }
+
+  /* ── Glow helper ── */
+  function hexToRgb(hex) {
+    var r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return r ? parseInt(r[1],16)+','+parseInt(r[2],16)+','+parseInt(r[3],16) : '255,164,91';
+  }
+
+  /* ── Main Init ── */
+  function init() {
+    var section = document.getElementById('fcat-' + SECTION_ID);
+    if (!section) return;
+
+    var isMobile = window.matchMedia('(max-width: 767px)').matches;
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var gsap = window.gsap;
+    var ST   = window.ScrollTrigger;
+
+    /* ─────────────────────────────────────
+       GSAP SCROLL ENTRANCE (desktop only)
+    ───────────────────────────────────── */
+    if (!isMobile && !prefersReduced && gsap && ST) {
+      gsap.registerPlugin(ST);
+
+      var items = section.querySelectorAll('.fcat__item');
+      var header = section.querySelector('.fcat__header');
+
+      /* Header animation */
+      if (header) {
+        var headerEls = [
+          header.querySelector('.fcat__eyebrow'),
+          header.querySelector('.fcat__title'),
+          header.querySelector('.fcat__subtitle')
+        ].filter(Boolean);
+
+        gsap.fromTo(headerEls,
+          { y: 28, opacity: 0 },
+          {
+            y: 0, opacity: 1,
+            duration: 0.75,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: header,
+              start: 'top 88%',
+              once: true
+            }
+          }
+        );
+      }
+
+      /* Cards stagger entrance */
+      if (items.length) {
+        gsap.fromTo(items,
+          { y: 40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            stagger: {
+              each: 0.12,
+              ease: 'power1.inOut'
+            },
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: section.querySelector('.fcat__grid'),
+              start: 'top 82%',
+              once: true
+            }
+          }
+        );
+      }
+
+      /* ─────────────────────────────────────
+         GSAP HOVER GLOW (dynamic per card)
+      ───────────────────────────────────── */
+      items.forEach(function (item) {
+        var card    = item.querySelector('.fcat__card');
+        var ring    = item.querySelector('.fcat__card-glow-ring');
+        var img     = item.querySelector('.fcat__card-img');
+        var text    = item.querySelector('.fcat__card-text');
+        var desc    = item.querySelector('.fcat__card-desc');
+        var cta     = item.querySelector('.fcat__card-cta');
+        var ctaArr  = item.querySelector('.fcat__card-cta-arrow');
+        var icon    = item.querySelector('.fcat__card-icon');
+        var shine   = item.querySelector('.fcat__card-shine');
+        var glowHex = item.dataset.glow || '#FFA45B';
+        var glowRgb = hexToRgb(glowHex);
+
+        if (!card) return;
+
+        function onEnter() {
+          /* Card lift */
+          gsap.to(card, {
+            scale: 1.038,
+            y: -5,
+            duration: 0.5,
+            ease: 'power2.out',
+            boxShadow: '0 22px 64px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.12)'
+          });
+
+          /* Glow ring */
+          if (ring) {
+            gsap.to(ring, {
+              opacity: 1,
+              duration: 0.4,
+              ease: 'power2.out',
+              borderColor: glowHex,
+              boxShadow:
+                '0 0 0 1px ' + glowHex + ',' +
+                '0 0 28px rgba(' + glowRgb + ',0.45),' +
+                'inset 0 0 24px rgba(' + glowRgb + ',0.06)'
+            });
+          }
+
+          /* Image zoom + brighten */
+          if (img) {
+            gsap.to(img, {
+              scale: 1.09,
+              filter: 'brightness(1.08) saturate(1.06)',
+              duration: 0.65,
+              ease: 'power2.out'
+            });
+          }
+
+          /* Text slide */
+          if (text) {
+            gsap.to(text, {
+              y: -5,
+              duration: 0.45,
+              ease: 'power2.out'
+            });
+          }
+
+          /* Desc reveal */
+          if (desc) {
+            gsap.to(desc, {
+              opacity: 1,
+              y: 0,
+              duration: 0.4,
+              delay: 0.05,
+              ease: 'power2.out'
+            });
+          }
+
+          /* CTA reveal */
+          if (cta) {
+            gsap.to(cta, {
+              opacity: 1,
+              y: 0,
+              duration: 0.4,
+              delay: 0.08,
+              ease: 'power2.out'
+            });
+          }
+
+          /* Arrow nudge */
+          if (ctaArr) {
+            gsap.to(ctaArr, {
+              x: 5,
+              duration: 0.35,
+              ease: 'back.out(2)'
+            });
+          }
+
+          /* Icon pop */
+          if (icon) {
+            gsap.to(icon, {
+              scale: 1.12,
+              rotation: -5,
+              duration: 0.45,
+              ease: 'back.out(1.8)'
+            });
+          }
+
+          /* Shine sweep */
+          if (shine) {
+            gsap.fromTo(shine,
+              { x: '-100%' },
+              { x: '220%', duration: 0.65, ease: 'power2.inOut' }
+            );
+          }
+        }
+
+        function onLeave() {
+          gsap.to(card, {
+            scale: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.08)'
+          });
+
+          if (ring) {
+            gsap.to(ring, {
+              opacity: 0,
+              duration: 0.4,
+              ease: 'power2.out'
+            });
+          }
+
+          if (img) {
+            gsap.to(img, {
+              scale: 1.0,
+              filter: 'brightness(1) saturate(1)',
+              duration: 0.6,
+              ease: 'power2.out'
+            });
+          }
+
+          if (text) {
+            gsap.to(text, { y: 4, duration: 0.4, ease: 'power2.out' });
+          }
+
+          if (desc) {
+            gsap.to(desc, {
+              opacity: 0,
+              y: 6,
+              duration: 0.3,
+              ease: 'power2.in'
+            });
+          }
+
+          if (cta) {
+            gsap.to(cta, {
+              opacity: 0,
+              y: 8,
+              duration: 0.3,
+              ease: 'power2.in'
+            });
+          }
+
+          if (ctaArr) {
+            gsap.to(ctaArr, { x: 0, duration: 0.3, ease: 'power2.out' });
+          }
+
+          if (icon) {
+            gsap.to(icon, {
+              scale: 1,
+              rotation: 0,
+              duration: 0.4,
+              ease: 'power2.out'
+            });
+          }
+        }
+
+        card.addEventListener('mouseenter', onEnter);
+        card.addEventListener('mouseleave', onLeave);
+        card.addEventListener('focus', onEnter);
+        card.addEventListener('blur', onLeave);
+      });
+
+    } else {
+      /* Non-GSAP / mobile: just reveal everything */
+      revealAll();
+    }
+
+    /* ─────────────────────────────────────
+       MOBILE: Scroll dots sync
+    ───────────────────────────────────── */
+    if (isMobile) {
+      var grid = section.querySelector('.fcat__grid');
+      var dots = section.querySelectorAll('.fcat__scroll-dot');
+      var mItems = section.querySelectorAll('.fcat__item');
+
+      if (grid && dots.length && mItems.length) {
+        /* Dot click → scroll to card */
+        dots.forEach(function (dot) {
+          dot.addEventListener('click', function () {
+            var idx = parseInt(dot.dataset.index, 10);
+            var target = mItems[idx];
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
+          });
+        });
+
+        /* Scroll → update active dot */
+        var ticking = false;
+        grid.addEventListener('scroll', function () {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(function () {
+            var scrollLeft = grid.scrollLeft;
+            var cardWidth  = mItems[0] ? mItems[0].offsetWidth + 14 : 1;
+            var activeIdx  = Math.round(scrollLeft / cardWidth);
+            activeIdx = Math.max(0, Math.min(activeIdx, dots.length - 1));
+
+            dots.forEach(function (d, i) {
+              d.classList.toggle('is-active', i === activeIdx);
+            });
+            ticking = false;
+          });
+        }, { passive: true });
+      }
+    }
+  }
+
+  /* ── Bootstrap ── */
+  function bootstrap() {
+    var isMobile = window.matchMedia('(max-width: 767px)').matches;
+
+    if (isMobile) {
+      /* No GSAP needed on mobile */
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    } else {
+      loadScript(GSAP_SRC)
+        .then(function () { return loadScript(ST_SRC); })
+        .then(function () {
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+          } else {
+            requestAnimationFrame(function () {
+              requestAnimationFrame(init);
+            });
+          }
+        })
+        .catch(function () {
+          revealAll();
+          init();
+        });
+    }
+  }
+
+  bootstrap();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🐾 Featured Categories",
+  "tag": "section",
+  "class": "section-featured-categories",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "✍️ Section Header"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Shop by Pet"
+    },
+    {
+      "type": "textarea",
+      "id": "section_subtitle",
+      "label": "Subtitle",
+      "default": "Find everything your furry, feathered or finned friend needs."
+    },
+    {
+      "type": "header",
+      "content": "🎨 Style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#F8F6F2"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Desktop Layout",
+      "options": [
+        { "value": "five-col", "label": "5 Equal Columns" },
+        { "value": "stagger",  "label": "3 + 2 Stagger" },
+        { "value": "masonry",  "label": "Masonry (feature first)" }
+      ],
+      "default": "stagger"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card Corner Radius",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icons",
+      "label": "Show Category Icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_glow",
+      "label": "Enable Glow Effect on Hover",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category Card",
+      "settings": [
+        {
+          "type": "header",
+          "content": "📸 Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "category_image",
+          "label": "Category Image",
+          "info": "Recommended: 800×900px portrait, JPG/WebP."
+        },
+        {
+          "type": "color",
+          "id": "placeholder_color",
+          "label": "Placeholder Color",
+          "default": "#E8E4DC",
+          "info": "Shown when no image is uploaded."
+        },
+        {
+          "type": "header",
+          "content": "✍️ Content"
+        },
+        {
+          "type": "text",
+          "id": "category_name",
+          "label": "Category Name",
+          "default": "Dog"
+        },
+        {
+          "type": "text",
+          "id": "category_description",
+          "label": "Short Description",
+          "default": "Premium essentials for your pup",
+          "info": "Appears on hover (desktop)."
+        },
+        {
+          "type": "url",
+          "id": "category_link",
+          "label": "Category Link"
+        },
+        {
+          "type": "header",
+          "content": "🏷️ Badges (optional)"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Promo Badge",
+          "info": "e.g. 'New Arrivals' or 'Sale'. Leave blank to hide.",
+        },
+        {
+          "type": "text",
+          "id": "product_count",
+          "label": "Product Count",
+          "info": "e.g. '120+ Products'. Leave blank to hide.",
+        },
+        {
+          "type": "header",
+          "content": "✨ Glow & Layout"
+        },
+        {
+          "type": "color",
+          "id": "glow_color",
+          "label": "Hover Glow Color",
+          "default": "#FFA45B",
+          "info": "Dog=orange, Cat=purple, Fish=aqua, Bird=green, Accessories=gold."
+        },
+        {
+          "type": "select",
+          "id": "text_position",
+          "label": "Text Position",
+          "options": [
+            { "value": "bottom-left", "label": "Bottom Left" },
+            { "value": "center",      "label": "Center" },
+            { "value": "top-left",    "label": "Top Left" }
+          ],
+          "default": "bottom-left"
+        },
+        {
+          "type": "select",
+          "id": "card_size",
+          "label": "Card Height",
+          "options": [
+            { "value": "normal", "label": "Normal" },
+            { "value": "tall",   "label": "Tall" },
+            { "value": "short",  "label": "Short" }
+          ],
+          "default": "normal"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "🐾 Featured Categories",
+      "category": "Collection",
+      "blocks": [
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Dog",
+            "category_description": "Premium essentials for your pup",
+            "glow_color": "#FFA45B",
+            "badge_text": "Best Sellers",
+            "product_count": "240+ Products"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Cat",
+            "category_description": "Everything your feline needs",
+            "glow_color": "#B08CFF",
+            "product_count": "180+ Products"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Fish",
+            "category_description": "Aquatic care made simple",
+            "glow_color": "#4ED6FF",
+            "badge_text": "New Arrivals",
+            "product_count": "95+ Products"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Bird",
+            "category_description": "Keep your birds happy & healthy",
+            "glow_color": "#7CFFB2",
+            "product_count": "75+ Products"
+          }
+        },
+        {
+          "type": "category",
+          "settings": {
+            "category_name": "Accessories",
+            "category_description": "Gear up in style",
+            "glow_color": "#FFD36E",
+            "badge_text": "Trending",
+            "product_count": "320+ Products"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1563 @@
+{%- liquid
+  assign s                = section.settings
+  assign sid              = 'dob-' | append: section.id
+
+  assign bg_color         = s.bg_color         | default: '#F7F4EF'
+  assign grad_color_1     = s.gradient_color_1
+  assign grad_color_2     = s.gradient_color_2
+  assign bg_image         = s.background_image
+  assign overlay_opacity  = s.overlay_opacity  | default: 30
+  assign text_color       = s.text_color       | default: '#1A1A2E'
+  assign subtext_color    = s.subtext_color     | default: '#5A5A7A'
+  assign badge_bg_from    = s.badge_color_from | default: '#E8534A'
+  assign badge_bg_to      = s.badge_color_to   | default: '#F4883A'
+  assign btn_bg_from      = s.btn_color_from   | default: '#E8534A'
+  assign btn_bg_to        = s.btn_color_to     | default: '#F4883A'
+  assign btn_text_color   = s.btn_text_color   | default: '#FFFFFF'
+  assign timer_bg         = s.timer_bg_color   | default: '#FFFFFF'
+  assign timer_text       = s.timer_text_color | default: '#1A1A2E'
+
+  assign has_gradient     = false
+  if grad_color_1 != blank and grad_color_2 != blank
+    assign has_gradient   = true
+  endif
+
+  assign end_dt           = s.countdown_end_date | append: 'T' | append: s.countdown_end_time
+-%}
+
+{%- comment %} ── Build inline background CSS string ── {% endcomment %}
+{%- capture bg_css -%}
+  {%- if bg_image != blank -%}
+    background-image: url('{{ bg_image | image_url: width: 1800 }}');
+    background-size: cover;
+    background-position: center;
+  {%- elsif has_gradient -%}
+    background: linear-gradient(135deg, {{ grad_color_1 }}, {{ grad_color_2 }});
+  {%- else -%}
+    background-color: {{ bg_color }};
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- comment %} ── Overlay opacity as decimal ── {% endcomment %}
+{%- assign overlay_decimal = overlay_opacity | divided_by: 100.0 -%}
+
+<section
+  id="{{ sid }}"
+  class="dob"
+  style="{{ bg_css }}"
+  data-end-datetime="{{ end_dt }}"
+  aria-label="{{ s.headline | default: 'Limited Time Offer' | escape }}"
+  role="region"
+>
+
+  {%- comment %} ══ 1. OVERLAY (image mode only) ══ {% endcomment %}
+  {%- if bg_image != blank %}
+    <div
+      class="dob__overlay"
+      style="background: rgba(0,0,0,{{ overlay_decimal }});"
+      aria-hidden="true"
+    ></div>
+  {%- endif %}
+
+  {%- comment %} ══ 2. AMBIENT DECORATIVE LAYER ══ {% endcomment %}
+  <div class="dob__ambient" aria-hidden="true">
+    <div class="dob__orb dob__orb--a"></div>
+    <div class="dob__orb dob__orb--b"></div>
+  </div>
+
+  {%- comment %} ══ 3. MAIN GRID ══ {% endcomment %}
+  <div class="dob__container">
+    <div class="dob__grid">
+
+      {%- comment %} ─────────────────────────────────────────
+        LEFT  COLUMN  ─  Offer Content
+      ───────────────────────────────────────── {% endcomment %}
+      <div class="dob__content-col">
+
+        {%- comment %} ── Flash tag ── {% endcomment %}
+        {%- if s.tag_text != blank %}
+          <div class="dob__tag" data-anim="tag">
+            <span class="dob__tag-dot" aria-hidden="true"></span>
+            <span>{{ s.tag_text }}</span>
+          </div>
+        {%- endif %}
+
+        {%- comment %} ── Discount badge ── {% endcomment %}
+        {%- if s.badge_text != blank %}
+          <div
+            class="dob__badge"
+            data-anim="badge"
+            role="text"
+            aria-label="{{ s.badge_text | escape }}"
+          >
+            <span class="dob__badge-label">{{ s.badge_text }}</span>
+            <span class="dob__badge-shine" aria-hidden="true"></span>
+          </div>
+        {%- endif %}
+
+        {%- comment %} ── Headline ── {% endcomment %}
+        {%- if s.headline != blank %}
+          <h2 class="dob__headline" data-anim="headline">
+            {{ s.headline }}
+          </h2>
+        {%- endif %}
+
+        {%- comment %} ── Subtext ── {% endcomment %}
+        {%- if s.subtext != blank %}
+          <p class="dob__subtext" data-anim="subtext">
+            {{ s.subtext }}
+          </p>
+        {%- endif %}
+
+        {%- comment %} ══ COUNTDOWN TIMER ══ {% endcomment %}
+        <div
+          class="dob__countdown"
+          data-anim="countdown"
+          data-countdown-root
+          role="timer"
+          aria-live="polite"
+          aria-label="Offer countdown timer"
+        >
+          <div class="dob__countdown-grid">
+
+            {%- assign units = 'days,hours,minutes,seconds' | split: ',' -%}
+{%- assign label_map = 'Days,Hours,Mins,Secs' | split: ',' -%}
+
+{%- for unit in units %}
+  {%- assign label = label_map[forloop.index0] %}
+
+  <div class="dob__unit" data-unit="{{ unit }}">
+    <div class="dob__unit-box" aria-hidden="true">
+      <span class="dob__digit dob__digit--curr">00</span>
+      <span class="dob__digit dob__digit--next">00</span>
+    </div>
+    <span class="dob__unit-label">{{ label }}</span>
+  </div>
+
+  {%- unless forloop.last %}
+    <div class="dob__sep" aria-hidden="true">
+      <span></span><span></span>
+    </div>
+  {%- endunless %}
+{%- endfor %}
+
+          </div>
+        </div>{%- comment %} /.dob__countdown {% endcomment %}
+
+        {%- comment %} ══ CTA ══ {% endcomment %}
+        <div class="dob__cta-wrap" data-anim="cta">
+          {%- if s.btn_text != blank %}
+            <a
+              href="{{ s.btn_url | default: '#' }}"
+              class="dob__btn"
+              aria-label="{{ s.btn_text | escape }} — {{ s.headline | escape }}"
+              role="button"
+            >
+              <span class="dob__btn-text">{{ s.btn_text }}</span>
+              <span class="dob__btn-arrow" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24"
+                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                        stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="dob__btn-bg" aria-hidden="true"></span>
+            </a>
+          {%- endif %}
+
+          {%- if s.secondary_btn_text != blank %}
+            <a
+              href="{{ s.secondary_btn_url | default: '#' }}"
+              class="dob__btn-ghost"
+              aria-label="{{ s.secondary_btn_text | escape }}"
+            >
+              {{ s.secondary_btn_text }}
+            </a>
+          {%- endif %}
+        </div>
+
+        {%- comment %} ── Trust strip ── {% endcomment %}
+        {%- if s.show_trust_strip %}
+          <div class="dob__trust" data-anim="trust" aria-label="Trust indicators">
+            {%- assign trust_items = 'Free Shipping,Vet Approved,30-Day Returns' | split: ',' %}
+            {%- for item in trust_items %}
+              <div class="dob__trust-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                     aria-hidden="true">
+                  <path d="M9 12L11 14L15 10M21 12C21 16.97 16.97 21 12 21
+                           C7.03 21 3 16.97 3 12C3 7.03 7.03 3 12 3
+                           C16.97 3 21 7.03 21 12Z"
+                        stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>{{ item }}</span>
+              </div>
+            {%- endfor %}
+          </div>
+        {%- endif %}
+
+      </div>{%- comment %} /.dob__content-col {% endcomment %}
+
+      {%- comment %} ─────────────────────────────────────────
+        RIGHT COLUMN  ─  Image / Illustration
+      ───────────────────────────────────────── {% endcomment %}
+      <div class="dob__image-col" data-anim="image" aria-hidden="true">
+        <div class="dob__image-frame">
+
+          {%- comment %} Decorative rings {% endcomment %}
+          <div class="dob__ring dob__ring--outer"></div>
+          <div class="dob__ring dob__ring--inner"></div>
+
+          {%- comment %} Main image {% endcomment %}
+          <div class="dob__img-wrap">
+            {%- if s.product_image != blank %}
+              {{
+                s.product_image
+                | image_url: width: 900
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '400,600,800,900',
+                  sizes: '(max-width:767px) 85vw, 44vw',
+                  alt: s.headline,
+                  class: 'dob__img'
+              }}
+            {%- else %}
+              <div class="dob__img-placeholder" aria-label="Pet product image placeholder">
+                <span class="dob__placeholder-emoji">🐾</span>
+                <svg viewBox="0 0 260 260" fill="none"
+                     xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true">
+                  <circle cx="130" cy="145" r="72"
+                          fill="rgba(232,83,74,0.08)"/>
+                  <circle cx="97"  cy="83"  r="23"
+                          fill="rgba(232,83,74,0.10)"/>
+                  <circle cx="163" cy="83"  r="23"
+                          fill="rgba(244,136,58,0.10)"/>
+                  <circle cx="67"  cy="118" r="18"
+                          fill="rgba(232,83,74,0.07)"/>
+                  <circle cx="193" cy="118" r="18"
+                          fill="rgba(244,136,58,0.07)"/>
+                  <text x="130" y="160"
+                        text-anchor="middle"
+                        font-size="68"
+                        fill="rgba(100,80,80,0.35)">🐶</text>
+                </svg>
+              </div>
+            {%- endif %}
+          </div>
+
+          {%- comment %} Floating deal badge {% endcomment %}
+          <div class="dob__float-pill dob__float-pill--top">
+            <span class="dob__float-pill-icon" aria-hidden="true">⚡</span>
+            <span class="dob__float-pill-text">Flash Deal!</span>
+          </div>
+
+          {%- comment %} Floating review bubble {% endcomment %}
+          <div class="dob__float-pill dob__float-pill--bottom">
+            <span class="dob__float-stars" aria-label="5 out of 5 stars">★★★★★</span>
+            <span class="dob__float-pill-text">2.4k+ Happy Pets</span>
+          </div>
+
+        </div>{%- comment %} /.dob__image-frame {% endcomment %}
+      </div>{%- comment %} /.dob__image-col {% endcomment %}
+
+    </div>{%- comment %} /.dob__grid {% endcomment %}
+  </div>{%- comment %} /.dob__container {% endcomment %}
+
+  {%- comment %} ══ EXPIRED STATE OVERLAY ══ {% endcomment %}
+  <div class="dob__expired"
+       data-expired-overlay
+       style="display:none;"
+       role="alert"
+       aria-live="assertive">
+    <div class="dob__expired-inner">
+      <span class="dob__expired-icon" aria-hidden="true">🕐</span>
+      <p class="dob__expired-msg">This offer has ended.</p>
+      <a href="/collections/all" class="dob__btn" aria-label="Browse all deals">
+        <span class="dob__btn-text">Browse All Deals</span>
+        <span class="dob__btn-bg" aria-hidden="true"></span>
+      </a>
+    </div>
+  </div>
+
+</section>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   CSS  —  scoped to #sid so multiple instances never clash
+══════════════════════════════════════════════════════════ {% endcomment %}
+<style>
+/* ── CSS custom properties (scoped) ────────────────────────── */
+#{{ sid }} {
+  --dob-text:         {{ text_color }};
+  --dob-subtext:      {{ subtext_color }};
+  --dob-badge-from:   {{ badge_bg_from }};
+  --dob-badge-to:     {{ badge_bg_to }};
+  --dob-btn-from:     {{ btn_bg_from }};
+  --dob-btn-to:       {{ btn_bg_to }};
+  --dob-btn-text:     {{ btn_text_color }};
+  --dob-timer-bg:     {{ timer_bg }};
+  --dob-timer-text:   {{ timer_text }};
+  --dob-radius:       20px;
+  --dob-radius-sm:    12px;
+  --dob-gap:          clamp(36px, 5vw, 72px);
+  --dob-pad-v:        clamp(56px, 8vw, 108px);
+  --dob-shadow-soft:  0 4px 24px rgba(0,0,0,0.07);
+  --dob-shadow-med:   0 12px 40px rgba(0,0,0,0.11);
+  --dob-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dob-ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+  --dob-badge-glow:   rgba({{ badge_bg_from | remove: '#' | hex_to_rgb }}, 0.40);
+}
+
+/* ── Base section ───────────────────────────────────────────── */
+#{{ sid }} {
+  position:      relative;
+  overflow:      hidden;
+  padding:       var(--dob-pad-v) 0;
+  display:       flex;
+  align-items:   center;
+  min-height:    540px;
+  isolation:     isolate;
+}
+
+/* ── Overlay (image mode) ───────────────────────────────────── */
+.dob__overlay {
+  position: absolute;
+  inset:    0;
+  z-index:  0;
+  pointer-events: none;
+}
+
+/* ── Ambient orbs ───────────────────────────────────────────── */
+.dob__ambient {
+  position:       absolute;
+  inset:          0;
+  z-index:        0;
+  pointer-events: none;
+  overflow:       hidden;
+}
+.dob__orb {
+  position:      absolute;
+  border-radius: 50%;
+  filter:        blur(72px);
+  animation:     dob-orb-drift 10s ease-in-out infinite;
+  will-change:   transform;
+}
+.dob__orb--a {
+  width:            420px;
+  height:           420px;
+  top:              -120px;
+  left:             -80px;
+  background:       radial-gradient(circle,
+                      rgba(232,83,74,0.12),
+                      transparent 70%);
+  animation-delay:  0s;
+}
+.dob__orb--b {
+  width:            340px;
+  height:           340px;
+  bottom:           -80px;
+  right:            -60px;
+  background:       radial-gradient(circle,
+                      rgba(244,136,58,0.10),
+                      transparent 70%);
+  animation-delay:  -5s;
+}
+@keyframes dob-orb-drift {
+  0%,100% { transform: translateY(0)    scale(1);    }
+  40%     { transform: translateY(-28px) scale(1.06); }
+  70%     { transform: translateY(18px)  scale(0.96); }
+}
+
+/* ── Container & grid ───────────────────────────────────────── */
+.dob__container {
+  position:   relative;
+  z-index:    2;
+  width:      100%;
+  margin:     0 auto;
+  padding:    0 clamp(20px, 7vw, 120px);
+}
+.dob__grid {
+  display:         grid;
+  grid-template-columns: 1fr 1fr;
+  gap:             var(--dob-gap);
+  align-items:     center;
+}
+
+/* ════════════════════════════════════════════════════════════
+   LEFT COLUMN
+════════════════════════════════════════════════════════════ */
+.dob__content-col {
+  display:        flex;
+  flex-direction: column;
+  gap:            0;
+}
+
+/* ── Flash tag ── */
+.dob__tag {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       6px 16px;
+  border-radius: 100px;
+  border:        1.5px solid rgba(232,83,74,0.30);
+  background:    rgba(232,83,74,0.07);
+  color:         var(--dob-badge-from);
+  font-size:     0.76rem;
+  font-weight:   700;
+  letter-spacing:0.11em;
+  text-transform:uppercase;
+  width:         fit-content;
+  margin-bottom: 18px;
+  backdrop-filter: blur(8px);
+}
+.dob__tag-dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    var(--dob-badge-from);
+  animation:     dob-dot-pulse 1.4s ease-in-out infinite;
+  flex-shrink:   0;
+}
+@keyframes dob-dot-pulse {
+  0%,100% { transform:scale(1);   opacity:1;   }
+  50%     { transform:scale(1.4); opacity:0.6; }
+}
+
+/* ── Discount badge ── */
+.dob__badge {
+  position:      relative;
+  display:       inline-flex;
+  align-items:   center;
+  margin-bottom: 22px;
+  width:         fit-content;
+  border-radius: var(--dob-radius-sm);
+  overflow:      hidden;
+  cursor:        default;
+}
+.dob__badge-label {
+  position:       relative;
+  z-index:        1;
+  display:        block;
+  padding:        12px 28px;
+  background:     linear-gradient(
+                    135deg,
+                    var(--dob-badge-from),
+                    var(--dob-badge-to)
+                  );
+  color:          #fff;
+  font-size:      clamp(1.55rem, 3.2vw, 2.5rem);
+  font-weight:    900;
+  letter-spacing: -0.02em;
+  line-height:    1;
+  white-space:    nowrap;
+  text-shadow:    0 2px 10px rgba(0,0,0,0.18);
+  border-radius:  var(--dob-radius-sm);
+  box-shadow:
+    0 6px 24px rgba(232,83,74,0.38),
+    0 2px 8px rgba(0,0,0,0.10);
+  animation:      dob-badge-glow-pulse 2.4s ease-in-out infinite;
+}
+.dob__badge-shine {
+  position:   absolute;
+  top:        0;
+  left:       -70%;
+  width:      50%;
+  height:     100%;
+  background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.28),
+                transparent
+              );
+  transform:  skewX(-18deg);
+  animation:  dob-shine-sweep 3.5s ease-in-out infinite;
+  z-index:    2;
+}
+@keyframes dob-badge-glow-pulse {
+  0%,100% {
+    box-shadow:
+      0 6px 24px rgba(232,83,74,0.38),
+      0 2px 8px rgba(0,0,0,0.10);
+  }
+  50% {
+    box-shadow:
+      0 8px 36px rgba(232,83,74,0.55),
+      0 0 0 6px rgba(232,83,74,0.10),
+      0 2px 8px rgba(0,0,0,0.10);
+  }
+}
+@keyframes dob-shine-sweep {
+  0%   { left: -70%; }
+  40%  { left:  130%; }
+  100% { left:  130%; }
+}
+
+/* ── Headline ── */
+.dob__headline {
+  color:          var(--dob-text);
+  font-size:      clamp(1.75rem, 3.5vw, 3rem);
+  font-weight:    800;
+  line-height:    1.16;
+  letter-spacing: -0.025em;
+  margin:         0 0 12px;
+  text-wrap:      balance;
+}
+
+/* ── Subtext ── */
+.dob__subtext {
+  color:       var(--dob-subtext);
+  font-size:   clamp(0.92rem, 1.4vw, 1.1rem);
+  line-height: 1.68;
+  margin:      0 0 30px;
+  max-width:   460px;
+  font-weight: 400;
+}
+
+/* ════════════════════════════════════════════════════════════
+   COUNTDOWN TIMER
+════════════════════════════════════════════════════════════ */
+.dob__countdown {
+  margin-bottom: 30px;
+}
+.dob__countdown-grid {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  flex-wrap:   nowrap;
+}
+
+/* Unit box */
+.dob__unit {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            6px;
+}
+.dob__unit-box {
+  position:        relative;
+  width:           clamp(60px, 8.5vw, 82px);
+  height:          clamp(60px, 8.5vw, 82px);
+  background:      var(--dob-timer-bg);
+  border-radius:   var(--dob-radius-sm);
+  box-shadow:      var(--dob-shadow-soft),
+                   inset 0 1px 0 rgba(255,255,255,0.8),
+                   inset 0 -1px 0 rgba(0,0,0,0.04);
+  border:          1px solid rgba(0,0,0,0.06);
+  overflow:        hidden;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+/* flip-clock centre line */
+.dob__unit-box::after {
+  content:    '';
+  position:   absolute;
+  left:       0;
+  right:      0;
+  top:        50%;
+  height:     1px;
+  background: rgba(0,0,0,0.07);
+  z-index:    4;
+}
+.dob__digit {
+  position:    absolute;
+  font-size:   clamp(1.3rem, 2.4vw, 1.85rem);
+  font-weight: 800;
+  color:       var(--dob-timer-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  width:       100%;
+  text-align:  center;
+  will-change: transform, opacity;
+  z-index:     2;
+}
+.dob__digit--curr { opacity:1; transform:translateY(0); }
+.dob__digit--next { opacity:0; transform:translateY(60%); }
+
+.dob__unit-label {
+  font-size:      0.67rem;
+  font-weight:    600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color:          var(--dob-subtext);
+}
+
+/* Separator */
+.dob__sep {
+  display:        flex;
+  flex-direction: column;
+  gap:            7px;
+  padding-bottom: 22px;
+  flex-shrink:    0;
+}
+.dob__sep span {
+  width:         5px;
+  height:        5px;
+  border-radius: 50%;
+  background:    var(--dob-badge-from);
+  animation:     dob-sep-blink 1s step-end infinite;
+}
+.dob__sep span:last-child { animation-delay:0.5s; }
+@keyframes dob-sep-blink {
+  0%,100% { opacity:1;   }
+  50%     { opacity:0.15; }
+}
+
+/* Urgent state */
+.dob__countdown--urgent .dob__unit-box {
+  border-color: rgba(232,83,74,0.45);
+  animation:    dob-unit-urgent 0.75s ease-in-out infinite;
+}
+@keyframes dob-unit-urgent {
+  0%,100% { box-shadow: var(--dob-shadow-soft); }
+  50%     { box-shadow: 0 0 0 3px rgba(232,83,74,0.22),
+                        var(--dob-shadow-soft); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   CTA BUTTON
+════════════════════════════════════════════════════════════ */
+.dob__cta-wrap {
+  display:       flex;
+  align-items:   center;
+  gap:           18px;
+  flex-wrap:     wrap;
+  margin-bottom: 26px;
+}
+.dob__btn {
+  position:        relative;
+  display:         inline-flex;
+  align-items:     center;
+  gap:             10px;
+  padding:         15px 34px;
+  border-radius:   100px;
+  text-decoration: none;
+  border:          none;
+  cursor:          pointer;
+  overflow:        hidden;
+  font-size:       0.97rem;
+  font-weight:     800;
+  letter-spacing:  0.04em;
+  text-transform:  uppercase;
+  color:           var(--dob-btn-text);
+  transition:
+    transform     0.30s var(--dob-ease-spring),
+    box-shadow    0.30s ease;
+  box-shadow:
+    0 6px 22px rgba(232,83,74,0.32),
+    0 2px 6px  rgba(0,0,0,0.10);
+  white-space: nowrap;
+}
+.dob__btn-bg {
+  position:      absolute;
+  inset:         0;
+  background:    linear-gradient(135deg, var(--dob-btn-from), var(--dob-btn-to));
+  border-radius: inherit;
+  z-index:       0;
+  transition:    filter 0.3s ease;
+}
+.dob__btn-text,
+.dob__btn-arrow {
+  position: relative;
+  z-index:  1;
+}
+.dob__btn-arrow {
+  display:    flex;
+  align-items:center;
+  transition: transform 0.30s ease;
+}
+/* Hover / focus */
+.dob__btn:hover,
+.dob__btn:focus-visible {
+  transform:  translateY(-3px) scale(1.025);
+  box-shadow:
+    0 14px 36px rgba(232,83,74,0.42),
+    0 4px 12px  rgba(0,0,0,0.12);
+  outline:    none;
+}
+.dob__btn:hover .dob__btn-bg     { filter: brightness(1.08); }
+.dob__btn:hover .dob__btn-arrow  { transform: translateX(4px); }
+.dob__btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.dob__btn:focus-visible {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 5px var(--dob-btn-from);
+}
+
+/* Ghost / secondary */
+.dob__btn-ghost {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             5px;
+  color:           var(--dob-subtext);
+  font-size:       0.88rem;
+  font-weight:     600;
+  text-decoration: none;
+  border-bottom:   1.5px solid rgba(0,0,0,0.15);
+  padding-bottom:  2px;
+  transition:      color 0.25s ease, border-color 0.25s ease;
+}
+.dob__btn-ghost:hover {
+  color:        var(--dob-text);
+  border-color: rgba(0,0,0,0.50);
+}
+
+/* ── Trust strip ── */
+.dob__trust {
+  display:     flex;
+  align-items: center;
+  gap:         18px;
+  flex-wrap:   wrap;
+}
+.dob__trust-item {
+  display:     flex;
+  align-items: center;
+  gap:         5px;
+  color:       var(--dob-subtext);
+  font-size:   0.78rem;
+  font-weight: 500;
+}
+.dob__trust-item svg { color: var(--dob-badge-from); flex-shrink:0; }
+
+/* ════════════════════════════════════════════════════════════
+   RIGHT COLUMN — IMAGE
+════════════════════════════════════════════════════════════ */
+.dob__image-col {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+.dob__image-frame {
+  position:   relative;
+  width:      100%;
+  max-width:  460px;
+  aspect-ratio:1 / 1;
+  display:    flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Decorative rings */
+.dob__ring {
+  position:      absolute;
+  border-radius: 50%;
+  border-style:  solid;
+  pointer-events:none;
+  animation:     dob-ring-spin 22s linear infinite;
+}
+.dob__ring--outer {
+  inset:        -24px;
+  border-width: 1.5px;
+  border-color: rgba(232,83,74,0.18)
+                rgba(244,136,58,0.12)
+                transparent
+                transparent;
+}
+.dob__ring--inner {
+  inset:             -8px;
+  border-width:      1px;
+  border-color:      transparent
+                     rgba(244,136,58,0.14)
+                     rgba(232,83,74,0.10)
+                     transparent;
+  animation-direction: reverse;
+  animation-duration:  16s;
+}
+@keyframes dob-ring-spin {
+  to { transform:rotate(360deg); }
+}
+
+/* Product image */
+.dob__img-wrap {
+  position:      relative;
+  width:         88%;
+  height:        88%;
+  border-radius: 50%;
+  overflow:      hidden;
+  background:    radial-gradient(
+                   circle,
+                   rgba(232,83,74,0.08),
+                   rgba(255,255,255,0.40) 70%
+                 );
+  border:        1.5px solid rgba(232,83,74,0.14);
+  box-shadow:
+    var(--dob-shadow-med),
+    0 0 48px rgba(232,83,74,0.12);
+  transition: box-shadow 0.40s ease;
+}
+.dob__image-frame:hover .dob__img-wrap {
+  box-shadow:
+    0 20px 56px rgba(0,0,0,0.14),
+    0 0 60px rgba(232,83,74,0.18);
+}
+.dob__img {
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: center;
+  display:         block;
+  transition:      transform 0.55s var(--dob-ease-out);
+}
+.dob__image-frame:hover .dob__img { transform: scale(1.05); }
+
+/* Placeholder */
+.dob__img-placeholder {
+  width:           100%;
+  height:          100%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-direction:  column;
+  gap:             8px;
+  opacity:         0.75;
+}
+.dob__placeholder-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+.dob__img-placeholder svg {
+  width:  160px;
+  height: 160px;
+}
+
+/* Floating pills */
+.dob__float-pill {
+  position:       absolute;
+  display:        inline-flex;
+  align-items:    center;
+  gap:            8px;
+  padding:        9px 16px;
+  background:     rgba(255,255,255,0.78);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border:         1px solid rgba(255,255,255,0.90);
+  border-radius:  100px;
+  box-shadow:     var(--dob-shadow-med);
+  white-space:    nowrap;
+  font-size:      0.82rem;
+  font-weight:    700;
+  color:          #1A1A2E;
+  z-index:        10;
+}
+.dob__float-pill--top {
+  top:   7%;
+  right: -6%;
+  animation: dob-float-a 4.2s ease-in-out infinite;
+}
+.dob__float-pill--bottom {
+  bottom:          9%;
+  left:            -6%;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             2px;
+  padding:         10px 18px;
+  border-radius:   var(--dob-radius-sm);
+  animation:       dob-float-b 4.8s ease-in-out infinite;
+}
+@keyframes dob-float-a {
+  0%,100% { transform:translateY(0);   }
+  50%     { transform:translateY(-9px); }
+}
+@keyframes dob-float-b {
+  0%,100% { transform:translateY(0);   }
+  50%     { transform:translateY(9px); }
+}
+.dob__float-pill-icon { font-size:1.15rem; }
+.dob__float-stars {
+  color:        #F59E0B;
+  font-size:    0.85rem;
+  letter-spacing:1px;
+  line-height:  1;
+}
+
+/* ── Expired overlay ─────────────────────────────────────── */
+.dob__expired {
+  position:       absolute;
+  inset:          0;
+  z-index:        30;
+  background:     rgba(255,255,255,0.92);
+  backdrop-filter:blur(8px);
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+}
+.dob__expired-inner {
+  text-align:  center;
+  padding:     40px 24px;
+}
+.dob__expired-icon { font-size:3.5rem; display:block; margin-bottom:12px; }
+.dob__expired-msg  {
+  font-size:   1.3rem;
+  font-weight: 700;
+  color:       var(--dob-text);
+  margin:      0 0 24px;
+}
+
+/* ── Reduced motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .dob__orb,
+  .dob__tag-dot,
+  .dob__badge-label,
+  .dob__badge-shine,
+  .dob__sep span,
+  .dob__ring,
+  .dob__float-pill--top,
+  .dob__float-pill--bottom {
+    animation: none !important;
+  }
+  .dob__img,
+  .dob__btn {
+    transition: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .dob__grid { gap: 40px; }
+  .dob__float-pill--top  { right: -2%; }
+  .dob__float-pill--bottom { left: -2%; }
+}
+
+@media (max-width: 767px) {
+  #{{ sid }} { padding: 52px 0; min-height: auto; }
+
+  .dob__grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+  .dob__image-col {
+    order: -1;
+    max-width: 300px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .dob__content-col {
+    align-items: center;
+    text-align:  center;
+  }
+  .dob__headline,
+  .dob__subtext { max-width: 100%; text-align: center; }
+  .dob__badge-label { clip-path: none; }
+  .dob__countdown-grid { justify-content: center; }
+  .dob__cta-wrap { flex-direction: column; align-items: center; width: 100%; }
+  .dob__btn {
+    width:           100%;
+    justify-content: center;
+    padding:         17px 36px;
+    font-size:       1.02rem;
+  }
+  .dob__trust { justify-content: center; }
+  .dob__float-pill--top    { top: -12px; right:  2%; }
+  .dob__float-pill--bottom { bottom: -12px; left: 2%; }
+}
+
+@media (max-width: 440px) {
+  .dob__unit-box { width:56px; height:56px; }
+  .dob__countdown-grid { gap: 6px; }
+  .dob__float-pill { display: none; }
+}
+</style>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   JAVASCRIPT  —  GSAP loader + countdown engine + animations
+══════════════════════════════════════════════════════════ {% endcomment %}
+
+{%- comment %} Lazy-load GSAP once per page ─────────────────────── {% endcomment %}
+<script>
+(function () {
+  if (window.__dobGsapState) return;
+  window.__dobGsapState = 'loading';
+
+  const GSAP_URL = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  const ST_URL   = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+
+  function loadScript(src, cb) {
+    const el  = document.createElement('script');
+    el.src    = src;
+    el.defer  = true;
+    el.onload = cb;
+    document.head.appendChild(el);
+  }
+
+  loadScript(GSAP_URL, function () {
+    loadScript(ST_URL, function () {
+      window.__dobGsapState = 'ready';
+      document.dispatchEvent(new CustomEvent('dob:gsap-ready'));
+    });
+  });
+}());
+</script>
+
+{%- comment %} Per-section logic ────────────────────────────────── {% endcomment %}
+<script>
+(function () {
+  'use strict';
+
+  /* ── Utilities ─────────────────────────────────────────── */
+  const pad      = n => String(Math.max(0, n)).padStart(2, '0');
+  const isMobile = () => window.matchMedia('(max-width:767px)').matches;
+  const noMotion = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ── Section ────────────────────────────────────────────── */
+  const section  = document.getElementById('{{ sid }}');
+  if (!section) return;
+
+  const endRaw   = section.dataset.endDatetime;
+  const endEpoch = endRaw ? new Date(endRaw).getTime() : null;
+
+  /* ── DOM map ─────────────────────────────────────────────── */
+  const sel = q => section.querySelector(q);
+  const dom = {
+    tag:        sel('[data-anim="tag"]'),
+    badge:      sel('[data-anim="badge"]'),
+    headline:   sel('[data-anim="headline"]'),
+    subtext:    sel('[data-anim="subtext"]'),
+    countdown:  sel('[data-anim="countdown"]'),
+    cta:        sel('[data-anim="cta"]'),
+    trust:      sel('[data-anim="trust"]'),
+    image:      sel('[data-anim="image"]'),
+    ctaBtn:     sel('.dob__btn'),
+    expired:    sel('[data-expired-overlay]'),
+    cdRoot:     sel('[data-countdown-root]'),
+    bgImgEl:    sel('.dob__bg-image'),
+  };
+
+  /* ── Countdown state ─────────────────────────────────────── */
+  let prevVals   = {};
+  let timerID    = null;
+  let gsapCtx    = null;
+
+  /* ══════════════════════════════════════════════════════════
+     COUNTDOWN ENGINE
+  ══════════════════════════════════════════════════════════ */
+  function getRemaining() {
+    if (!endEpoch) return null;
+    const diff = endEpoch - Date.now();
+    if (diff <= 0) return null;
+    return {
+      days:    Math.floor(diff / 86_400_000),
+      hours:   Math.floor(diff % 86_400_000 / 3_600_000),
+      minutes: Math.floor(diff % 3_600_000  /    60_000),
+      seconds: Math.floor(diff % 60_000     /     1_000),
+      diff,
+    };
+  }
+
+  /**
+   * Flip animation:
+   * current digit slides up & fades out,
+   * next digit slides up from below & fades in.
+   */
+  function flipDigit(unit, newValStr) {
+    const box  = section.querySelector(`.dob__unit[data-unit="${unit}"] .dob__unit-box`);
+    if (!box) return;
+    const curr = box.querySelector('.dob__digit--curr');
+    const next = box.querySelector('.dob__digit--next');
+    if (!curr || !next) return;
+
+    /* Populate next layer */
+    next.textContent = newValStr;
+
+    if (noMotion() || !window.gsap) {
+      curr.textContent = newValStr;
+      return;
+    }
+
+    const dur = 0.22;
+    gsap.timeline()
+      .to(curr, {
+        y: '-55%', opacity: 0,
+        duration: dur, ease: 'power2.in',
+      })
+      .fromTo(next,
+        { y: '55%', opacity: 0 },
+        { y: '0%',  opacity: 1,
+          duration: dur, ease: 'power2.out' },
+        `<${dur * 0.1}`
+      )
+      .call(() => {
+        curr.textContent = newValStr;
+        gsap.set(curr, { y: '0%', opacity: 1 });
+        gsap.set(next, { y: '55%', opacity: 0 });
+      });
+  }
+
+  function updateUnit(key, val) {
+    const str = pad(val);
+    if (prevVals[key] === str) return;
+    prevVals[key] = str;
+    flipDigit(key, str);
+  }
+
+  function setInitialValues(t) {
+    ['days','hours','minutes','seconds'].forEach(k => {
+      const box  = section.querySelector(`.dob__unit[data-unit="${k}"] .dob__unit-box`);
+      if (!box) return;
+      const curr = box.querySelector('.dob__digit--curr');
+      if (curr) curr.textContent = pad(t ? t[k] : 0);
+    });
+  }
+
+  function setUrgent(flag) {
+    dom.cdRoot && dom.cdRoot.classList.toggle('dob__countdown--urgent', flag);
+  }
+
+  function showExpired() {
+    setInitialValues(null);
+    if (!dom.expired) return;
+    dom.expired.style.display = 'flex';
+    if (window.gsap && !noMotion()) {
+      gsap.fromTo(dom.expired,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.55, ease: 'power2.out' }
+      );
+    }
+  }
+
+  function tick() {
+    const t = getRemaining();
+    if (!t) { showExpired(); return; }
+
+    updateUnit('days',    t.days);
+    updateUnit('hours',   t.hours);
+    updateUnit('minutes', t.minutes);
+    updateUnit('seconds', t.seconds);
+
+    setUrgent(t.diff < 3_600_000); /* < 1 hour */
+
+    timerID = setTimeout(tick, 1_000);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     GSAP ANIMATIONS
+  ══════════════════════════════════════════════════════════ */
+  function initGsap() {
+    if (!window.gsap || noMotion()) {
+      /* Fallback: ensure everything is visible */
+      [
+        dom.tag, dom.badge, dom.headline,
+        dom.subtext, dom.countdown, dom.cta,
+        dom.trust, dom.image
+      ].forEach(el => { if (el) el.style.opacity = '1'; });
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsapCtx = gsap.context(() => {
+
+      /* 1 ── Initial states ─────────────────────────────── */
+      const leftEls = [
+        dom.tag, dom.badge, dom.headline,
+        dom.subtext, dom.countdown, dom.cta, dom.trust,
+      ].filter(Boolean);
+
+      gsap.set(leftEls,   { opacity: 0, x: -36 });
+      if (dom.image) gsap.set(dom.image, { opacity: 0, x: 36, scale: 0.92 });
+
+      /* 2 ── Entrance timeline (ScrollTrigger, once) ───── */
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start:   'top 78%',
+          once:    true,
+        },
+        defaults: { ease: 'power3.out' },
+      });
+
+      if (dom.tag) {
+        tl.to(dom.tag, { opacity:1, x:0, duration:0.45 });
+      }
+      if (dom.badge) {
+        tl.to(dom.badge,
+          { opacity:1, x:0, scale:1, duration:0.60,
+            ease:'back.out(1.7)' },
+          '-=0.20'
+        );
+        gsap.set(dom.badge, { scale:0.65 });
+      }
+      if (dom.headline) {
+        tl.to(dom.headline, { opacity:1, x:0, duration:0.55 }, '-=0.30');
+      }
+      if (dom.subtext) {
+        tl.to(dom.subtext, { opacity:1, x:0, duration:0.50 }, '-=0.32');
+      }
+      if (dom.countdown) {
+        tl.to(dom.countdown, { opacity:1, x:0, duration:0.55 }, '-=0.28');
+      }
+      if (dom.cta) {
+        tl.to(dom.cta, { opacity:1, x:0, duration:0.65,
+          ease:'back.out(2)' }, '-=0.30');
+      }
+      if (dom.trust) {
+        tl.to(dom.trust, { opacity:1, x:0, duration:0.45 }, '-=0.28');
+      }
+      if (dom.image) {
+        tl.to(dom.image, {
+          opacity:1, x:0, scale:1, duration:0.80,
+          ease:'back.out(1.4)',
+        }, '<0.05');
+      }
+
+      /* 3 ── CTA breathing loop ─────────────────────────── */
+      if (dom.ctaBtn && !isMobile()) {
+        gsap.to(dom.ctaBtn, {
+          scale:    1.032,
+          duration: 1.9,
+          ease:     'sine.inOut',
+          yoyo:     true,
+          repeat:   -1,
+        });
+      }
+
+      /* 4 ── Parallax scroll (desktop only) ─────────────── */
+      if (!isMobile()) {
+        const bgImgNode = section.querySelector('.dob__bg-image');
+        if (bgImgNode) {
+          gsap.to(bgImgNode, {
+            yPercent: 20,
+            ease:     'none',
+            scrollTrigger: {
+              trigger: section,
+              start:   'top bottom',
+              end:     'bottom top',
+              scrub:   1.4,
+            },
+          });
+        }
+
+        /* Subtle section scale on scroll */
+        gsap.fromTo(
+          section.querySelector('.dob__grid'),
+          { scale: 0.97 },
+          {
+            scale: 1,
+            ease:  'none',
+            scrollTrigger: {
+              trigger: section,
+              start:   'top 85%',
+              end:     'top 35%',
+              scrub:   true,
+            },
+          }
+        );
+      }
+
+    }, section); /* ← scope */
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════════ */
+  function boot() {
+    /* Show initial zeroed values immediately */
+    const first = getRemaining();
+    setInitialValues(first);
+
+    tick();
+
+    if (window.__dobGsapState === 'ready') {
+      initGsap();
+    } else {
+      document.addEventListener('dob:gsap-ready', initGsap, { once: true });
+    }
+  }
+
+  /* Boot on DOMContentLoaded or immediately if already loaded */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  /* ── Theme-editor lifecycle (live preview) ─────────────── */
+  document.addEventListener('shopify:section:unload', function (e) {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    clearTimeout(timerID);
+    if (gsapCtx) gsapCtx.revert();
+  });
+
+  document.addEventListener('shopify:section:load', function (e) {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    prevVals = {};
+    boot();
+  });
+
+}());
+</script>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   SCHEMA
+══════════════════════════════════════════════════════════ {% endcomment %}
+{% schema %}
+{
+  "name": "🐾 Deals Offer Banner",
+  "tag":   "section",
+  "class": "section-deals-offer-banner",
+  "limit": 2,
+
+  "settings": [
+
+    {
+      "type":    "header",
+      "content": "🎨 Background — Color"
+    },
+    {
+      "type":    "color",
+      "id":      "bg_color",
+      "label":   "Background Color",
+      "default": "#F7F4EF",
+      "info":    "Used when no background image or gradient is set."
+    },
+
+    {
+      "type":    "header",
+      "content": "🌈 Background — Gradient (overrides solid color)"
+    },
+    {
+      "type":  "color",
+      "id":    "gradient_color_1",
+      "label": "Gradient — Start Color",
+      "info":  "Leave blank to disable gradient."
+    },
+    {
+      "type":  "color",
+      "id":    "gradient_color_2",
+      "label": "Gradient — End Color",
+      "info":  "Leave blank to disable gradient."
+    },
+
+    {
+      "type":    "header",
+      "content": "🖼 Background — Image (overrides color & gradient)"
+    },
+    {
+      "type":  "image_picker",
+      "id":    "background_image",
+      "label": "Background Image",
+      "info":  "Min 1800 × 900 px recommended. Will be darkened by overlay."
+    },
+    {
+      "type":    "range",
+      "id":      "overlay_opacity",
+      "label":   "Image Overlay Opacity",
+      "min":     0,
+      "max":     90,
+      "step":    5,
+      "unit":    "%",
+      "default": 30,
+      "info":    "Controls how dark the overlay is over the background image."
+    },
+
+    {
+      "type":    "header",
+      "content": "✏️ Offer Content"
+    },
+    {
+      "type":    "text",
+      "id":      "tag_text",
+      "label":   "Flash Tag Line",
+      "default": "⚡ Flash Sale — Limited Time Only"
+    },
+    {
+      "type":    "text",
+      "id":      "badge_text",
+      "label":   "Discount Badge",
+      "default": "UP TO 50% OFF",
+      "info":    "Bold discount label. Keep it short."
+    },
+    {
+      "type":    "textarea",
+      "id":      "headline",
+      "label":   "Main Headline",
+      "default": "Limited Time Pet Essentials Sale"
+    },
+    {
+      "type":    "textarea",
+      "id":      "subtext",
+      "label":   "Supporting Subtext",
+      "default": "Don't miss exclusive deals on your pet's favorite products. Premium quality, unbeatable prices."
+    },
+
+    {
+      "type":    "header",
+      "content": "⏳ Countdown Timer"
+    },
+    {
+      "type":    "text",
+      "id":      "countdown_end_date",
+      "label":   "End Date",
+      "default": "2025-12-31",
+      "info":    "Format: YYYY-MM-DD"
+    },
+    {
+      "type":    "text",
+      "id":      "countdown_end_time",
+      "label":   "End Time",
+      "default": "23:59:59",
+      "info":    "Format: HH:MM:SS  (store local timezone)"
+    },
+
+    {
+      "type":    "header",
+      "content": "🔘 Call to Action"
+    },
+    {
+      "type":    "text",
+      "id":      "btn_text",
+      "label":   "Primary Button Text",
+      "default": "Shop the Deal Now"
+    },
+    {
+      "type":  "url",
+      "id":    "btn_url",
+      "label": "Primary Button Link"
+    },
+    {
+      "type":    "text",
+      "id":      "secondary_btn_text",
+      "label":   "Secondary Button Text (optional)",
+      "default": "Browse All Deals"
+    },
+    {
+      "type":  "url",
+      "id":    "secondary_btn_url",
+      "label": "Secondary Button Link"
+    },
+
+    {
+      "type":    "header",
+      "content": "🖼 Product Image"
+    },
+    {
+      "type":  "image_picker",
+      "id":    "product_image",
+      "label": "Product / Pet Image",
+      "info":  "Square image (1:1). PNG with transparent background works best."
+    },
+
+    {
+      "type":    "header",
+      "content": "🔤 Text Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "text_color",
+      "label":   "Heading Color",
+      "default": "#1A1A2E"
+    },
+    {
+      "type":    "color",
+      "id":      "subtext_color",
+      "label":   "Subtext & Label Color",
+      "default": "#5A5A7A"
+    },
+
+    {
+      "type":    "header",
+      "content": "🏷 Badge Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "badge_color_from",
+      "label":   "Badge Gradient — Start",
+      "default": "#E8534A"
+    },
+    {
+      "type":    "color",
+      "id":      "badge_color_to",
+      "label":   "Badge Gradient — End",
+      "default": "#F4883A"
+    },
+
+    {
+      "type":    "header",
+      "content": "🔘 Button Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "btn_color_from",
+      "label":   "Button Gradient — Start",
+      "default": "#E8534A"
+    },
+    {
+      "type":    "color",
+      "id":      "btn_color_to",
+      "label":   "Button Gradient — End",
+      "default": "#F4883A"
+    },
+    {
+      "type":    "color",
+      "id":      "btn_text_color",
+      "label":   "Button Text Color",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type":    "header",
+      "content": "⏱ Timer Block Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "timer_bg_color",
+      "label":   "Timer Card Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type":    "color",
+      "id":      "timer_text_color",
+      "label":   "Timer Number Color",
+      "default": "#1A1A2E"
+    },
+
+    {
+      "type":    "header",
+      "content": "⚙️ Options"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_trust_strip",
+      "label":   "Show Trust Strip",
+      "default": true,
+      "info":    "Displays Free Shipping · Vet Approved · 30-Day Returns"
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "🐾 Deals Offer Banner v2",
+      "category": "Promotions",
+      "settings": {
+        "bg_color":            "#F7F4EF",
+        "tag_text":            "⚡ Flash Sale — Limited Time Only",
+        "badge_text":          "UP TO 50% OFF",
+        "headline":            "Limited Time Pet Essentials Sale",
+        "subtext":             "Don't miss exclusive deals on your pet's favorite products. Premium quality, unbeatable prices.",
+        "countdown_end_date":  "2025-12-31",
+        "countdown_end_time":  "23:59:59",
+        "btn_text":            "Shop the Deal Now",
+        "secondary_btn_text":  "Browse All Deals",
+        "badge_color_from":    "#E8534A",
+        "badge_color_to":      "#F4883A",
+        "btn_color_from":      "#E8534A",
+        "btn_color_to":        "#F4883A",
+        "btn_text_color":      "#FFFFFF",
+        "text_color":          "#1A1A2E",
+        "subtext_color":       "#5A5A7A",
+        "timer_bg_color":      "#FFFFFF",
+        "timer_text_color":    "#1A1A2E",
+        "show_trust_strip":    true,
+        "overlay_opacity":     30
+      }
+    }
+  ]
+}
+{% endschema %}

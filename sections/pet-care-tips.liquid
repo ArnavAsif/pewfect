@@ -1,0 +1,1420 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  SECTION  : Pet Care Tips                                        ║
+  ║  Style    : Premium Editorial / Visual-first                     ║
+  ║  Version  : 2.0.0                                                ║
+  ║  Deps     : GSAP 3.12 + ScrollTrigger (CDN, deferred)           ║
+  ║                                                                  ║
+  ║  FEATURES                                                        ║
+  ║  • Block-based cards (fully editable in Theme Editor)            ║
+  ║  • GSAP scroll-reveal with rotation stagger                      ║
+  ║  • Hover: card scale + image zoom + shadow lift                  ║
+  ║  • Mobile: native-scroll horizontal slider                       ║
+  ║  • Lazy-load images, GPU-only animations                         ║
+  ║  • Full accessibility (alt, aria, focus rings, reduced-motion)   ║
+  ╚══════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign sid = 'pct-' | append: section.id
+  assign col_count = s.columns | default: 3
+  assign show_intro = s.show_section_intro
+-%}
+
+<section
+  id="{{ sid }}"
+  class="pct"
+  aria-labelledby="{{ sid }}-heading"
+>
+  {%- comment %} ══ SECTION INTRO ══ {%- endcomment %}
+  {%- if show_intro %}
+    <div class="pct__intro" data-pct-intro>
+      {%- if s.eyebrow != blank %}
+        <p class="pct__eyebrow">{{ s.eyebrow }}</p>
+      {%- endif %}
+
+      {%- if s.heading != blank %}
+        <h2 class="pct__heading" id="{{ sid }}-heading">
+          {{ s.heading }}
+        </h2>
+      {%- endif %}
+
+      {%- if s.subheading != blank %}
+        <p class="pct__subheading">{{ s.subheading }}</p>
+      {%- endif %}
+    </div>
+  {%- else %}
+    {%- comment %} Hidden heading for accessibility even when intro hidden {%- endcomment %}
+    <h2 id="{{ sid }}-heading" class="visually-hidden">
+      {{ s.heading | default: 'Pet Care Tips' }}
+    </h2>
+  {%- endif %}
+
+  {%- comment %} ══ CARDS TRACK (wraps both grid & slider) ══ {%- endcomment %}
+  <div class="pct__track-wrap">
+    {%- comment %} Mobile drag indicator {%- endcomment %}
+    <div class="pct__swipe-hint" aria-hidden="true">
+      <span class="pct__swipe-hint-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18L15 12L9 6" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span>Swipe to explore</span>
+    </div>
+
+    <div
+      class="pct__track"
+      data-pct-track
+      role="list"
+      aria-label="Pet care tips"
+    >
+      {%- for block in section.blocks %}
+        {%- liquid
+          assign b = block.settings
+          assign card_image = b.card_image
+          assign card_title = b.card_title | default: 'Pet Care Tip'
+          assign card_sub = b.card_subtext
+          assign card_url = b.card_url
+          assign card_icon = b.card_icon
+          assign overlay_hex = b.overlay_color | default: '#000000'
+          assign overlay_opac = b.overlay_opacity | default: 40
+          assign overlay_dec = overlay_opac | divided_by: 100.0
+          assign tag_color = b.tag_color | default: '#FFFFFF'
+          assign text_color = b.text_color | default: '#FFFFFF'
+          assign card_tag = b.card_tag
+          assign anim_delay = forloop.index0 | times: 120
+        -%}
+
+        <article
+          class="pct__card"
+          data-pct-card
+          data-delay="{{ anim_delay }}"
+          role="listitem"
+          {{ block.shopify_attributes }}
+          {%- if card_url != blank %}
+            tabindex="0"
+          {%- endif %}
+          aria-label="{{ card_title | escape }}"
+        >
+          {%- comment %} ── Clickable wrapper ── {%- endcomment %}
+          {%- if card_url != blank %}
+            <a
+              class="pct__card-link"
+              href="{{ card_url }}"
+              tabindex="-1"
+              aria-hidden="true"
+            ></a>
+          {%- endif %}
+
+          {%- comment %} ── Background image ── {%- endcomment %}
+          <div class="pct__card-img-wrap" aria-hidden="true">
+            {%- if card_image != blank %}
+              {{
+                card_image
+                | image_url: width: 900
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '400, 600, 800, 900',
+                  sizes: '(max-width:599px) 85vw, (max-width:1023px) 45vw, 32vw',
+                  alt: card_title,
+                  class: 'pct__card-img'
+              }}
+            {%- else %}
+              <div class="pct__card-img-placeholder">
+                <span class="pct__placeholder-emoji" aria-hidden="true">
+                  {{- card_icon | default: '🐾' -}}
+                </span>
+              </div>
+            {%- endif %}
+          </div>
+
+          {%- comment %} ── Gradient overlay ── {%- endcomment %}
+          <div
+            class="pct__card-overlay"
+            aria-hidden="true"
+            style="
+              background: linear-gradient(
+                to top,
+                {{ overlay_hex }}{{ overlay_opac | times: 2 | append: '' }} 0%,
+                {{ overlay_hex }}20 55%,
+                transparent 100%
+              );
+            "
+          ></div>
+
+          {%- comment %} ── Card inner content ── {%- endcomment %}
+          <div class="pct__card-body">
+            {%- comment %} Top area: icon + tag {%- endcomment %}
+            <div class="pct__card-top">
+              {% comment %} {%- if card_icon != blank %}
+                <span
+                  class="pct__card-icon"
+                  aria-hidden="true"
+                  style="color: {{ tag_color }};"
+                >
+                  {{ card_icon }}
+                </span>
+              {%- endif %} {% endcomment %}
+
+              {%- if card_tag != blank %}
+                <span
+                  class="pct__card-tag"
+                  style="color: {{ tag_color }};"
+                >
+                  {{ card_tag }}
+                </span>
+              {%- endif %}
+            </div>
+
+            {%- comment %} Bottom area: title + sub {%- endcomment %}
+            <div class="pct__card-bottom">
+              <h3
+                class="pct__card-title"
+                style="color: {{ text_color }};"
+              >
+                {{ card_title }}
+              </h3>
+
+              {%- if card_sub != blank %}
+                <p
+                  class="pct__card-sub"
+                  style="color: {{ text_color }};"
+                >
+                  {{ card_sub }}
+                </p>
+              {%- endif %}
+
+              {%- if card_url != blank %}
+                <span
+                  class="pct__card-arrow"
+                  aria-hidden="true"
+                  style="color: {{ text_color }};"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="currentColor" stroke-width="2.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              {%- endif %}
+            </div>
+          </div>
+          {%- comment %} /.pct__card-body {%- endcomment %}
+
+          {%- comment %} ── Hover shimmer ── {%- endcomment %}
+          <div class="pct__card-shimmer" aria-hidden="true"></div>
+        </article>
+      {%- else %}
+        {%- comment %} ══ PLACEHOLDER CARDS (no blocks added yet) ══ {%- endcomment %}
+        {%- assign placeholder_data = 'Grooming Care|🛁|Brush, bathe and bond with your pet every week.,#C8A882|#6B4C2A,Feeding Guide|🥣|Balanced nutrition is the foundation of a healthy life.,#9DC88A|#2D5A1B,Training Tips|🎾|Positive reinforcement builds trust and better behaviour.,#A8C4D4|#1A4A5E,Health Basics|💊|Regular check-ups keep your best friend thriving.,#D4A8C4|#5E1A4A'
+          | split: ','
+        %}
+
+        {%- for i in (1..4) %}
+          {%- assign idx = i | minus: 1 | times: 5 %}
+
+          {%- assign ph_title = placeholder_data[idx] %}
+
+          {%- assign idx_1 = idx | plus: 1 %}
+          {%- assign ph_icon = placeholder_data[idx_1] %}
+
+          {%- assign idx_2 = idx | plus: 2 %}
+          {%- assign ph_sub = placeholder_data[idx_2] %}
+
+          {%- assign idx_3 = idx | plus: 3 %}
+          {%- assign ph_overlay = placeholder_data[idx_3] %}
+
+          {%- assign idx_4 = idx | plus: 4 %}
+          {%- assign ph_bg = placeholder_data[idx_4] %}
+
+          {%- assign anim_delay = idx | times: 24 %}
+
+          <article
+            class="pct__card pct__card--placeholder"
+            data-pct-card
+            data-delay="{{ anim_delay }}"
+            role="listitem"
+            aria-label="{{ ph_title }}"
+          >
+            <div class="pct__card-img-wrap" aria-hidden="true">
+              <div
+                class="pct__card-img-placeholder"
+                style="background: {{ ph_bg }}22;"
+              >
+                <span class="pct__placeholder-emoji">{{ ph_icon }}</span>
+              </div>
+            </div>
+
+            <div
+              class="pct__card-overlay"
+              aria-hidden="true"
+              style="
+                background: linear-gradient(
+                  to top,
+                  {{ ph_overlay }}CC 0%,
+                  {{ ph_overlay }}33 55%,
+                  transparent 100%
+                );
+              "
+            ></div>
+
+            <div class="pct__card-body">
+              <div class="pct__card-top">
+                <span class="pct__card-icon" aria-hidden="true">{{ ph_icon }}</span>
+                <span class="pct__card-tag" style="color:rgba(255,255,255,0.80);"> Pet Care </span>
+              </div>
+              <div class="pct__card-bottom">
+                <h3 class="pct__card-title">{{ ph_title }}</h3>
+                <p class="pct__card-sub">{{ ph_sub }}</p>
+                <span class="pct__card-arrow" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                          stroke="currentColor" stroke-width="2.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div class="pct__card-shimmer" aria-hidden="true"></div>
+          </article>
+        {%- endfor %}
+      {%- endfor %}
+    </div>
+    {%- comment %} /.pct__track {%- endcomment %}
+
+    {%- comment %} ══ MOBILE DOTS INDICATOR ══ {%- endcomment %}
+    <div
+      class="pct__dots"
+      data-pct-dots
+      aria-hidden="true"
+    ></div>
+  </div>
+  {%- comment %} /.pct__track-wrap {%- endcomment %}
+
+  {%- comment %} ══ OPTIONAL VIEW ALL LINK ══ {%- endcomment %}
+  {%- if s.show_cta and s.cta_text != blank %}
+    <div class="pct__footer" data-pct-footer>
+      <a
+        href="{{ s.cta_url | default: '#' }}"
+        class="pct__cta"
+        aria-label="{{ s.cta_text | escape }}"
+      >
+        <span>{{ s.cta_text }}</span>
+        <span class="pct__cta-arrow" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                  stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+  {%- endif %}
+</section>
+
+{%- comment %}
+  ══════════════════════════════════════════════════════════
+     STYLES
+  ══════════════════════════════════════════════════════════
+{%- endcomment %}
+<style>
+  /* ── Visually hidden utility ─────────────────────────── */
+  .visually-hidden {
+    position:   absolute;
+    width:      1px;
+    height:     1px;
+    padding:    0;
+    margin:     -1px;
+    overflow:   hidden;
+    clip:       rect(0,0,0,0);
+    white-space:nowrap;
+    border:     0;
+  }
+
+  /* ── CSS custom properties ───────────────────────────── */
+  #{{ sid }} {
+    --pct-bg:           {{ s.section_bg | default: '#FDFCF9' }};
+    --pct-text:         {{ s.section_text_color | default: '#1C1917' }};
+    --pct-subtext:      {{ s.section_subtext_color | default: '#78716C' }};
+    --pct-accent:       {{ s.accent_color | default: '#D97757' }};
+    --pct-card-radius:  {{ s.card_radius | default: 20 }}px;
+    --pct-card-h:       {{ s.card_height | default: 480 }}px;
+    --pct-cols:         {{ col_count }};
+    --pct-gap:          clamp(16px, 2.2vw, 28px);
+    --pct-pad-v:        clamp(64px, 9vw, 120px);
+    --pct-pad-h:        clamp(20px, 5vw, 72px);
+    --pct-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+    --pct-ease-smooth:  cubic-bezier(0.22, 1, 0.36, 1);
+    --pct-transition:   0.55s var(--pct-ease-smooth);
+  }
+
+  /* ── Base section ────────────────────────────────────── */
+  #{{ sid }} {
+    background-color: var(--pct-bg);
+    padding:          var(--pct-pad-v) 0;
+    overflow:         hidden;
+    position:         relative;
+  }
+
+  /* ── Section intro ───────────────────────────────────── */
+  .pct__intro {
+    text-align:    center;
+    padding:       0 var(--pct-pad-h);
+    margin-bottom: clamp(36px, 5vw, 64px);
+    max-width:     680px;
+    margin-left:   auto;
+    margin-right:  auto;
+  }
+  .pct__eyebrow {
+    font-size:      0.76rem;
+    font-weight:    700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color:          var(--pct-accent);
+    margin:         0 0 14px;
+  }
+  .pct__heading {
+    font-size:      clamp(1.9rem, 4vw, 3.2rem);
+    font-weight:    800;
+    color:          var(--pct-text);
+    line-height:    1.14;
+    letter-spacing: -0.025em;
+    margin:         0 0 16px;
+    text-wrap:      balance;
+  }
+  .pct__subheading {
+    font-size:   clamp(0.95rem, 1.5vw, 1.1rem);
+    color:       var(--pct-subtext);
+    line-height: 1.70;
+    margin:      0;
+    font-weight: 400;
+  }
+
+  /* ── Track wrap ──────────────────────────────────────── */
+  .pct__track-wrap {
+    position: relative;
+    padding:  0 var(--pct-pad-h);
+  }
+
+  /* ── Swipe hint (mobile only) ─────────────────────────  */
+  .pct__swipe-hint {
+    display:     none;
+    align-items: center;
+    gap:         6px;
+    font-size:   0.76rem;
+    font-weight: 600;
+    color:       var(--pct-subtext);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-left: 4px;
+    opacity:     0.75;
+  }
+  .pct__swipe-hint-icon {
+    display:     flex;
+    align-items: center;
+    animation:   pct-swipe-nudge 1.8s ease-in-out infinite;
+  }
+  @keyframes pct-swipe-nudge {
+    0%,100% { transform:translateX(0);  }
+    50%     { transform:translateX(5px); }
+  }
+
+  /* ══════════════════════════════════════════════════════
+     CARD GRID  (desktop / tablet)
+  ══════════════════════════════════════════════════════ */
+  .pct__track {
+    display:               grid;
+    grid-template-columns: repeat(var(--pct-cols), 1fr);
+    gap:                   var(--pct-gap);
+    list-style:            none;
+    margin:                0;
+    padding:               0;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     INDIVIDUAL CARD
+  ══════════════════════════════════════════════════════ */
+  .pct__card {
+    position:      relative;
+    height:        var(--pct-card-h);
+    border-radius: var(--pct-card-radius);
+    overflow:      hidden;
+    cursor:        pointer;
+    outline:       none;
+
+    /* Initial GSAP state set via JS; CSS fallback: */
+    opacity:       0;
+    transform:     translateY(40px) rotateZ(2deg);
+
+    /* Smooth transitions (non-GSAP hover) */
+    transition:
+      box-shadow  var(--pct-transition),
+      transform   var(--pct-transition);
+
+    /* Subtle card shadow */
+    box-shadow:
+      0 2px 12px rgba(0,0,0,0.07),
+      0 1px 3px  rgba(0,0,0,0.04);
+  }
+
+  /* Keyboard focus ring */
+  .pct__card:focus-visible {
+    outline:        3px solid var(--pct-accent);
+    outline-offset: 4px;
+  }
+
+  /* CSS hover (fallback when GSAP not loaded) */
+  @media (hover: hover) {
+    .pct__card:hover {
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.16),
+        0 6px 20px  rgba(0,0,0,0.08);
+    }
+  }
+
+  /* ── Full-area clickable link ─────────────────────────── */
+  .pct__card-link {
+    position: absolute;
+    inset:    0;
+    z-index:  10;
+    display:  block;
+  }
+
+  /* ── Image layer ─────────────────────────────────────── */
+  .pct__card-img-wrap {
+    position:   absolute;
+    inset:      0;
+    overflow:   hidden;
+    will-change:transform;
+  }
+  .pct__card-img {
+    width:           100%;
+    height:          100%;
+    object-fit:      cover;
+    object-position: center;
+    display:         block;
+    transform:       scale(1);
+    transition:      transform 0.70s var(--pct-ease-smooth);
+    will-change:     transform;
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-img {
+      transform: scale(1.08);
+    }
+  }
+
+  /* ── Placeholder (no image) ──────────────────────────── */
+  .pct__card-img-placeholder {
+    width:           100%;
+    height:          100%;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    background:      linear-gradient(
+                       135deg,
+                       rgba(217,119,87,0.12),
+                       rgba(217,119,87,0.05)
+                     );
+  }
+  .pct__placeholder-emoji {
+    font-size:   5.5rem;
+    line-height: 1;
+    filter:      saturate(0.7) brightness(1.1);
+    opacity:     0.55;
+  }
+
+  /* ── Gradient overlay ────────────────────────────────── */
+  .pct__card-overlay {
+    position:   absolute;
+    inset:      0;
+    z-index:    2;
+    transition: opacity 0.55s ease;
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-overlay {
+      opacity: 1.1; /* Intentionally slightly over 1 — browsers clamp, subtle darkening */
+    }
+  }
+
+  /* ── Card body (content) ─────────────────────────────── */
+  .pct__card-body {
+    position:        absolute;
+    inset:           0;
+    z-index:         3;
+    display:         flex;
+    flex-direction:  column;
+    justify-content: space-between;
+    padding:         clamp(18px, 3vw, 28px);
+  }
+
+  /* Top section: icon + tag */
+  .pct__card-top {
+    display:     flex;
+    align-items: center;
+    gap:         10px;
+  }
+  .pct__card-icon {
+    font-size:   1.55rem;
+    line-height: 1;
+    filter:      drop-shadow(0 1px 4px rgba(0,0,0,0.35));
+    flex-shrink: 0;
+  }
+  .pct__card-tag {
+    font-size:      0.70rem;
+    font-weight:    700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity:        0.85;
+    text-shadow:    0 1px 4px rgba(0,0,0,0.35);
+  }
+
+  /* Bottom section: title + sub + arrow */
+  .pct__card-bottom {
+    display:        flex;
+    flex-direction: column;
+    gap:            6px;
+  }
+  .pct__card-title {
+    font-size:      clamp(1.15rem, 2.2vw, 1.55rem);
+    font-weight:    800;
+    line-height:    1.18;
+    letter-spacing: -0.015em;
+    margin:         0;
+    text-shadow:    0 2px 12px rgba(0,0,0,0.40);
+    transition:     transform 0.40s var(--pct-ease-smooth);
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-title {
+      transform: translateY(-3px);
+    }
+  }
+
+  .pct__card-sub {
+    font-size:   clamp(0.80rem, 1.2vw, 0.92rem);
+    font-weight: 400;
+    line-height: 1.55;
+    margin:      0;
+    opacity:     0.82;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+
+    /* Hidden by default, revealed on hover */
+    max-height:  0;
+    overflow:    hidden;
+    opacity:     0;
+    transform:   translateY(6px);
+    transition:
+      max-height 0.45s var(--pct-ease-smooth),
+      opacity    0.40s ease,
+      transform  0.40s var(--pct-ease-smooth);
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-sub {
+      max-height: 60px;
+      opacity:    0.88;
+      transform:  translateY(0);
+    }
+  }
+
+  .pct__card-arrow {
+    display:    flex;
+    align-items:center;
+    margin-top: 4px;
+    opacity:    0;
+    transform:  translateX(-8px);
+    transition:
+      opacity   0.40s ease,
+      transform 0.40s var(--pct-ease-smooth);
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-arrow {
+      opacity:   1;
+      transform: translateX(0);
+    }
+  }
+
+  /* ── Shimmer overlay on hover ────────────────────────── */
+  .pct__card-shimmer {
+    position:    absolute;
+    inset:       0;
+    z-index:     4;
+    background:  linear-gradient(
+                   135deg,
+                   rgba(255,255,255,0.06) 0%,
+                   transparent 60%
+                 );
+    border-radius: inherit;
+    opacity:     0;
+    transition:  opacity 0.55s ease;
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .pct__card:hover .pct__card-shimmer {
+      opacity: 1;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════
+     DOTS INDICATOR
+  ══════════════════════════════════════════════════════ */
+  .pct__dots {
+    display:         none;
+    justify-content: center;
+    gap:             7px;
+    margin-top:      20px;
+  }
+  .pct__dot {
+    width:         7px;
+    height:        7px;
+    border-radius: 50%;
+    background:    var(--pct-subtext);
+    opacity:       0.30;
+    transition:    opacity 0.3s ease, transform 0.3s ease;
+    cursor:        pointer;
+  }
+  .pct__dot--active {
+    opacity:    1;
+    background: var(--pct-accent);
+    transform:  scale(1.3);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     FOOTER CTA
+  ══════════════════════════════════════════════════════ */
+  .pct__footer {
+    display:         flex;
+    justify-content: center;
+    margin-top:      clamp(36px, 5vw, 60px);
+    padding:         0 var(--pct-pad-h);
+    opacity:         0;
+    transform:       translateY(20px);
+  }
+  .pct__cta {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             10px;
+    padding:         13px 30px;
+    border-radius:   100px;
+    border:          2px solid var(--pct-accent);
+    color:           var(--pct-accent);
+    font-size:       0.90rem;
+    font-weight:     700;
+    letter-spacing:  0.05em;
+    text-transform:  uppercase;
+    text-decoration: none;
+    transition:
+      background  0.30s ease,
+      color       0.30s ease,
+      transform   0.30s var(--pct-ease-spring),
+      box-shadow  0.30s ease;
+  }
+  .pct__cta:hover,
+  .pct__cta:focus-visible {
+    background:  var(--pct-accent);
+    color:       #fff;
+    transform:   translateY(-2px);
+    box-shadow:  0 8px 24px rgba(0,0,0,0.14);
+    outline:     none;
+  }
+  .pct__cta:focus-visible {
+    outline:        3px solid var(--pct-accent);
+    outline-offset: 4px;
+  }
+  .pct__cta-arrow {
+    display:    flex;
+    align-items:center;
+    transition: transform 0.30s ease;
+  }
+  .pct__cta:hover .pct__cta-arrow,
+  .pct__cta:focus-visible .pct__cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     RESPONSIVE  —  Tablet (2 columns)
+  ══════════════════════════════════════════════════════ */
+  @media (max-width: 1023px) {
+    #{{ sid }} {
+      --pct-cols:  2;
+      --pct-card-h:{{ s.card_height | default: 480 | times: 0.9 | round }}px;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════
+     RESPONSIVE  —  Mobile (horizontal slider)
+  ══════════════════════════════════════════════════════ */
+  @media (max-width: 599px) {
+    #{{ sid }} {
+      --pct-card-h: {{ s.card_height | default: 420 | times: 0.82 | round }}px;
+    }
+
+    .pct__track-wrap { padding: 0; }
+
+    .pct__swipe-hint {
+      display:      flex;
+      padding-left: clamp(20px, 5vw, 40px);
+    }
+
+    .pct__track {
+      grid-template-columns: repeat({{ section.blocks.size | default: 4 }}, 80vw);
+      gap:                   14px;
+      overflow-x:            auto;
+      overflow-y:            visible;
+      scroll-snap-type:      x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width:       none;
+      padding:               8px clamp(20px, 5vw, 40px) 16px;
+      padding-right:         clamp(20px, 5vw, 40px);
+    }
+    .pct__track::-webkit-scrollbar { display: none; }
+
+    .pct__card {
+      scroll-snap-align: start;
+      flex-shrink:       0;
+    }
+
+    /* On mobile: always show content, skip hover-only states */
+    .pct__card-sub {
+      max-height: 60px;
+      opacity:    0.80;
+      transform:  translateY(0);
+    }
+    .pct__card-arrow {
+      opacity:   1;
+      transform: translateX(0);
+    }
+
+    /* Dots visible on mobile */
+    .pct__dots { display: flex; }
+
+    .pct__footer { padding: 0 clamp(20px, 5vw, 40px); }
+  }
+
+  /* ── Reduced-motion overrides ─────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .pct__card,
+    .pct__card-img,
+    .pct__card-title,
+    .pct__card-sub,
+    .pct__card-arrow,
+    .pct__card-shimmer,
+    .pct__cta {
+      transition: none !important;
+      animation:  none !important;
+    }
+    .pct__swipe-hint-icon { animation: none !important; }
+    .pct__card {
+      opacity:   1 !important;
+      transform: none !important;
+    }
+    .pct__footer {
+      opacity:   1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+{%- comment %}
+  ══════════════════════════════════════════════════════════
+     JAVASCRIPT  —  GSAP loader, scroll-reveal, hover, mobile slider
+  ══════════════════════════════════════════════════════════
+{%- endcomment %}
+
+{%- comment %} ── Load GSAP once per page ── {%- endcomment %}
+<script>
+  (function () {
+    if (window.__pctGsap) return;
+    window.__pctGsap = 'loading';
+
+    const GSAP = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+    const ST = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+
+    function load(src, cb) {
+      const s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      s.onload = cb;
+      document.head.appendChild(s);
+    }
+
+    load(GSAP, () =>
+      load(ST, () => {
+        window.__pctGsap = 'ready';
+        document.dispatchEvent(new CustomEvent('pct:gsap-ready'));
+      })
+    );
+  })();
+</script>
+
+{%- comment %} ── Per-section logic ── {%- endcomment %}
+<script>
+(function () {
+  'use strict';
+
+  /* ── Utilities ──────────────────────────────────────────── */
+  const isMobile    = () => window.matchMedia('(max-width:599px)').matches;
+  const noMotion    = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const $ = (sel, ctx) => (ctx || document).querySelector(sel);
+  const $$ = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
+
+  /* ── Section ────────────────────────────────────────────── */
+  const section = document.getElementById('{{ sid }}');
+  if (!section) return;
+
+  const cards    = $$('[data-pct-card]', section);
+  const track    = $('[data-pct-track]', section);
+  const dotsWrap = $('[data-pct-dots]', section);
+  const footer   = $('[data-pct-footer]', section);
+  const intro    = $('[data-pct-intro]', section);
+
+  let gsapCtx = null;
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE DOTS
+  ══════════════════════════════════════════════════════════ */
+  function buildDots() {
+    if (!dotsWrap || !cards.length) return;
+    dotsWrap.innerHTML = '';
+
+    cards.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'pct__dot' + (i === 0 ? ' pct__dot--active' : '');
+      dot.setAttribute('aria-label', `Go to card ${i + 1}`);
+      dot.addEventListener('click', () => scrollToCard(i));
+      dotsWrap.appendChild(dot);
+    });
+  }
+
+  function scrollToCard(idx) {
+    if (!track || !cards[idx]) return;
+    track.scrollTo({
+      left:     cards[idx].offsetLeft - parseInt(getComputedStyle(track).paddingLeft),
+      behavior: 'smooth',
+    });
+  }
+
+  function updateDots() {
+    if (!track || !dotsWrap) return;
+    const dots    = $$('.pct__dot', dotsWrap);
+    const trackL  = track.scrollLeft;
+    const cardW   = cards[0]?.offsetWidth + parseInt(getComputedStyle(track).gap) || 1;
+    const active  = Math.round(trackL / cardW);
+    dots.forEach((d, i) => d.classList.toggle('pct__dot--active', i === active));
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     KEYBOARD NAV (card focus)
+  ══════════════════════════════════════════════════════════ */
+  function initKeyboard() {
+    cards.forEach(card => {
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const link = $('a.pct__card-link', card);
+          if (link) link.click();
+        }
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     GSAP ANIMATIONS
+  ══════════════════════════════════════════════════════════ */
+  function initGsap() {
+    if (!window.gsap || noMotion()) {
+      /* Fallback: make everything visible immediately */
+      cards.forEach(c => {
+        c.style.opacity   = '1';
+        c.style.transform = 'none';
+      });
+      if (footer) {
+        footer.style.opacity   = '1';
+        footer.style.transform = 'none';
+      }
+      if (intro) {
+        intro.style.opacity   = '1';
+        intro.style.transform = 'none';
+      }
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsapCtx = gsap.context(() => {
+
+      /* ── 1. Section intro reveal ──────────────────────── */
+      if (intro) {
+        gsap.set(intro, { opacity: 0, y: 30 });
+        gsap.to(intro, {
+          opacity:  1,
+          y:        0,
+          duration: 0.80,
+          ease:     'power3.out',
+          scrollTrigger: {
+            trigger: intro,
+            start:   'top 82%',
+            once:    true,
+          },
+        });
+      }
+
+      /* ── 2. Cards staggered scroll-reveal ─────────────── */
+      if (!isMobile()) {
+        /* Desktop: ScrollTrigger per card for fine control */
+        cards.forEach((card) => {
+          const delay = parseInt(card.dataset.delay || 0) / 1000;
+
+          gsap.set(card, {
+            opacity:  0,
+            y:        48,
+            rotateZ:  2,
+            scale:    0.97,
+          });
+
+          gsap.to(card, {
+            opacity:  1,
+            y:        0,
+            rotateZ:  0,
+            scale:    1,
+            duration: 0.80,
+            delay:    delay,
+            ease:     'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start:   'top 86%',
+              once:    true,
+            },
+          });
+        });
+      } else {
+        /* Mobile: simple batch reveal (no per-card trigger, perf) */
+        gsap.set(cards, { opacity: 0, y: 24 });
+        gsap.to(cards, {
+          opacity:  1,
+          y:        0,
+          duration: 0.60,
+          ease:     'power2.out',
+          stagger:  0.08,
+          scrollTrigger: {
+            trigger: track,
+            start:   'top 88%',
+            once:    true,
+          },
+        });
+      }
+
+      /* ── 3. Footer CTA reveal ─────────────────────────── */
+      if (footer) {
+        gsap.to(footer, {
+          opacity:  1,
+          y:        0,
+          duration: 0.65,
+          ease:     'power3.out',
+          scrollTrigger: {
+            trigger: footer,
+            start:   'top 90%',
+            once:    true,
+          },
+        });
+      }
+
+      /* ── 4. Desktop hover — GSAP-powered ──────────────── */
+      if (!isMobile()) {
+        cards.forEach(card => {
+          const img = $('.pct__card-img', card);
+
+          card.addEventListener('mouseenter', () => {
+            gsap.to(card, {
+              scale:    1.025,
+              duration: 0.50,
+              ease:     'power2.out',
+            });
+            if (img) {
+              gsap.to(img, {
+                scale:    1.09,
+                duration: 0.70,
+                ease:     'power2.out',
+              });
+            }
+          });
+
+          card.addEventListener('mouseleave', () => {
+            gsap.to(card, {
+              scale:    1,
+              duration: 0.55,
+              ease:     'power2.inOut',
+            });
+            if (img) {
+              gsap.to(img, {
+                scale:    1,
+                duration: 0.65,
+                ease:     'power2.inOut',
+              });
+            }
+          });
+        });
+      }
+
+      /* ── 5. Very subtle continuous floating (desktop) ─── */
+      if (!isMobile() && {{ s.enable_float_animation | default: false }}) {
+        cards.forEach((card, i) => {
+          const dir = i % 2 === 0 ? -6 : 6;
+          gsap.to(card, {
+            y:        dir,
+            duration: 4 + i * 0.4,
+            ease:     'sine.inOut',
+            yoyo:     true,
+            repeat:   -1,
+            delay:    i * 0.3,
+          });
+        });
+      }
+
+    }, section);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════════ */
+  function boot() {
+    buildDots();
+    initKeyboard();
+
+    /* Mobile scroll → update dots */
+    if (track) {
+      track.addEventListener('scroll', updateDots, { passive: true });
+    }
+
+    if (window.__pctGsap === 'ready') {
+      initGsap();
+    } else {
+      document.addEventListener('pct:gsap-ready', initGsap, { once: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  /* ── Theme editor lifecycle ─────────────────────────────── */
+  document.addEventListener('shopify:section:unload', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    if (gsapCtx) gsapCtx.revert();
+  });
+  document.addEventListener('shopify:section:load', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    boot();
+  });
+  document.addEventListener('shopify:block:select', e => {
+    if (!section.contains(e.detail.target)) return;
+    const card = e.detail.target.closest('[data-pct-card]');
+    if (card) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  });
+
+}());
+</script>
+
+{%- comment %}
+  ══════════════════════════════════════════════════════════
+     SCHEMA
+  ══════════════════════════════════════════════════════════
+{%- endcomment %}
+{% schema %}
+{
+  "name": "🐾 Pet Care Tips",
+  "tag": "section",
+  "class": "section-pet-care-tips",
+  "limit": 2,
+
+  "settings": [
+    {
+      "type": "header",
+      "content": "🖼 Section Intro"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_section_intro",
+      "label": "Show Section Intro (eyebrow, heading, subheading)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Label",
+      "default": "Expert Advice"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Pet Care, Simplified"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Section Subheading",
+      "default": "Everything your pet needs — from daily grooming to nutrition, training, and wellness."
+    },
+
+    {
+      "type": "header",
+      "content": "🎨 Section Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section Background",
+      "default": "#FDFCF9"
+    },
+    {
+      "type": "color",
+      "id": "section_text_color",
+      "label": "Heading Color",
+      "default": "#1C1917"
+    },
+    {
+      "type": "color",
+      "id": "section_subtext_color",
+      "label": "Subtext / Label Color",
+      "default": "#78716C"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (eyebrow, CTA border)",
+      "default": "#D97757"
+    },
+
+    {
+      "type": "header",
+      "content": "🃏 Card Layout"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Desktop Columns",
+      "options": [
+        { "value": "2", "label": "2 Columns" },
+        { "value": "3", "label": "3 Columns" },
+        { "value": "4", "label": "4 Columns" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Card Height",
+      "min": 360,
+      "max": 640,
+      "step": 20,
+      "unit": "px",
+      "default": 480
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card Corner Radius",
+      "min": 0,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "🔘 Footer CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show 'View All' Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "Explore All Pet Care Tips"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA Button Link"
+    },
+
+    {
+      "type": "header",
+      "content": "✨ Animation"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_float_animation",
+      "label": "Enable Subtle Floating Animation",
+      "default": false,
+      "info": "Adds a very gentle, continuous up/down float on cards (desktop only)."
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "tip_card",
+      "name": "🐾 Tip Card",
+      "limit": 8,
+
+      "settings": [
+        {
+          "type": "header",
+          "content": "🖼 Card Image & Link"
+        },
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Card Image",
+          "info": "Vertical / portrait images work best (2:3 or 3:4). Min 800px tall."
+        },
+        {
+          "type": "url",
+          "id": "card_url",
+          "label": "Card Link (optional)"
+        },
+
+        {
+          "type": "header",
+          "content": "✏️ Card Text"
+        },
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card Title",
+          "default": "Grooming Care"
+        },
+        {
+          "type": "text",
+          "id": "card_subtext",
+          "label": "Short Subtext (optional — 1 line max)",
+          "default": "Weekly brushing keeps coats healthy and shiny."
+        },
+        {
+          "type": "text",
+          "id": "card_tag",
+          "label": "Category Tag (optional)",
+          "default": "Grooming"
+        },
+        {
+          "type": "text",
+          "id": "card_icon",
+          "label": "Icon / Emoji (optional)",
+          "default": "🛁",
+          "info": "Use a single emoji: 🛁 🥣 🎾 💊 🐾 🏃 ❤️"
+        },
+
+        {
+          "type": "header",
+          "content": "🎨 Card Colors"
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Overlay Tint Color",
+          "default": "#1C0F00",
+          "info": "The gradient overlay color for text readability."
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "Overlay Opacity",
+          "min": 20,
+          "max": 90,
+          "step": 5,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "tag_color",
+          "label": "Tag & Icon Color",
+          "default": "#FFFFFF"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "🐾 Pet Care Tips",
+      "category": "Content",
+      "blocks": [
+        {
+          "type": "tip_card",
+          "settings": {
+            "card_title": "Grooming Care",
+            "card_subtext": "Weekly brushing keeps coats healthy and shiny.",
+            "card_tag": "Grooming",
+            "card_icon": "🛁",
+            "overlay_color": "#1C0F00",
+            "overlay_opacity": 50,
+            "text_color": "#FFFFFF",
+            "tag_color": "#FFFFFF"
+          }
+        },
+        {
+          "type": "tip_card",
+          "settings": {
+            "card_title": "Feeding Guide",
+            "card_subtext": "Balanced nutrition is the foundation of a long, healthy life.",
+            "card_tag": "Nutrition",
+            "card_icon": "🥣",
+            "overlay_color": "#0A1F0A",
+            "overlay_opacity": 50,
+            "text_color": "#FFFFFF",
+            "tag_color": "#FFFFFF"
+          }
+        },
+        {
+          "type": "tip_card",
+          "settings": {
+            "card_title": "Training Tips",
+            "card_subtext": "Positive reinforcement builds trust and better behaviour.",
+            "card_tag": "Training",
+            "card_icon": "🎾",
+            "overlay_color": "#0A0F1F",
+            "overlay_opacity": 50,
+            "text_color": "#FFFFFF",
+            "tag_color": "#FFFFFF"
+          }
+        },
+        {
+          "type": "tip_card",
+          "settings": {
+            "card_title": "Health Basics",
+            "card_subtext": "Regular vet check-ups keep your best friend thriving.",
+            "card_tag": "Health",
+            "card_icon": "💊",
+            "overlay_color": "#1F0A1A",
+            "overlay_opacity": 50,
+            "text_color": "#FFFFFF",
+            "tag_color": "#FFFFFF"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

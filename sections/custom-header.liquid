@@ -1,0 +1,2449 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  SECTION  : Pet Shop Header — Redesigned                         ║
+  ║  Style    : Warm Editorial / Organic D2C                         ║
+  ║  Palette  : Cream #FDFCF9 · Stone #1C1917 · Terracotta #D97757  ║
+  ║  Version  : 3.0.0                                                ║
+  ║                                                                  ║
+  ║  WHAT'S NEW                                                      ║
+  ║  • Pill-style nav links with warm hover fills                    ║
+  ║  • Two-tier header: utility bar + main nav bar                   ║
+  ║  • Floating mega-menu with image cards                           ║
+  ║  • Animated logo paw-print wordmark                              ║
+  ║  • Warm gradient announcement bar                                ║
+  ║  • Mobile drawer with warm palette + pet emoji accents           ║
+  ║  • Backdrop-blur glass header on scroll                          ║
+  ╚══════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+{%- liquid
+  assign sid          = 'ph3-' | append: section.id
+  assign s            = section.settings
+
+  assign bg_default   = '#FDFCF9'
+  assign accent_def   = '#D97757'
+  assign stone_def    = '#1C1917'
+  assign muted_def    = '#78716C'
+  assign border_def   = '#EAE5DD'
+
+  assign logo_img     = s.logo_image
+  assign logo_text    = s.logo_text    | default: shop.name
+  assign logo_w       = s.logo_max_width | default: 150
+  assign main_menu    = s.main_menu
+
+  assign bar_bg       = s.announcement_bg    | default: '#D97757'
+  assign bar_fg       = s.announcement_fg    | default: '#FFFFFF'
+  assign bar_text     = s.announcement_text  | default: '🐾 Free shipping on orders $50+ &nbsp;·&nbsp; Code: PETLOVE for 10% off &nbsp;·&nbsp; Vet-approved products'
+  assign bar_url      = s.announcement_url
+  assign bar_dismiss  = s.announcement_dismissible
+
+  assign show_search  = s.show_search
+  assign show_account = s.show_account
+  assign show_cart    = s.show_cart
+  assign show_whislist = s.show_wishlist
+  assign sticky       = s.enable_sticky
+  assign show_progress = s.show_scroll_progress
+-%}
+
+{%- comment %} ══════════════════════════════════════
+  ANNOUNCEMENT BAR
+══════════════════════════════════════ {% endcomment %}
+{%- if s.show_announcement_bar and bar_text != blank %}
+<div
+  id="{{ sid }}-bar"
+  class="ph3-bar"
+  style="--bar-bg:{{ bar_bg }}; --bar-fg:{{ bar_fg }};"
+  role="region"
+  aria-label="Announcement"
+  data-ph3-bar
+>
+  <div class="ph3-bar__marquee" aria-live="polite">
+    <div class="ph3-bar__track" aria-hidden="true">
+      {%- for i in (1..4) %}
+        <span class="ph3-bar__item">
+          {%- if bar_url != blank %}
+            <a href="{{ bar_url }}" class="ph3-bar__link">{{ bar_text }}</a>
+          {%- else %}
+            {{ bar_text }}
+          {%- endif %}
+          <span class="ph3-bar__dot" aria-hidden="true">✦</span>
+        </span>
+      {%- endfor %}
+    </div>
+  </div>
+
+  {%- if bar_dismiss %}
+    <button
+      class="ph3-bar__close"
+      aria-label="Dismiss announcement"
+      data-ph3-bar-close
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  {%- endif %}
+</div>
+{%- endif %}
+
+
+{%- comment %} ══════════════════════════════════════
+  MAIN HEADER
+══════════════════════════════════════ {% endcomment %}
+<header
+  id="{{ sid }}"
+  class="ph3{% if sticky %} ph3--sticky{% endif %}"
+  style="
+    --ph3-cream:  {{ s.bg_color   | default: bg_default }};
+    --ph3-stone:  {{ s.text_color | default: stone_def  }};
+    --ph3-accent: {{ s.accent_color | default: accent_def }};
+    --ph3-muted:  {{ s.text_muted   | default: muted_def  }};
+    --ph3-border: {{ s.border_color | default: border_def }};
+    --ph3-logo-w: {{ logo_w }}px;
+  "
+  role="banner"
+  data-ph3-header
+>
+
+  {%- comment %} ── TOP UTILITY STRIP ── {% endcomment %}
+  <div class="ph3__strip">
+    <div class="ph3__strip-inner">
+
+      <p class="ph3__strip-left">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+             aria-hidden="true">
+          <path d="M12 2L3 7V12C3 16.418 7.03 20.592 12 22C16.97 20.592
+                   21 16.418 21 12V7L12 2Z"
+                stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M9 12L11 14L15 10" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ s.strip_text | default: 'Vet-approved • Ethically sourced • Loved by 50k+ pet parents' }}
+      </p>
+
+      <nav class="ph3__strip-right" aria-label="Secondary navigation">
+        {%- if show_account %}
+          <a
+            href="{{ customer | default: routes.account_login_url }}"
+            class="ph3__strip-link"
+          >
+            {%- if customer %}Hi, {{ customer.first_name }}
+            {%- else %}Sign In{% endif %}
+          </a>
+        {%- endif %}
+        <a href="/pages/help" class="ph3__strip-link">Help</a>
+        <a href="/pages/track-order" class="ph3__strip-link">Track Order</a>
+
+        {%- comment %} Currency selector placeholder {% endcomment %}
+        <span class="ph3__strip-link ph3__strip-link--static">🇺🇸 USD</span>
+      </nav>
+
+    </div>
+  </div>
+
+  {%- comment %} ── MAIN NAV ROW ── {% endcomment %}
+  <div class="ph3__main" data-ph3-main>
+    <div class="ph3__main-inner">
+
+      {%- comment %} LOGO {% endcomment %}
+      <a
+        href="{{ routes.root_url }}"
+        class="ph3__logo"
+        aria-label="{{ logo_text }} — home"
+      >
+        {%- if logo_img != blank %}
+          {{
+            logo_img
+            | image_url: width: 400
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '150, 220, 300, 400',
+              alt: logo_text,
+              class: 'ph3__logo-img'
+          }}
+        {%- else %}
+          <span class="ph3__logo-mark" aria-label="{{ logo_text }}">
+            <span class="ph3__logo-icon" aria-hidden="true">
+              <svg width="36" height="36" viewBox="0 0 48 48"
+                   fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="22"
+                        fill="var(--ph3-accent)" opacity="0.12"/>
+                <ellipse cx="16" cy="14" rx="5" ry="7"
+                         fill="var(--ph3-accent)"/>
+                <ellipse cx="32" cy="14" rx="5" ry="7"
+                         fill="var(--ph3-accent)"/>
+                <ellipse cx="9"  cy="24" rx="4" ry="5.5"
+                         fill="var(--ph3-accent)" opacity="0.75"/>
+                <ellipse cx="39" cy="24" rx="4" ry="5.5"
+                         fill="var(--ph3-accent)" opacity="0.75"/>
+                <ellipse cx="24" cy="32" rx="10" ry="8"
+                         fill="var(--ph3-accent)"/>
+              </svg>
+            </span>
+            <span class="ph3__logo-name">{{ logo_text }}</span>
+          </span>
+        {%- endif %}
+      </a>
+
+      {%- comment %} DESKTOP NAV {% endcomment %}
+      <nav class="ph3__nav" aria-label="Main navigation" data-ph3-nav>
+        <ul class="ph3__nav-list" role="list">
+
+          {%- comment %} ── SHOP (mega) ── {% endcomment %}
+          <li class="ph3__item ph3__item--mega" data-ph3-item>
+            <button
+              class="ph3__link ph3__link--btn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-ph3-mega-btn
+            >
+              Shop
+              <span class="ph3__chevron" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </button>
+
+            <div class="ph3__mega" data-ph3-mega role="region" aria-label="Shop menu">
+              <div class="ph3__mega-wrap">
+
+                {%- comment %} Link columns from menu OR dummy {% endcomment %}
+                <div class="ph3__mega-cols">
+
+                  <div class="ph3__mega-col">
+                    <p class="ph3__mega-head">🐶 Dogs</p>
+                    <ul class="ph3__mega-list" role="list">
+                      <li><a href="/collections/dog-food"      class="ph3__mega-link">Dog Food & Treats</a></li>
+                      <li><a href="/collections/dog-toys"      class="ph3__mega-link">Toys & Play</a></li>
+                      <li><a href="/collections/dog-grooming"  class="ph3__mega-link">Grooming</a></li>
+                      <li><a href="/collections/dog-beds"      class="ph3__mega-link">Beds & Comfort</a></li>
+                      <li><a href="/collections/dog-collars"   class="ph3__mega-link">Collars & Leashes</a></li>
+                      <li><a href="/collections/dog-health"    class="ph3__mega-link">Health & Wellness</a></li>
+                    </ul>
+                  </div>
+
+                  <div class="ph3__mega-col">
+                    <p class="ph3__mega-head">🐱 Cats</p>
+                    <ul class="ph3__mega-list" role="list">
+                      <li><a href="/collections/cat-food"      class="ph3__mega-link">Cat Food & Treats</a></li>
+                      <li><a href="/collections/cat-toys"      class="ph3__mega-link">Toys & Enrichment</a></li>
+                      <li><a href="/collections/cat-litter"    class="ph3__mega-link">Litter & Hygiene</a></li>
+                      <li><a href="/collections/cat-beds"      class="ph3__mega-link">Beds & Trees</a></li>
+                      <li><a href="/collections/cat-grooming"  class="ph3__mega-link">Grooming</a></li>
+                      <li><a href="/collections/cat-health"    class="ph3__mega-link">Health & Wellness</a></li>
+                    </ul>
+                  </div>
+
+                  <div class="ph3__mega-col">
+                    <p class="ph3__mega-head">🐠 Small Pets</p>
+                    <ul class="ph3__mega-list" role="list">
+                      <li><a href="/collections/bird"          class="ph3__mega-link">Birds</a></li>
+                      <li><a href="/collections/fish"          class="ph3__mega-link">Fish & Aquatics</a></li>
+                      <li><a href="/collections/rabbit"        class="ph3__mega-link">Rabbits</a></li>
+                      <li><a href="/collections/hamster"       class="ph3__mega-link">Hamsters & Rodents</a></li>
+                      <li><a href="/collections/reptile"       class="ph3__mega-link">Reptiles</a></li>
+                    </ul>
+                  </div>
+
+                </div>
+
+                {%- comment %} Featured promo card {% endcomment %}
+                <div class="ph3__mega-promo">
+                  {%- assign mp = section.blocks | where: 'type', 'mega_promo' | first %}
+                  {%- if mp != blank and mp.settings.promo_image != blank %}
+                    <div class="ph3__mega-promo-img">
+                      {{
+                        mp.settings.promo_image
+                        | image_url: width: 480
+                        | image_tag:
+                          loading: 'lazy',
+                          widths: '240,360,480',
+                          alt: mp.settings.promo_title,
+                          class: 'ph3__mega-promo-photo'
+                      }}
+                    </div>
+                    <div class="ph3__mega-promo-body">
+                      <span class="ph3__mega-promo-badge">
+                        {{ mp.settings.promo_badge | default: '🔥 Hot Deal' }}
+                      </span>
+                      <p class="ph3__mega-promo-title">
+                        {{ mp.settings.promo_title | default: 'New Arrivals' }}
+                      </p>
+                      <a href="{{ mp.settings.promo_url | default: '/collections/new' }}"
+                         class="ph3__mega-promo-cta">
+                        {{ mp.settings.promo_cta | default: 'Shop Now' }}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                             aria-hidden="true">
+                          <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                                stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    </div>
+                  {%- else %}
+                    <div class="ph3__mega-promo-placeholder">
+                      <div class="ph3__mega-promo-body">
+                        <span class="ph3__mega-promo-badge">🔥 This Week</span>
+                        <p class="ph3__mega-promo-title">New Arrivals Just Dropped</p>
+                        <a href="/collections/new" class="ph3__mega-promo-cta">
+                          Shop New
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                               aria-hidden="true">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                                  stroke="currentColor" stroke-width="2.5"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  {%- endif %}
+                </div>
+
+              </div>
+            </div>
+          </li>
+
+          {%- comment %} ── BRANDS (dropdown) ── {% endcomment %}
+          <li class="ph3__item ph3__item--drop" data-ph3-item>
+            <button
+              class="ph3__link ph3__link--btn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-ph3-mega-btn
+            >
+              Brands
+              <span class="ph3__chevron" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+
+            <div class="ph3__drop" data-ph3-mega role="region" aria-label="Brands menu">
+              <ul class="ph3__drop-list" role="list">
+                <li><a href="/collections/royal-canin"   class="ph3__drop-link">Royal Canin</a></li>
+                <li><a href="/collections/hills"         class="ph3__drop-link">Hill's Science Diet</a></li>
+                <li><a href="/collections/purina"        class="ph3__drop-link">Purina Pro Plan</a></li>
+                <li><a href="/collections/kong"          class="ph3__drop-link">KONG</a></li>
+                <li><a href="/collections/frontline"     class="ph3__drop-link">Frontline</a></li>
+                <li><a href="/collections/blue-buffalo"  class="ph3__drop-link">Blue Buffalo</a></li>
+                <li class="ph3__drop-divider" role="separator"></li>
+                <li>
+                  <a href="/collections/brands" class="ph3__drop-link ph3__drop-link--all">
+                    All Brands →
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          {%- comment %} ── PET CARE (dropdown) ── {% endcomment %}
+          <li class="ph3__item ph3__item--drop" data-ph3-item>
+            <button
+              class="ph3__link ph3__link--btn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-ph3-mega-btn
+            >
+              Pet Care
+              <span class="ph3__chevron" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+
+            <div class="ph3__drop" data-ph3-mega role="region" aria-label="Pet Care menu">
+              <ul class="ph3__drop-list" role="list">
+                <li><a href="/blogs/tips/grooming"  class="ph3__drop-link">🛁 Grooming Tips</a></li>
+                <li><a href="/blogs/tips/nutrition" class="ph3__drop-link">🥣 Nutrition Guides</a></li>
+                <li><a href="/blogs/tips/training"  class="ph3__drop-link">🎾 Training Advice</a></li>
+                <li><a href="/blogs/tips/health"    class="ph3__drop-link">💊 Health Basics</a></li>
+                <li><a href="/blogs/tips"           class="ph3__drop-link">📖 All Articles</a></li>
+              </ul>
+            </div>
+          </li>
+
+          {%- comment %} ── Simple links ── {% endcomment %}
+          <li class="ph3__item">
+            <a href="/collections/sale" class="ph3__link ph3__link--sale">
+              <span class="ph3__sale-dot" aria-hidden="true"></span>
+              Sale
+            </a>
+          </li>
+
+          <li class="ph3__item">
+            <a href="/pages/about" class="ph3__link">Our Story</a>
+          </li>
+
+          {%- comment %} Dynamic links from Shopify menu (supplementary) {% endcomment %}
+          {%- if main_menu != blank %}
+            {%- for link in linklists[main_menu].links %}
+              {%- unless link.title == 'Shop' or link.title == 'Brands'
+                   or link.title == 'Pet Care' or link.title == 'Sale'
+                   or link.title == 'Our Story' %}
+                <li class="ph3__item">
+                  <a
+                    href="{{ link.url }}"
+                    class="ph3__link{% if link.active %} ph3__link--active{% endif %}"
+                  >
+                    {{ link.title }}
+                  </a>
+                </li>
+              {%- endunless %}
+            {%- endfor %}
+          {%- endif %}
+
+        </ul>
+      </nav>
+
+      {%- comment %} UTILITY ICONS {% endcomment %}
+      <div class="ph3__utils">
+
+        {%- if show_search %}
+          <button
+            class="ph3__icon-btn"
+            aria-label="Open search"
+            aria-expanded="false"
+            data-ph3-search-open
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" aria-hidden="true">
+              <circle cx="11" cy="11" r="7.5"
+                      stroke="currentColor" stroke-width="2"/>
+              <path d="M21 21L16.5 16.5"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round"/>
+            </svg>
+          </button>
+        {%- endif %}
+
+        {%- if show_whislist %}
+          <a
+            href="/pages/wishlist"
+            class="ph3__icon-btn"
+            aria-label="Wishlist"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06
+                       a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
+                       1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        {%- endif %}
+
+        {%- if show_cart %}
+          <a
+            href="{{ routes.cart_url }}"
+            class="ph3__icon-btn ph3__cart"
+            aria-label="Cart — {{ cart.item_count }} items"
+            data-ph3-cart
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" aria-hidden="true">
+              <path d="M6 2L3 6V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1
+                       21 20V6L18 2H6Z"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="3" y1="6" x2="21" y2="6"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round"/>
+              <path d="M16 10C16 12.21 14.21 14 12 14C9.79 14 8 12.21 8 10"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {%- if cart.item_count > 0 %}
+              <span class="ph3__cart-badge" data-ph3-cart-count aria-hidden="true">
+                {{ cart.item_count }}
+              </span>
+            {%- endif %}
+          </a>
+        {%- endif %}
+
+        {%- comment %} Hamburger (mobile) {% endcomment %}
+        <button
+          class="ph3__burger"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="{{ sid }}-drawer"
+          data-ph3-burger
+        >
+          <span class="ph3__burger-box" aria-hidden="true">
+            <span class="ph3__burger-line ph3__burger-line--a"></span>
+            <span class="ph3__burger-line ph3__burger-line--b"></span>
+            <span class="ph3__burger-line ph3__burger-line--c"></span>
+          </span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  {%- comment %} Scroll progress {% endcomment %}
+  {%- if show_progress %}
+    <div class="ph3__progress" data-ph3-progress aria-hidden="true"></div>
+  {%- endif %}
+
+</header>
+
+
+{%- comment %} ══════════════════════════════════════
+  SEARCH OVERLAY
+══════════════════════════════════════ {% endcomment %}
+{%- if show_search %}
+<div
+  id="{{ sid }}-search"
+  class="ph3-search"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search"
+  data-ph3-search
+  hidden
+>
+  <div class="ph3-search__veil" data-ph3-search-close aria-hidden="true"></div>
+
+  <div class="ph3-search__box">
+    <div class="ph3-search__row">
+      <svg class="ph3-search__icon" width="22" height="22"
+           viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="2"/>
+        <path d="M21 21L16.5 16.5" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input
+        id="{{ sid }}-search-input"
+        class="ph3-search__input"
+        type="search"
+        placeholder="{{ s.search_placeholder | default: 'Search pets, products, tips…' }}"
+        autocomplete="off"
+        aria-label="Search"
+        data-ph3-search-input
+      >
+      <button
+        class="ph3-search__close"
+        aria-label="Close search"
+        data-ph3-search-close
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             aria-hidden="true">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="ph3-search__suggestions" data-ph3-suggestions>
+      <p class="ph3-search__suggest-label">Trending searches</p>
+      <div class="ph3-search__chips">
+        {%- assign chips = s.search_quick_tags | default: 'Dog Food, Cat Toys, Flea Treatment, Dog Beds, Cat Litter, Puppy Starter Kit' | split: ',' %}
+        {%- for chip in chips %}
+          <button class="ph3-search__chip" data-ph3-chip="{{ chip | strip }}">
+            {{ chip | strip }}
+          </button>
+        {%- endfor %}
+      </div>
+    </div>
+
+    <div
+      class="ph3-search__results"
+      data-ph3-search-results
+      aria-live="polite"
+    ></div>
+  </div>
+</div>
+{%- endif %}
+
+
+{%- comment %} ══════════════════════════════════════
+  MOBILE DRAWER
+══════════════════════════════════════ {% endcomment %}
+<div
+  id="{{ sid }}-drawer"
+  class="ph3-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Site navigation"
+  data-ph3-drawer
+  hidden
+>
+  <div class="ph3-drawer__veil" data-ph3-drawer-close aria-hidden="true"></div>
+
+  <div class="ph3-drawer__panel">
+
+    {%- comment %} Panel header {% endcomment %}
+    <div class="ph3-drawer__head">
+      <a href="{{ routes.root_url }}" class="ph3-drawer__logo" tabindex="-1">
+        {%- if logo_img != blank %}
+          {{
+            logo_img
+            | image_url: width: 200
+            | image_tag: loading: 'lazy', alt: logo_text, class: 'ph3-drawer__logo-img'
+          }}
+        {%- else %}
+          <span class="ph3-drawer__logo-text">
+            <span aria-hidden="true">🐾</span>
+            {{ logo_text }}
+          </span>
+        {%- endif %}
+      </a>
+      <button
+        class="ph3-drawer__x"
+        aria-label="Close menu"
+        data-ph3-drawer-close
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             aria-hidden="true">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- comment %} Drawer search {% endcomment %}
+    <div class="ph3-drawer__search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           aria-hidden="true">
+        <circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="2"/>
+        <path d="M21 21L16.5 16.5" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="search"
+        class="ph3-drawer__search"
+        placeholder="Search…"
+        aria-label="Search products"
+      >
+    </div>
+
+    {%- comment %} Navigation {% endcomment %}
+    <nav class="ph3-drawer__nav" aria-label="Mobile navigation">
+      <ul class="ph3-drawer__list" role="list">
+
+        {%- comment %} Shop accordion {% endcomment %}
+        <li class="ph3-drawer__item" data-ph3-drawer-item>
+          <button
+            class="ph3-drawer__row ph3-drawer__row--parent"
+            aria-expanded="false"
+            aria-controls="{{ sid }}-m-shop"
+            data-ph3-drawer-toggle
+          >
+            <span class="ph3-drawer__row-icon" aria-hidden="true">🛍️</span>
+            <span>Shop</span>
+            <span class="ph3-drawer__arr" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+          <ul id="{{ sid }}-m-shop" class="ph3-drawer__sub" hidden role="list">
+            <li class="ph3-drawer__sub-head">🐶 Dogs</li>
+            <li><a href="/collections/dog-food"    class="ph3-drawer__sub-link">Dog Food & Treats</a></li>
+            <li><a href="/collections/dog-toys"    class="ph3-drawer__sub-link">Toys & Play</a></li>
+            <li><a href="/collections/dog-grooming"class="ph3-drawer__sub-link">Grooming</a></li>
+            <li><a href="/collections/dog-beds"    class="ph3-drawer__sub-link">Beds & Comfort</a></li>
+            <li class="ph3-drawer__sub-head">🐱 Cats</li>
+            <li><a href="/collections/cat-food"    class="ph3-drawer__sub-link">Cat Food & Treats</a></li>
+            <li><a href="/collections/cat-toys"    class="ph3-drawer__sub-link">Toys & Enrichment</a></li>
+            <li><a href="/collections/cat-litter"  class="ph3-drawer__sub-link">Litter & Hygiene</a></li>
+            <li class="ph3-drawer__sub-head">🐠 Small Pets</li>
+            <li><a href="/collections/birds"       class="ph3-drawer__sub-link">Birds</a></li>
+            <li><a href="/collections/fish"        class="ph3-drawer__sub-link">Fish & Aquatics</a></li>
+            <li>
+              <a href="/collections/all" class="ph3-drawer__sub-link ph3-drawer__sub-link--all">
+                View All Products
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        {%- comment %} Brands accordion {% endcomment %}
+        <li class="ph3-drawer__item" data-ph3-drawer-item>
+          <button
+            class="ph3-drawer__row ph3-drawer__row--parent"
+            aria-expanded="false"
+            aria-controls="{{ sid }}-m-brands"
+            data-ph3-drawer-toggle
+          >
+            <span class="ph3-drawer__row-icon" aria-hidden="true">⭐</span>
+            <span>Brands</span>
+            <span class="ph3-drawer__arr" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+          <ul id="{{ sid }}-m-brands" class="ph3-drawer__sub" hidden role="list">
+            <li><a href="/collections/royal-canin"  class="ph3-drawer__sub-link">Royal Canin</a></li>
+            <li><a href="/collections/hills"        class="ph3-drawer__sub-link">Hill's Science Diet</a></li>
+            <li><a href="/collections/purina"       class="ph3-drawer__sub-link">Purina Pro Plan</a></li>
+            <li><a href="/collections/kong"         class="ph3-drawer__sub-link">KONG</a></li>
+            <li><a href="/collections/blue-buffalo" class="ph3-drawer__sub-link">Blue Buffalo</a></li>
+            <li>
+              <a href="/collections/brands" class="ph3-drawer__sub-link ph3-drawer__sub-link--all">
+                All Brands
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        {%- comment %} Pet Care accordion {% endcomment %}
+        <li class="ph3-drawer__item" data-ph3-drawer-item>
+          <button
+            class="ph3-drawer__row ph3-drawer__row--parent"
+            aria-expanded="false"
+            aria-controls="{{ sid }}-m-care"
+            data-ph3-drawer-toggle
+          >
+            <span class="ph3-drawer__row-icon" aria-hidden="true">💚</span>
+            <span>Pet Care</span>
+            <span class="ph3-drawer__arr" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9L12 15L18 9" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </button>
+          <ul id="{{ sid }}-m-care" class="ph3-drawer__sub" hidden role="list">
+            <li><a href="/blogs/tips/grooming"  class="ph3-drawer__sub-link">🛁 Grooming Tips</a></li>
+            <li><a href="/blogs/tips/nutrition" class="ph3-drawer__sub-link">🥣 Nutrition Guides</a></li>
+            <li><a href="/blogs/tips/training"  class="ph3-drawer__sub-link">🎾 Training Advice</a></li>
+            <li><a href="/blogs/tips/health"    class="ph3-drawer__sub-link">💊 Health Basics</a></li>
+            <li><a href="/blogs/tips"           class="ph3-drawer__sub-link ph3-drawer__sub-link--all">All Articles</a></li>
+          </ul>
+        </li>
+
+        {%- comment %} Simple links {% endcomment %}
+        <li class="ph3-drawer__item">
+          <a href="/collections/sale" class="ph3-drawer__row ph3-drawer__row--sale">
+            <span class="ph3-drawer__row-icon" aria-hidden="true">🔥</span>
+            <span>Sale</span>
+            <span class="ph3-drawer__badge" aria-hidden="true">Hot</span>
+          </a>
+        </li>
+        <li class="ph3-drawer__item">
+          <a href="/pages/about" class="ph3-drawer__row">
+            <span class="ph3-drawer__row-icon" aria-hidden="true">🌿</span>
+            <span>Our Story</span>
+          </a>
+        </li>
+        <li class="ph3-drawer__item">
+          <a href="/pages/help" class="ph3-drawer__row">
+            <span class="ph3-drawer__row-icon" aria-hidden="true">💬</span>
+            <span>Help & FAQs</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+
+    {%- comment %} Drawer footer {% endcomment %}
+    <div class="ph3-drawer__foot">
+      <div class="ph3-drawer__foot-links">
+        {%- if show_account %}
+          <a
+            href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+            class="ph3-drawer__foot-btn"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                 aria-hidden="true">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M4 20C4 17.24 7.58 15 12 15C16.42 15 20 17.24 20 20"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            {%- if customer %}My Account{%- else %}Sign In / Register{%- endif %}
+          </a>
+        {%- endif %}
+        <a href="/pages/track-order" class="ph3-drawer__foot-btn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+               aria-hidden="true">
+            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61 3.95
+                     5.32 5.64 3.64C7.32 1.95 9.61 1 12 1C14.39 1 16.68 1.95
+                     18.36 3.64C20.05 5.32 21 7.61 21 10Z"
+                  stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Track Order
+        </a>
+      </div>
+      <p class="ph3-drawer__foot-tag">
+        🐾 Premium care for happy, healthy pets
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   STYLES
+══════════════════════════════════════════════════════════ {% endcomment %}
+<style>
+/* ─────────────────────────────────────────────────────────
+   Tokens & Reset
+───────────────────────────────────────────────────────── */
+#{{ sid }},
+#{{ sid }}-search,
+#{{ sid }}-drawer,
+#{{ sid }}-bar {
+  --ph3-cream:   #FDFCF9;
+  --ph3-stone:   #1C1917;
+  --ph3-accent:  #D97757;
+  --ph3-warm:    #F5EFE6;
+  --ph3-muted:   #78716C;
+  --ph3-border:  #EAE5DD;
+  --ph3-success: #6DB87A;
+  --ph3-r:       12px;
+  --ph3-r-sm:    8px;
+  --ph3-ease:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ph3-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ph3-h:       66px;
+  --ph3-strip-h: 34px;
+  font-family: inherit;
+}
+
+/* ─────────────────────────────────────────────────────────
+   ANNOUNCEMENT BAR
+───────────────────────────────────────────────────────── */
+#{{ sid }}-bar {
+  position:   relative;
+  z-index:    200;
+  background: var(--bar-bg, var(--ph3-accent));
+  color:      var(--bar-fg, #fff);
+  height:     36px;
+  display:    flex;
+  align-items:center;
+  overflow:   hidden;
+  transition: max-height 0.40s ease, opacity 0.30s ease;
+  max-height: 36px;
+}
+#{{ sid }}-bar.ph3-bar--gone {
+  max-height: 0;
+  opacity:    0;
+  pointer-events: none;
+}
+.ph3-bar__marquee {
+  flex:     1;
+  overflow: hidden;
+  position: relative;
+}
+.ph3-bar__track {
+  display:   flex;
+  width:     max-content;
+  animation: ph3-marquee 28s linear infinite;
+}
+@keyframes ph3-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ph3-bar__item {
+  display:     inline-flex;
+  align-items: center;
+  gap:         20px;
+  padding:     0 40px;
+  font-size:   0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.ph3-bar__link {
+  color:           inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ph3-bar__dot {
+  font-size:   0.65rem;
+  opacity:     0.6;
+}
+.ph3-bar__close {
+  position:      absolute;
+  right:         14px;
+  top:           50%;
+  transform:     translateY(-50%);
+  background:    none;
+  border:        none;
+  cursor:        pointer;
+  color:         inherit;
+  opacity:       0.75;
+  padding:       6px;
+  border-radius: 50%;
+  line-height:   0;
+  transition:    opacity 0.2s ease, background 0.2s ease;
+  z-index:       2;
+}
+.ph3-bar__close:hover  { opacity:1; background:rgba(0,0,0,0.12); }
+
+/* ─────────────────────────────────────────────────────────
+   HEADER BASE
+───────────────────────────────────────────────────────── */
+#{{ sid }} {
+  position:    relative;
+  z-index:     100;
+  background:  var(--ph3-cream);
+  border-bottom: 1px solid var(--ph3-border);
+  transition:  box-shadow 0.35s ease, border-color 0.35s ease,
+               background 0.35s ease;
+}
+#{{ sid }}.ph3--sticky { position: sticky; top: 0; }
+#{{ sid }}.ph3--scrolled {
+  background:    rgba(253, 252, 249, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:    0 2px 24px rgba(28,25,23,0.08);
+  border-color:  transparent;
+}
+
+/* ─────────────────────────────────────────────────────────
+   UTILITY STRIP (top micro-bar)
+───────────────────────────────────────────────────────── */
+.ph3__strip {
+  border-bottom: 1px solid var(--ph3-border);
+  background:    var(--ph3-warm);
+  height:        var(--ph3-strip-h);
+  display:       flex;
+  align-items:   center;
+  overflow:      hidden;
+  transition:    height 0.35s ease, opacity 0.35s ease;
+}
+#{{ sid }}.ph3--scrolled .ph3__strip {
+  height:  0;
+  opacity: 0;
+  pointer-events: none;
+}
+.ph3__strip-inner {
+  width:       100%;
+  {% comment %} max-width:   1380px; {% endcomment %}
+  margin:      0 auto;
+  padding:     0 clamp(16px, 4vw, 60px);
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+  gap:         12px;
+}
+.ph3__strip-left {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  font-size:   0.73rem;
+  color:       var(--ph3-muted);
+  margin:      0;
+  font-weight: 500;
+}
+.ph3__strip-left svg { color: var(--ph3-accent); flex-shrink:0; }
+.ph3__strip-right {
+  display:     flex;
+  align-items: center;
+  gap:         2px;
+}
+.ph3__strip-link {
+  font-size:       0.73rem;
+  color:           var(--ph3-muted);
+  text-decoration: none;
+  font-weight:     500;
+  padding:         3px 10px;
+  border-radius:   var(--ph3-r-sm);
+  transition:      color 0.2s ease, background 0.2s ease;
+  white-space:     nowrap;
+}
+.ph3__strip-link:hover { color: var(--ph3-stone); background: var(--ph3-border); }
+.ph3__strip-link--static { cursor:default; }
+.ph3__strip-link--static:hover { background:none; color:var(--ph3-muted); }
+
+/* ─────────────────────────────────────────────────────────
+   MAIN NAV ROW
+───────────────────────────────────────────────────────── */
+.ph3__main { height: var(--ph3-h); }
+.ph3__main-inner {
+  height:          100%;
+  {% comment %} max-width:       1380px; {% endcomment %}
+  margin:          0 auto;
+  padding:         0 clamp(16px, 4vw, 60px);
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             24px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LOGO
+───────────────────────────────────────────────────────── */
+.ph3__logo {
+  text-decoration: none;
+  flex-shrink:     0;
+  display:         inline-flex;
+  align-items:     center;
+}
+.ph3__logo-img {
+  max-width:  var(--ph3-logo-w);
+  max-height: 46px;
+  object-fit: contain;
+  display:    block;
+  transition: max-height 0.35s ease;
+}
+#{{ sid }}.ph3--scrolled .ph3__logo-img { max-height: 36px; }
+
+.ph3__logo-mark {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+}
+.ph3__logo-icon {
+  flex-shrink: 0;
+  display:     flex;
+  align-items: center;
+  transition:  transform 0.55s var(--ph3-spring);
+}
+.ph3__logo:hover .ph3__logo-icon { transform: rotate(-8deg) scale(1.08); }
+.ph3__logo-name {
+  font-size:      1.45rem;
+  font-weight:    800;
+  color:          var(--ph3-stone);
+  letter-spacing: -0.025em;
+  line-height:    1;
+}
+
+/* ─────────────────────────────────────────────────────────
+   DESKTOP NAV
+───────────────────────────────────────────────────────── */
+.ph3__nav {
+  flex:            1;
+  display:         flex;
+  justify-content: center;
+}
+.ph3__nav-list {
+  display:     flex;
+  align-items: center;
+  gap:         2px;
+  list-style:  none;
+  margin:      0;
+  padding:     0;
+}
+.ph3__item { position: relative; }
+
+/* Nav link — pill style */
+.ph3__link {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             4px;
+  padding:         7px 15px;
+  border-radius:   100px;
+  font-size:       0.91rem;
+  font-weight:     600;
+  color:           var(--ph3-stone);
+  text-decoration: none;
+  background:      none;
+  border:          none;
+  cursor:          pointer;
+  white-space:     nowrap;
+  font-family:     inherit;
+  transition:
+    background 0.22s ease,
+    color      0.22s ease,
+    transform  0.22s var(--ph3-spring);
+  position: relative;
+}
+.ph3__link:hover,
+.ph3__link--active,
+.ph3__link--btn[aria-expanded="true"] {
+  background: var(--ph3-warm);
+  color:      var(--ph3-accent);
+}
+.ph3__link:focus-visible {
+  outline:        2px solid var(--ph3-accent);
+  outline-offset: 2px;
+}
+
+/* Sale link */
+.ph3__link--sale {
+  color: #C1441C;
+  font-weight: 700;
+}
+.ph3__link--sale:hover {
+  background: rgba(193,68,28,0.09);
+  color: #C1441C;
+}
+.ph3__sale-dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    #C1441C;
+  flex-shrink:   0;
+  animation:     ph3-sale-pulse 1.4s ease-in-out infinite;
+}
+@keyframes ph3-sale-pulse {
+  0%,100% { opacity:1; transform:scale(1);    box-shadow: 0 0 0 0 rgba(193,68,28,0.4); }
+  50%     { opacity:0.8; transform:scale(1.2); box-shadow: 0 0 0 4px rgba(193,68,28,0); }
+}
+
+/* Chevron */
+.ph3__chevron {
+  display:    flex;
+  align-items:center;
+  opacity:    0.5;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.ph3__link--btn[aria-expanded="true"] .ph3__chevron {
+  transform: rotate(180deg);
+  opacity:   1;
+}
+
+/* ─────────────────────────────────────────────────────────
+   MEGA MENU
+───────────────────────────────────────────────────────── */
+.ph3__mega {
+  position:    absolute;
+  top:         calc(100% + 14px);
+  left:        50%;
+  transform:   translateX(-50%) translateY(-6px);
+  width:       min(800px, 94vw);
+  background:  #fff;
+  border:      1px solid var(--ph3-border);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 6px rgba(28,25,23,0.04),
+    0 20px 60px rgba(28,25,23,0.12);
+  opacity:       0;
+  visibility:    hidden;
+  pointer-events:none;
+  transition:
+    opacity    0.28s ease,
+    transform  0.28s var(--ph3-ease),
+    visibility 0.28s;
+  z-index:    400;
+  overflow:   hidden;
+}
+/* Caret */
+.ph3__mega::before {
+  content:     '';
+  position:    absolute;
+  top:         -6px;
+  left:        50%;
+  transform:   translateX(-50%) rotate(45deg);
+  width:       12px;
+  height:      12px;
+  background:  #fff;
+  border-top:  1px solid var(--ph3-border);
+  border-left: 1px solid var(--ph3-border);
+  border-radius: 3px 0 0 0;
+}
+/* Open state */
+.ph3__item--mega:hover .ph3__mega,
+.ph3__item--mega .ph3__link--btn[aria-expanded="true"] ~ .ph3__mega {
+  opacity:       1;
+  visibility:    visible;
+  pointer-events:auto;
+  transform:     translateX(-50%) translateY(0);
+}
+
+.ph3__mega-wrap {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+}
+.ph3__mega-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:     0;
+  padding: 28px;
+}
+.ph3__mega-col {
+  padding: 0 20px 0 0;
+  border-right: 1px solid var(--ph3-border);
+}
+.ph3__mega-col:first-child  { padding-left: 0; }
+.ph3__mega-col:last-child   { border-right: none; padding-right: 0; }
+
+.ph3__mega-head {
+  font-size:      0.72rem;
+  font-weight:    700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color:          var(--ph3-accent);
+  margin:         0 0 12px;
+  padding-left:   2px;
+}
+.ph3__mega-list {
+  list-style: none;
+  margin:     0;
+  padding:    0;
+  display:    flex;
+  flex-direction: column;
+  gap:        2px;
+}
+.ph3__mega-link {
+  display:         block;
+  padding:         6px 10px;
+  border-radius:   var(--ph3-r-sm);
+  font-size:       0.87rem;
+  color:           var(--ph3-muted);
+  font-weight:     500;
+  text-decoration: none;
+  transition:      background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.ph3__mega-link:hover {
+  background: var(--ph3-warm);
+  color:      var(--ph3-stone);
+  transform:  translateX(3px);
+}
+.ph3__mega-link:focus-visible {
+  outline: 2px solid var(--ph3-accent);
+  outline-offset: 2px;
+}
+
+/* Promo card */
+.ph3__mega-promo {
+  background:    var(--ph3-warm);
+  border-left:   1px solid var(--ph3-border);
+  display:       flex;
+  flex-direction:column;
+  overflow:      hidden;
+}
+.ph3__mega-promo-img { flex:1; overflow:hidden; min-height:130px; }
+.ph3__mega-promo-photo {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+  transition: transform 0.55s ease;
+}
+.ph3__mega-promo:hover .ph3__mega-promo-photo { transform:scale(1.06); }
+.ph3__mega-promo-placeholder {
+  flex:       1;
+  background: linear-gradient(135deg,
+    rgba(217,119,87,0.15),
+    rgba(217,119,87,0.06)
+  );
+  display:    flex;
+  align-items:flex-end;
+}
+.ph3__mega-promo-body {
+  padding: 18px;
+}
+.ph3__mega-promo-badge {
+  display:        inline-block;
+  font-size:      0.68rem;
+  font-weight:    700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color:          var(--ph3-accent);
+  background:     rgba(217,119,87,0.13);
+  padding:        4px 10px;
+  border-radius:  100px;
+  margin-bottom:  8px;
+}
+.ph3__mega-promo-title {
+  font-size:   0.92rem;
+  font-weight: 700;
+  color:       var(--ph3-stone);
+  margin:      0 0 12px;
+  line-height: 1.3;
+}
+.ph3__mega-promo-cta {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             5px;
+  font-size:       0.80rem;
+  font-weight:     700;
+  color:           var(--ph3-accent);
+  text-decoration: none;
+  transition:      gap 0.25s ease;
+}
+.ph3__mega-promo-cta:hover { gap: 8px; }
+
+/* ─────────────────────────────────────────────────────────
+   SIMPLE DROPDOWN
+───────────────────────────────────────────────────────── */
+.ph3__drop {
+  position:    absolute;
+  top:         calc(100% + 14px);
+  left:        50%;
+  transform:   translateX(-50%) translateY(-6px);
+  min-width:   210px;
+  background:  #fff;
+  border:      1px solid var(--ph3-border);
+  border-radius: var(--ph3-r);
+  box-shadow:
+    0 4px 6px rgba(28,25,23,0.04),
+    0 16px 40px rgba(28,25,23,0.11);
+  opacity:       0;
+  visibility:    hidden;
+  pointer-events:none;
+  transition:
+    opacity    0.25s ease,
+    transform  0.25s var(--ph3-ease),
+    visibility 0.25s;
+  z-index:    400;
+  padding:    6px;
+  overflow:   hidden;
+}
+.ph3__drop::before {
+  content:     '';
+  position:    absolute;
+  top:         -6px;
+  left:        50%;
+  transform:   translateX(-50%) rotate(45deg);
+  width:       12px;
+  height:      12px;
+  background:  #fff;
+  border-top:  1px solid var(--ph3-border);
+  border-left: 1px solid var(--ph3-border);
+  border-radius: 3px 0 0 0;
+}
+.ph3__item--drop:hover .ph3__drop,
+.ph3__item--drop .ph3__link--btn[aria-expanded="true"] ~ .ph3__drop {
+  opacity:       1;
+  visibility:    visible;
+  pointer-events:auto;
+  transform:     translateX(-50%) translateY(0);
+}
+.ph3__drop-list {
+  list-style: none;
+  margin:     0;
+  padding:    0;
+}
+.ph3__drop-link {
+  display:         block;
+  padding:         9px 14px;
+  border-radius:   var(--ph3-r-sm);
+  font-size:       0.87rem;
+  color:           var(--ph3-muted);
+  font-weight:     500;
+  text-decoration: none;
+  transition:      background 0.2s ease, color 0.2s ease;
+}
+.ph3__drop-link:hover,
+.ph3__drop-link:focus-visible {
+  background: var(--ph3-warm);
+  color:      var(--ph3-stone);
+  outline:    none;
+}
+.ph3__drop-link--all {
+  color:       var(--ph3-accent);
+  font-weight: 700;
+}
+.ph3__drop-divider {
+  height: 1px;
+  background: var(--ph3-border);
+  margin: 4px 6px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   UTILITY ICONS
+───────────────────────────────────────────────────────── */
+.ph3__utils {
+  display:     flex;
+  align-items: center;
+  gap:         2px;
+  flex-shrink: 0;
+}
+.ph3__icon-btn {
+  position:        relative;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           42px;
+  height:          42px;
+  border-radius:   100px;
+  background:      none;
+  border:          none;
+  color:           var(--ph3-stone);
+  text-decoration: none;
+  cursor:          pointer;
+  transition:
+    background 0.22s ease,
+    color      0.22s ease,
+    transform  0.22s var(--ph3-spring);
+}
+.ph3__icon-btn:hover,
+.ph3__icon-btn:focus-visible {
+  background: var(--ph3-warm);
+  color:      var(--ph3-accent);
+  outline:    none;
+}
+.ph3__icon-btn:active { transform: scale(0.9); }
+.ph3__icon-btn:focus-visible {
+  outline:        2px solid var(--ph3-accent);
+  outline-offset: 2px;
+}
+
+/* Cart badge */
+.ph3__cart-badge {
+  position:        absolute;
+  top:             5px;
+  right:           5px;
+  min-width:       17px;
+  height:          17px;
+  border-radius:   100px;
+  background:      var(--ph3-accent);
+  color:           #fff;
+  font-size:       0.62rem;
+  font-weight:     800;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         0 4px;
+  line-height:     1;
+  border:          2px solid var(--ph3-cream);
+  animation:       ph3-pop 0.40s var(--ph3-spring) both;
+}
+@keyframes ph3-pop {
+  from { transform:scale(0) rotate(-15deg); }
+  to   { transform:scale(1) rotate(0deg);   }
+}
+
+/* Hamburger */
+.ph3__burger {
+  display:        none;
+  flex-direction: column;
+  align-items:    center;
+  justify-content:center;
+  width:          42px;
+  height:         42px;
+  border-radius:  100px;
+  background:     none;
+  border:         none;
+  cursor:         pointer;
+  padding:        0;
+  transition:     background 0.22s ease;
+}
+.ph3__burger:hover,
+.ph3__burger:focus-visible {
+  background: var(--ph3-warm);
+  outline:    none;
+}
+.ph3__burger:focus-visible { outline:2px solid var(--ph3-accent); outline-offset:2px; }
+
+.ph3__burger-box {
+  display:        flex;
+  flex-direction: column;
+  gap:            5px;
+  width:          20px;
+}
+.ph3__burger-line {
+  height:        2px;
+  border-radius: 2px;
+  background:    var(--ph3-stone);
+  display:       block;
+  transform-origin: center;
+  transition:
+    transform  0.38s var(--ph3-ease),
+    opacity    0.28s ease,
+    width      0.38s ease;
+}
+.ph3__burger-line--a { width:20px; }
+.ph3__burger-line--b { width:14px; }
+.ph3__burger-line--c { width:20px; }
+
+.ph3__burger[aria-expanded="true"] .ph3__burger-line--a {
+  transform: translateY(7px) rotate(45deg);
+}
+.ph3__burger[aria-expanded="true"] .ph3__burger-line--b {
+  opacity:0; transform:scaleX(0);
+}
+.ph3__burger[aria-expanded="true"] .ph3__burger-line--c {
+  transform: translateY(-7px) rotate(-45deg);
+  width:20px;
+}
+
+/* Progress */
+.ph3__progress {
+  position:   absolute;
+  bottom:     0;
+  left:       0;
+  height:     2.5px;
+  width:      0%;
+  background: linear-gradient(90deg, var(--ph3-accent), #F4883A);
+  border-radius: 0 2px 2px 0;
+  will-change:width;
+  transition: width 0.08s linear;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SEARCH OVERLAY
+───────────────────────────────────────────────────────── */
+#{{ sid }}-search {
+  position:   fixed;
+  inset:      0;
+  z-index:    600;
+  display:    flex;
+  flex-direction: column;
+  align-items: center;
+}
+#{{ sid }}-search[hidden] { display:none; }
+
+.ph3-search__veil {
+  position:       absolute;
+  inset:          0;
+  background:     rgba(28,25,23,0.38);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  animation:      ph3-fade 0.25s ease both;
+}
+@keyframes ph3-fade {
+  from {opacity:0;} to {opacity:1;}
+}
+.ph3-search__box {
+  position:      relative;
+  z-index:       1;
+  width:         100%;
+  max-width:     680px;
+  background:    var(--ph3-cream);
+  border-radius: 0 0 24px 24px;
+  box-shadow:    0 20px 60px rgba(28,25,23,0.18);
+  overflow:      hidden;
+  animation:     ph3-searchdrop 0.32s var(--ph3-ease) both;
+}
+@keyframes ph3-searchdrop {
+  from { transform:translateY(-16px); opacity:0; }
+  to   { transform:translateY(0);     opacity:1; }
+}
+.ph3-search__row {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  padding:       18px 22px;
+  border-bottom: 1px solid var(--ph3-border);
+}
+.ph3-search__icon { color: var(--ph3-muted); flex-shrink:0; }
+.ph3-search__input {
+  flex:        1;
+  border:      none;
+  outline:     none;
+  font-size:   1.05rem;
+  font-family: inherit;
+  color:       var(--ph3-stone);
+  background:  transparent;
+  min-width:   0;
+}
+.ph3-search__input::placeholder { color:var(--ph3-muted); }
+.ph3-search__close {
+  background:    none;
+  border:        none;
+  cursor:        pointer;
+  color:         var(--ph3-muted);
+  padding:       7px;
+  border-radius: 50%;
+  line-height:   0;
+  transition:    background 0.2s ease, color 0.2s ease;
+  flex-shrink:   0;
+}
+.ph3-search__close:hover        { background:var(--ph3-warm); color:var(--ph3-stone); }
+.ph3-search__close:focus-visible { outline:2px solid var(--ph3-accent); outline-offset:2px; }
+
+.ph3-search__suggestions { padding:18px 22px 12px; }
+.ph3-search__suggest-label {
+  font-size:      0.70rem;
+  font-weight:    700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color:          var(--ph3-muted);
+  margin:         0 0 10px;
+}
+.ph3-search__chips {
+  display:  flex;
+  gap:      7px;
+  flex-wrap:wrap;
+}
+.ph3-search__chip {
+  padding:       6px 14px;
+  border-radius: 100px;
+  border:        1.5px solid var(--ph3-border);
+  background:    #fff;
+  color:         var(--ph3-stone);
+  font-size:     0.80rem;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    border-color 0.2s, background 0.2s, color 0.2s;
+  font-family:   inherit;
+}
+.ph3-search__chip:hover,
+.ph3-search__chip:focus-visible {
+  border-color: var(--ph3-accent);
+  background:   rgba(217,119,87,0.08);
+  color:        var(--ph3-accent);
+  outline:      none;
+}
+
+.ph3-search__results {
+  max-height: 360px;
+  overflow-y: auto;
+  padding:    0 22px 16px;
+}
+
+/* Result card */
+.ph3-result {
+  display:         flex;
+  align-items:     center;
+  gap:             14px;
+  padding:         11px 10px;
+  border-radius:   var(--ph3-r-sm);
+  text-decoration: none;
+  color:           inherit;
+  transition:      background 0.2s ease;
+}
+.ph3-result:hover,
+.ph3-result:focus-visible {
+  background: var(--ph3-warm);
+  outline:    none;
+}
+.ph3-result__thumb {
+  width:         52px;
+  height:        52px;
+  border-radius: var(--ph3-r-sm);
+  overflow:      hidden;
+  background:    var(--ph3-warm);
+  flex-shrink:   0;
+  display:       flex;
+  align-items:   center;
+  justify-content:center;
+}
+.ph3-result__thumb img {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+}
+.ph3-result__info  { flex:1; min-width:0; }
+.ph3-result__name  {
+  font-size:   0.88rem;
+  font-weight: 600;
+  color:       var(--ph3-stone);
+  margin:      0 0 2px;
+  white-space: nowrap;
+  overflow:    hidden;
+  text-overflow:ellipsis;
+}
+.ph3-result__price {
+  font-size:   0.80rem;
+  font-weight: 700;
+  color:       var(--ph3-accent);
+  margin:      0;
+}
+.ph3-result__arrow {
+  color:       var(--ph3-muted);
+  flex-shrink: 0;
+  transition:  transform 0.2s ease;
+}
+.ph3-result:hover .ph3-result__arrow { transform:translateX(3px); }
+
+/* ─────────────────────────────────────────────────────────
+   MOBILE DRAWER
+───────────────────────────────────────────────────────── */
+#{{ sid }}-drawer {
+  position: fixed;
+  inset:    0;
+  z-index:  600;
+  display:  flex;
+}
+#{{ sid }}-drawer[hidden] { display:none; }
+
+.ph3-drawer__veil {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(28,25,23,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  animation:       ph3-fade 0.25s ease both;
+}
+.ph3-drawer__panel {
+  position:        relative;
+  z-index:         1;
+  width:           min(340px, 88vw);
+  height:          100%;
+  background:      var(--ph3-cream);
+  display:         flex;
+  flex-direction:  column;
+  box-shadow:      6px 0 40px rgba(28,25,23,0.16);
+  animation:       ph3-drawerslide 0.36s var(--ph3-ease) both;
+  overflow:        hidden;
+}
+@keyframes ph3-drawerslide {
+  from { transform:translateX(-100%); }
+  to   { transform:translateX(0); }
+}
+
+/* Drawer head */
+.ph3-drawer__head {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         18px 20px;
+  border-bottom:   1px solid var(--ph3-border);
+  flex-shrink:     0;
+  background:      var(--ph3-cream);
+}
+.ph3-drawer__logo { text-decoration:none; }
+.ph3-drawer__logo-img {
+  max-width:  120px;
+  max-height: 36px;
+  object-fit: contain;
+}
+.ph3-drawer__logo-text {
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  font-size:   1.15rem;
+  font-weight: 800;
+  color:       var(--ph3-stone);
+}
+.ph3-drawer__x {
+  background:    none;
+  border:        none;
+  cursor:        pointer;
+  color:         var(--ph3-muted);
+  padding:       8px;
+  border-radius: 50%;
+  line-height:   0;
+  transition:    background 0.2s, color 0.2s;
+}
+.ph3-drawer__x:hover        { background:var(--ph3-warm); color:var(--ph3-stone); }
+.ph3-drawer__x:focus-visible { outline:2px solid var(--ph3-accent); outline-offset:2px; }
+
+/* Drawer search */
+.ph3-drawer__search-wrap {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  margin:        14px 16px;
+  padding:       10px 16px;
+  background:    var(--ph3-warm);
+  border-radius: 100px;
+  border:        1.5px solid var(--ph3-border);
+  flex-shrink:   0;
+  transition:    border-color 0.25s ease;
+}
+.ph3-drawer__search-wrap:focus-within { border-color: var(--ph3-accent); }
+.ph3-drawer__search-wrap svg { color:var(--ph3-muted); flex-shrink:0; }
+.ph3-drawer__search {
+  flex:        1;
+  border:      none;
+  outline:     none;
+  background:  transparent;
+  font-size:   0.88rem;
+  color:       var(--ph3-stone);
+  font-family: inherit;
+  min-width:   0;
+}
+.ph3-drawer__search::placeholder { color:var(--ph3-muted); }
+
+/* Drawer nav */
+.ph3-drawer__nav { flex:1; overflow-y:auto; }
+.ph3-drawer__list {
+  list-style:none;
+  margin:0; padding:8px 10px;
+  display:flex; flex-direction:column; gap:2px;
+}
+.ph3-drawer__item {}
+.ph3-drawer__row {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  width:           100%;
+  padding:         13px 14px;
+  border-radius:   var(--ph3-r-sm);
+  font-size:       0.97rem;
+  font-weight:     600;
+  color:           var(--ph3-stone);
+  background:      none;
+  border:          none;
+  cursor:          pointer;
+  text-decoration: none;
+  text-align:      left;
+  font-family:     inherit;
+  transition:      background 0.2s ease, color 0.2s ease;
+}
+.ph3-drawer__row:hover,
+.ph3-drawer__row:focus-visible {
+  background: var(--ph3-warm);
+  outline:    none;
+}
+.ph3-drawer__row--parent { justify-content: space-between; }
+.ph3-drawer__row--parent span:nth-child(2) { flex:1; }
+.ph3-drawer__row--sale { color:#C1441C; }
+.ph3-drawer__row-icon { font-size:1.1rem; flex-shrink:0; }
+.ph3-drawer__arr {
+  color:     var(--ph3-muted);
+  flex-shrink:0;
+  transition:transform 0.30s ease;
+  display:   flex; align-items:center;
+}
+.ph3-drawer__item .ph3-drawer__row--parent[aria-expanded="true"] .ph3-drawer__arr {
+  transform: rotate(180deg);
+}
+.ph3-drawer__badge {
+  font-size:   0.60rem;
+  font-weight: 800;
+  background:  #C1441C;
+  color:       #fff;
+  padding:     2px 7px;
+  border-radius:100px;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  flex-shrink: 0;
+}
+
+/* Sub-menu */
+.ph3-drawer__sub {
+  list-style: none;
+  margin:     0;
+  padding:    0 0 4px 14px;
+  animation:  ph3-sub-in 0.28s var(--ph3-ease) both;
+}
+.ph3-drawer__sub[hidden] { display:none; }
+@keyframes ph3-sub-in {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.ph3-drawer__sub-head {
+  font-size:      0.68rem;
+  font-weight:    700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color:          var(--ph3-accent);
+  padding:        10px 14px 4px;
+}
+.ph3-drawer__sub-link {
+  display:         block;
+  padding:         9px 14px;
+  border-radius:   var(--ph3-r-sm);
+  font-size:       0.87rem;
+  color:           var(--ph3-muted);
+  font-weight:     500;
+  text-decoration: none;
+  transition:      background 0.2s, color 0.2s;
+}
+.ph3-drawer__sub-link:hover,
+.ph3-drawer__sub-link:focus-visible {
+  background: var(--ph3-warm);
+  color:      var(--ph3-stone);
+  outline:    none;
+}
+.ph3-drawer__sub-link--all {
+  color:       var(--ph3-accent);
+  font-weight: 700;
+}
+
+/* Drawer foot */
+.ph3-drawer__foot {
+  padding:    16px 20px;
+  border-top: 1px solid var(--ph3-border);
+  flex-shrink:0;
+  background: var(--ph3-warm);
+}
+.ph3-drawer__foot-links {
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  margin-bottom:  14px;
+}
+.ph3-drawer__foot-btn {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  padding:         10px 12px;
+  border-radius:   var(--ph3-r-sm);
+  font-size:       0.88rem;
+  font-weight:     600;
+  color:           var(--ph3-muted);
+  text-decoration: none;
+  transition:      background 0.2s, color 0.2s;
+}
+.ph3-drawer__foot-btn:hover { background:var(--ph3-border); color:var(--ph3-stone); }
+.ph3-drawer__foot-btn svg { flex-shrink:0; }
+.ph3-drawer__foot-tag {
+  font-size:   0.74rem;
+  color:       var(--ph3-muted);
+  margin:      0;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .ph3__nav    { display:none; }
+  .ph3__burger { display:flex; }
+  .ph3__strip  { display:none; }
+}
+@media (max-width: 767px) {
+  #{{ sid }} { --ph3-h: 60px; }
+  .ph3__logo-img { max-height: 36px; }
+  .ph3__icon-btn { width:40px; height:40px; }
+}
+@media (max-width: 420px) {
+  .ph3__icon-btn { width:38px; height:38px; }
+  #{{ sid }}-bar { height:32px; }
+  .ph3-bar__item { font-size:0.72rem; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Reduced-motion
+───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * { animation:none !important; transition:none !important; }
+  .ph3-bar__track { animation:none !important; }
+}
+</style>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   JAVASCRIPT
+══════════════════════════════════════════════════════════ {% endcomment %}
+<script>
+(function () {
+  'use strict';
+
+  const sid  = '{{ sid }}';
+  const S    = (sel, ctx) => (ctx || document).querySelector(sel);
+  const SA   = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
+  const noMo = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ── Refs ───────────────────────────────────────────── */
+  const header   = document.getElementById(sid);
+  const bar      = document.getElementById(sid + '-bar');
+  const search   = document.getElementById(sid + '-search');
+  const drawer   = document.getElementById(sid + '-drawer');
+  if (!header) return;
+
+  const burger       = S('[data-ph3-burger]',       header);
+  const searchOpen   = S('[data-ph3-search-open]',  header);
+  const progressBar  = S('[data-ph3-progress]',     header);
+
+  /* ══════════════════════════════════════════════════════
+     SCROLL — shrink + progress
+  ══════════════════════════════════════════════════════ */
+  let rafPending = false;
+  function onScroll() {
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(() => {
+      header.classList.toggle('ph3--scrolled', window.scrollY > 24);
+      if (progressBar) {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = max > 0
+          ? ((window.scrollY / max) * 100).toFixed(2) + '%'
+          : '0%';
+      }
+      rafPending = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ══════════════════════════════════════════════════════
+     ANNOUNCEMENT BAR — dismiss + pause marquee on hover
+  ══════════════════════════════════════════════════════ */
+  if (bar) {
+    const barClose  = S('[data-ph3-bar-close]', bar);
+    const barTrack  = S('.ph3-bar__track',      bar);
+    const storeKey  = 'ph3-bar-' + sid;
+
+    if (sessionStorage.getItem(storeKey)) {
+      bar.classList.add('ph3-bar--gone');
+    }
+    if (barClose) {
+      barClose.addEventListener('click', () => {
+        bar.classList.add('ph3-bar--gone');
+        sessionStorage.setItem(storeKey, '1');
+      });
+    }
+    if (barTrack) {
+      bar.addEventListener('mouseenter', () => barTrack.style.animationPlayState = 'paused');
+      bar.addEventListener('mouseleave', () => barTrack.style.animationPlayState = 'running');
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════
+     MEGA / DROP — hover + keyboard
+  ══════════════════════════════════════════════════════ */
+  SA('[data-ph3-item]', header).forEach(item => {
+    const btn  = S('[data-ph3-mega-btn]', item);
+    const menu = S('[data-ph3-mega]',     item);
+    if (!btn || !menu) return;
+
+    let closeTimer;
+
+    const open  = () => { clearTimeout(closeTimer); btn.setAttribute('aria-expanded','true'); };
+    const close = () => { closeTimer = setTimeout(() => btn.setAttribute('aria-expanded','false'), 110); };
+
+    item.addEventListener('mouseenter', open);
+    item.addEventListener('mouseleave', close);
+
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+      }
+      if (e.key === 'Escape') {
+        btn.setAttribute('aria-expanded','false');
+        btn.focus();
+      }
+    });
+    menu.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        btn.setAttribute('aria-expanded','false');
+        btn.focus();
+      }
+    });
+  });
+
+  /* Close on outside click */
+  document.addEventListener('click', e => {
+    SA('[data-ph3-item]', header).forEach(item => {
+      const btn = S('[data-ph3-mega-btn]', item);
+      if (btn && !item.contains(e.target)) {
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+  });
+
+  /* ══════════════════════════════════════════════════════
+     FOCUS TRAP
+  ══════════════════════════════════════════════════════ */
+  function trapFocus(el) {
+    const nodes = SA([
+      'a[href]', 'button:not([disabled])',
+      'input', 'textarea', '[tabindex]:not([tabindex="-1"])'
+    ].join(','), el).filter(n => !n.closest('[hidden]'));
+
+    if (!nodes.length) return () => {};
+    const first = nodes[0], last = nodes[nodes.length - 1];
+
+    function onTab(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
+    }
+    el.addEventListener('keydown', onTab);
+    first.focus();
+    return () => el.removeEventListener('keydown', onTab);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     MOBILE DRAWER
+  ══════════════════════════════════════════════════════ */
+  let drawerUnlockFocus = null;
+
+  function openDrawer() {
+    if (!drawer) return;
+    drawer.removeAttribute('hidden');
+    burger && burger.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+    drawerUnlockFocus = trapFocus(drawer);
+    drawer.addEventListener('keydown', escDrawer);
+  }
+  function closeDrawer() {
+    if (!drawer) return;
+    drawer.setAttribute('hidden','');
+    burger && burger.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+    drawerUnlockFocus && drawerUnlockFocus();
+    drawer.removeEventListener('keydown', escDrawer);
+    burger && burger.focus();
+  }
+  function escDrawer(e) { if (e.key === 'Escape') closeDrawer(); }
+
+  if (burger) burger.addEventListener('click', openDrawer);
+  SA('[data-ph3-drawer-close]', drawer || document).forEach(el =>
+    el.addEventListener('click', closeDrawer)
+  );
+
+  /* Drawer accordion */
+  SA('[data-ph3-drawer-toggle]', drawer || document).forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const subId = toggle.getAttribute('aria-controls');
+      const sub   = document.getElementById(subId);
+      if (!sub) return;
+      const open  = toggle.getAttribute('aria-expanded') === 'true';
+
+      /* Close siblings */
+      SA('[data-ph3-drawer-toggle]', drawer).forEach(t => {
+        if (t !== toggle) {
+          t.setAttribute('aria-expanded','false');
+          const s = document.getElementById(t.getAttribute('aria-controls'));
+          if (s) s.setAttribute('hidden','');
+        }
+      });
+
+      toggle.setAttribute('aria-expanded', String(!open));
+      open ? sub.setAttribute('hidden','') : sub.removeAttribute('hidden');
+    });
+  });
+
+  /* ══════════════════════════════════════════════════════
+     SEARCH OVERLAY
+  ══════════════════════════════════════════════════════ */
+  let searchUnlockFocus = null;
+  let searchDebounce    = null;
+
+  function openSearch() {
+    if (!search) return;
+    search.removeAttribute('hidden');
+    searchOpen && searchOpen.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+    searchUnlockFocus = trapFocus(search);
+    search.addEventListener('keydown', escSearch);
+    const inp = S('[data-ph3-search-input]', search);
+    if (inp) setTimeout(() => inp.focus(), 60);
+  }
+  function closeSearch() {
+    if (!search) return;
+    search.setAttribute('hidden','');
+    searchOpen && searchOpen.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+    searchUnlockFocus && searchUnlockFocus();
+    search.removeEventListener('keydown', escSearch);
+    searchOpen && searchOpen.focus();
+  }
+  function escSearch(e) { if (e.key === 'Escape') closeSearch(); }
+
+  if (searchOpen) searchOpen.addEventListener('click', openSearch);
+  SA('[data-ph3-search-close]', search || document).forEach(el =>
+    el.addEventListener('click', closeSearch)
+  );
+
+  /* Quick chips */
+  const searchInp = S('[data-ph3-search-input]', search);
+  SA('[data-ph3-chip]', search || document).forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (!searchInp) return;
+      searchInp.value = chip.dataset.ph3Chip;
+      searchInp.dispatchEvent(new Event('input'));
+      searchInp.focus();
+    });
+  });
+
+  /* Predictive search */
+  if (searchInp) {
+    const resultsWrap  = S('[data-ph3-search-results]', search);
+    const suggestWrap  = S('[data-ph3-suggestions]',    search);
+
+    searchInp.addEventListener('input', () => {
+      clearTimeout(searchDebounce);
+      const q = searchInp.value.trim();
+      if (!q) {
+        if (resultsWrap) resultsWrap.innerHTML = '';
+        if (suggestWrap) suggestWrap.style.display = '';
+        return;
+      }
+      if (suggestWrap) suggestWrap.style.display = 'none';
+
+      searchDebounce = setTimeout(async () => {
+        try {
+          const r = await fetch(
+            `/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=product&resources[limit]=6`
+          );
+          const d = await r.json();
+          paintResults(d.resources?.results?.products || [], resultsWrap);
+        } catch { paintResults([], resultsWrap); }
+      }, 260);
+    });
+  }
+
+  function paintResults(products, wrap) {
+    if (!wrap) return;
+    if (!products.length) {
+      wrap.innerHTML = `<p style="font-size:.85rem;color:var(--ph3-muted);padding:12px 0;">
+        No products found. Try something else.
+      </p>`;
+      return;
+    }
+    wrap.innerHTML = products.map(p => `
+      <a href="${p.url}" class="ph3-result">
+        <div class="ph3-result__thumb">
+          ${p.featured_image?.url
+            ? `<img src="${p.featured_image.url}&width=120" alt="${p.title}" loading="lazy">`
+            : '🐾'}
+        </div>
+        <div class="ph3-result__info">
+          <p class="ph3-result__name">${p.title}</p>
+          ${p.price
+            ? `<p class="ph3-result__price">${fmtMoney(p.price)}</p>`
+            : ''}
+        </div>
+        <svg class="ph3-result__arrow" width="15" height="15"
+             viewBox="0 0 24 24" fill="none">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round"/>
+        </svg>
+      </a>
+    `).join('');
+  }
+
+  function fmtMoney(cents) {
+    return new Intl.NumberFormat('en-US', {
+      style:'currency', currency:'{{ shop.currency }}'
+    }).format(cents / 100);
+  }
+
+  /* ══════════════════════════════════════════════════════
+     CART COUNT — live update
+  ══════════════════════════════════════════════════════ */
+  document.addEventListener('cart:updated', e => {
+    const count = e.detail?.itemCount ?? 0;
+    SA('[data-ph3-cart]', header).forEach(btn => {
+      btn.setAttribute('aria-label', `Cart — ${count} item${count !== 1 ? 's' : ''}`);
+      let badge = S('[data-ph3-cart-count]', btn);
+      if (count > 0) {
+        if (!badge) {
+          badge = Object.assign(document.createElement('span'), {
+            className: 'ph3__cart-badge',
+          });
+          badge.setAttribute('data-ph3-cart-count','');
+          badge.setAttribute('aria-hidden','true');
+          btn.appendChild(badge);
+        }
+        badge.textContent = count > 99 ? '99+' : String(count);
+      } else if (badge) badge.remove();
+    });
+  });
+
+  /* ── Cleanup ────────────────────────────────────────── */
+  document.addEventListener('shopify:section:unload', e => {
+    if (e.detail.sectionId === '{{ section.id }}') {
+      window.removeEventListener('scroll', onScroll);
+    }
+  });
+
+}());
+</script>
+
+
+{% schema %}
+{
+  "name": "🐾 Header",
+  "tag":  "header",
+  "class":"section-header",
+  "limit": 1,
+
+  "settings": [
+    {
+      "type": "header",
+      "content": "🏷 Brand"
+    },
+    {
+      "type":  "image_picker",
+      "id":    "logo_image",
+      "label": "Logo Image",
+      "info":  "SVG or PNG, transparent background. Max 400 × 120 px."
+    },
+    {
+      "type":    "text",
+      "id":      "logo_text",
+      "label":   "Logo Text (fallback)",
+      "default": "PawPlace"
+    },
+    {
+      "type":    "range",
+      "id":      "logo_max_width",
+      "label":   "Logo Max Width",
+      "min":     80,
+      "max":     260,
+      "step":    10,
+      "unit":    "px",
+      "default": 150
+    },
+
+    {
+      "type": "header",
+      "content": "🗂 Navigation"
+    },
+    {
+      "type":    "link_list",
+      "id":      "main_menu",
+      "label":   "Additional Menu Links",
+      "default": "main-menu",
+      "info":    "Extra links appended after the built-in nav items."
+    },
+
+    {
+      "type": "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type": "color", "id": "bg_color",
+      "label": "Header Background", "default": "#FDFCF9"
+    },
+    {
+      "type": "color", "id": "text_color",
+      "label": "Text Color",        "default": "#1C1917"
+    },
+    {
+      "type": "color", "id": "text_muted",
+      "label": "Muted Text",        "default": "#78716C"
+    },
+    {
+      "type": "color", "id": "accent_color",
+      "label": "Accent Color",      "default": "#D97757"
+    },
+    {
+      "type": "color", "id": "border_color",
+      "label": "Border Color",      "default": "#EAE5DD"
+    },
+
+    {
+      "type": "header",
+      "content": "📣 Announcement Bar"
+    },
+    {
+      "type": "checkbox", "id": "show_announcement_bar",
+      "label": "Show Bar",    "default": true
+    },
+    {
+      "type":    "textarea",
+      "id":      "announcement_text",
+      "label":   "Bar Text",
+      "default": "🐾 Free shipping on orders $50+ &nbsp;·&nbsp; Code: PETLOVE for 10% off &nbsp;·&nbsp; Vet-approved products",
+      "info":    "Scrolls as a ticker. Use &nbsp;·&nbsp; as a separator."
+    },
+    {
+      "type": "url",   "id": "announcement_url",
+      "label": "Bar Link (optional)"
+    },
+    {
+      "type": "color", "id": "announcement_bg",
+      "label": "Bar Background", "default": "#D97757"
+    },
+    {
+      "type": "color", "id": "announcement_fg",
+      "label": "Bar Text Color", "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox", "id": "announcement_dismissible",
+      "label": "Allow Dismiss",  "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "🔍 Search"
+    },
+    {
+      "type": "checkbox", "id": "show_search",
+      "label": "Show Search",   "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "search_placeholder",
+      "label":   "Search Placeholder",
+      "default": "Search pets, products, tips…"
+    },
+    {
+      "type":    "text",
+      "id":      "search_quick_tags",
+      "label":   "Quick Search Tags (comma-separated)",
+      "default": "Dog Food, Cat Toys, Flea Treatment, Dog Beds, Cat Litter, Puppy Kit"
+    },
+
+    {
+      "type": "header",
+      "content": "👤 Account & Cart"
+    },
+    {
+      "type": "checkbox", "id": "show_account",
+      "label": "Show Account",  "default": true
+    },
+    {
+      "type": "checkbox", "id": "show_wishlist",
+      "label": "Show Wishlist Icon", "default": true
+    },
+    {
+      "type": "checkbox", "id": "show_cart",
+      "label": "Show Cart",     "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "ℹ️ Utility Strip"
+    },
+    {
+      "type":    "text",
+      "id":      "strip_text",
+      "label":   "Strip Left Text",
+      "default": "Vet-approved • Ethically sourced • Loved by 50k+ pet parents"
+    },
+
+    {
+      "type": "header",
+      "content": "✨ Options"
+    },
+    {
+      "type": "checkbox", "id": "enable_sticky",
+      "label": "Sticky Header",         "default": true
+    },
+    {
+      "type": "checkbox", "id": "show_scroll_progress",
+      "label": "Scroll Progress Bar",   "default": true
+    }
+  ],
+
+  "blocks": [
+    {
+      "type":  "mega_promo",
+      "name":  "🖼 Mega Menu Promo Card",
+      "limit": 1,
+      "settings": [
+        {
+          "type":  "image_picker",
+          "id":    "promo_image",
+          "label": "Promo Image"
+        },
+        {
+          "type": "text", "id": "promo_badge",
+          "label": "Badge Label",  "default": "🔥 This Week"
+        },
+        {
+          "type": "text", "id": "promo_title",
+          "label": "Promo Title",  "default": "New Arrivals Just Dropped"
+        },
+        {
+          "type": "url",  "id": "promo_url",
+          "label": "Promo Link"
+        },
+        {
+          "type": "text", "id": "promo_cta",
+          "label": "CTA Text",     "default": "Shop Now"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "🐾 Header",
+      "settings": {
+        "logo_text":              "PawPlace",
+        "logo_max_width":         150,
+        "bg_color":               "#FDFCF9",
+        "text_color":             "#1C1917",
+        "text_muted":             "#78716C",
+        "accent_color":           "#D97757",
+        "border_color":           "#EAE5DD",
+        "show_announcement_bar":  true,
+        "announcement_bg":        "#D97757",
+        "announcement_fg":        "#FFFFFF",
+        "announcement_dismissible": true,
+        "show_search":            true,
+        "search_quick_tags":      "Dog Food, Cat Toys, Flea Treatment, Dog Beds, Cat Litter, Puppy Kit",
+        "show_account":           true,
+        "show_wishlist":          true,
+        "show_cart":              true,
+        "strip_text":             "Vet-approved • Ethically sourced • Loved by 50k+ pet parents",
+        "enable_sticky":          true,
+        "show_scroll_progress":   true
+      }
+    }
+  ]
+}
+{% endschema %}

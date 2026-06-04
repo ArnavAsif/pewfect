@@ -1,0 +1,2042 @@
+{% comment %}
+  ============================================================
+  Premium Pet Shop — Best Selling Products Slider
+  File: sections/best-selling-products.liquid
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign section_title    = section.settings.section_title
+  assign section_subtitle = section.settings.section_subtitle
+  assign bg_color         = section.settings.background_color
+  assign accent_color     = section.settings.accent_color
+  assign products         = section.settings.product_collection.products
+  assign products_limit   = section.settings.products_limit
+  assign show_rating      = section.settings.show_rating
+  assign show_badge       = section.settings.show_badge
+  assign card_style       = section.settings.card_style
+  assign autoplay         = section.settings.autoplay
+  assign autoplay_speed   = section.settings.autoplay_speed
+-%}
+
+<section
+  class="bsp"
+  id="bsp-{{ section.id }}"
+  aria-labelledby="bsp-title-{{ section.id }}"
+  style="--bsp-accent: {{ accent_color }}; background: {{ bg_color }};"
+>
+
+  {%- comment %} ── Decorative BG ── {% endcomment %}
+  <div class="bsp__bg-deco" aria-hidden="true">
+    <div class="bsp__bg-blob bsp__bg-blob--1"></div>
+    <div class="bsp__bg-blob bsp__bg-blob--2"></div>
+  </div>
+
+  {%- comment %} ── Header ── {% endcomment %}
+  <div class="bsp__header">
+    <div class="bsp__header-left">
+      <div class="bsp__eyebrow" aria-hidden="true">
+        <span class="bsp__eyebrow-pip"></span>
+        <span class="bsp__eyebrow-pip"></span>
+        <span class="bsp__eyebrow-text">Most Loved</span>
+      </div>
+      <h2 class="bsp__title" id="bsp-title-{{ section.id }}">
+        {{ section_title }}
+      </h2>
+      {%- if section_subtitle != blank -%}
+        <p class="bsp__subtitle">{{ section_subtitle }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="bsp__header-right">
+      {%- if section.settings.view_all_link != blank -%}
+        <a
+          href="{{ section.settings.view_all_link }}"
+          class="bsp__view-all"
+          aria-label="View all best selling products"
+        >
+          <span>View All</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+      {%- comment %} ── Nav Arrows ── {% endcomment %}
+      <div class="bsp__nav" aria-label="Slider navigation" role="group">
+        <button
+          class="bsp__nav-btn bsp__nav-btn--prev"
+          id="bsp-prev-{{ section.id }}"
+          aria-label="Previous products"
+          type="button"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button
+          class="bsp__nav-btn bsp__nav-btn--next"
+          id="bsp-next-{{ section.id }}"
+          aria-label="Next products"
+          type="button"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- comment %} ── Slider Track ── {% endcomment %}
+  <div
+    class="bsp__outer"
+    id="bsp-outer-{{ section.id }}"
+    role="region"
+    aria-label="Best selling products carousel"
+  >
+    <div
+      class="bsp__track"
+      id="bsp-track-{{ section.id }}"
+      aria-live="polite"
+    >
+
+      {%- liquid
+        if products != blank
+          assign product_list = products | limit: products_limit
+        endif
+      -%}
+
+      {%- if product_list != blank and product_list != empty -%}
+        {%- for product in product_list -%}
+          {%- liquid
+            assign product_image   = product.featured_image
+            assign product_title   = product.title
+            assign product_price   = product.price | money
+            assign compare_price   = product.compare_at_price | money
+            assign on_sale         = false
+            if product.compare_at_price > product.price
+              assign on_sale = true
+              assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+            endif
+            assign first_variant   = product.first_available_variant
+            assign is_available    = product.available
+            assign product_url     = product.url
+            assign vendor          = product.vendor
+            assign product_type    = product.type
+          -%}
+
+          <div
+            class="bsp__slide"
+            data-product-id="{{ product.id }}"
+            data-index="{{ forloop.index0 }}"
+            aria-label="{{ product_title | escape }}, {{ product_price }}"
+          >
+            <div class="bsp__card bsp__card--{{ card_style }}" tabindex="0">
+
+              {%- comment %} ── Card Image Area ── {% endcomment %}
+              <div class="bsp__card-media">
+
+                {%- comment %} ── Badges ── {% endcomment %}
+                <div class="bsp__card-badges" aria-hidden="true">
+                  {%- if show_badge -%}
+                    {%- if forloop.index <= 3 -%}
+                      <span class="bsp__badge bsp__badge--hot">
+                        🔥 Best Seller
+                      </span>
+                    {%- endif -%}
+                  {%- endif -%}
+                  {%- if on_sale -%}
+                    <span class="bsp__badge bsp__badge--sale">
+                      -{{ save_pct }}%
+                    </span>
+                  {%- endif -%}
+                  {%- unless is_available -%}
+                    <span class="bsp__badge bsp__badge--sold">Sold Out</span>
+                  {%- endunless -%}
+                </div>
+
+                {%- comment %} ── Wishlist btn ── {% endcomment %}
+                <button
+                  class="bsp__wishlist"
+                  aria-label="Add {{ product_title | escape }} to wishlist"
+                  type="button"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
+
+                {%- comment %} ── Product Image ── {% endcomment %}
+                <a
+                  href="{{ product_url }}"
+                  class="bsp__card-img-link"
+                  tabindex="-1"
+                  aria-hidden="true"
+                >
+                  {%- if product_image != blank -%}
+                    <img
+                      class="bsp__card-img bsp__card-img--primary"
+                      src="{{ product_image | image_url: width: 600 }}"
+                      srcset="
+                        {{ product_image | image_url: width: 300 }} 300w,
+                        {{ product_image | image_url: width: 500 }} 500w,
+                        {{ product_image | image_url: width: 700 }} 700w
+                      "
+                      sizes="(max-width: 767px) 72vw, (max-width: 1023px) 38vw, 22vw"
+                      alt="{{ product_image.alt | default: product_title | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                      width="{{ product_image.width }}"
+                      height="{{ product_image.height }}"
+                    >
+                    {%- if product.images[1] != blank -%}
+                      <img
+                        class="bsp__card-img bsp__card-img--secondary"
+                        src="{{ product.images[1] | image_url: width: 600 }}"
+                        srcset="
+                          {{ product.images[1] | image_url: width: 300 }} 300w,
+                          {{ product.images[1] | image_url: width: 500 }} 500w,
+                          {{ product.images[1] | image_url: width: 700 }} 700w
+                        "
+                        sizes="(max-width: 767px) 72vw, (max-width: 1023px) 38vw, 22vw"
+                        alt="{{ product.images[1].alt | default: product_title | escape }}"
+                        loading="lazy"
+                        decoding="async"
+                        width="{{ product.images[1].width }}"
+                        height="{{ product.images[1].height }}"
+                        aria-hidden="true"
+                      >
+                    {%- endif -%}
+                  {%- else -%}
+                    <div class="bsp__card-img-placeholder" aria-hidden="true">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.2" opacity="0.3">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                      </svg>
+                    </div>
+                  {%- endif -%}
+
+                  {%- comment %} ── Quick view trigger ── {% endcomment %}
+                  <div class="bsp__quick-view" aria-hidden="true">
+                    <span>Quick View</span>
+                  </div>
+                </a>
+
+                {%- comment %} ── Add to Cart (slide-up panel) ── {% endcomment %}
+                <div class="bsp__atc-panel" aria-hidden="true">
+                  {%- if is_available -%}
+                    <form
+                      action="/cart/add"
+                      method="post"
+                      class="bsp__atc-form"
+                      data-product-id="{{ product.id }}"
+                    >
+                      <input type="hidden" name="id" value="{{ first_variant.id }}">
+                      <input type="hidden" name="quantity" value="1">
+
+                      {%- comment %} Variant selector if multiple ── {% endcomment %}
+                      {%- if product.variants.size > 1 -%}
+                        <select
+                          name="id"
+                          class="bsp__variant-select"
+                          aria-label="Select variant for {{ product_title | escape }}"
+                        >
+                          {%- for variant in product.variants -%}
+                            <option
+                              value="{{ variant.id }}"
+                              {%- unless variant.available %} disabled{%- endunless -%}
+                            >
+                              {{ variant.title }}
+                              {%- unless variant.available %} — Sold out{%- endunless -%}
+                            </option>
+                          {%- endfor -%}
+                        </select>
+                      {%- endif -%}
+
+                      <button
+                        type="submit"
+                        class="bsp__atc-btn"
+                        aria-label="Add {{ product_title | escape }} to cart"
+                      >
+                        <span class="bsp__atc-btn-icon" aria-hidden="true">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                          </svg>
+                        </span>
+                        <span class="bsp__atc-btn-text">Add to Cart</span>
+                        <span class="bsp__atc-btn-price">{{ product_price }}</span>
+                      </button>
+                    </form>
+                  {%- else -%}
+                    <button class="bsp__atc-btn bsp__atc-btn--soldout" disabled>
+                      <span>Sold Out</span>
+                    </button>
+                  {%- endif -%}
+                </div>
+
+              </div>
+
+              {%- comment %} ── Card Info ── {% endcomment %}
+              <div class="bsp__card-info">
+
+                {%- comment %} ── Vendor / Type ── {% endcomment %}
+                {%- if vendor != blank -%}
+                  <span class="bsp__card-vendor">{{ vendor }}</span>
+                {%- endif -%}
+
+                {%- comment %} ── Title ── {% endcomment %}
+                <h3 class="bsp__card-title">
+                  <a
+                    href="{{ product_url }}"
+                    class="bsp__card-title-link"
+                    aria-label="{{ product_title | escape }} — {{ product_price }}"
+                  >
+                    {{ product_title }}
+                  </a>
+                </h3>
+
+                {%- comment %} ── Rating ── {% endcomment %}
+                {%- if show_rating -%}
+                  <div
+                    class="bsp__card-rating"
+                    aria-label="Rating: {{ block.settings.rating | default: '4.8' }} out of 5"
+                  >
+                    <div class="bsp__stars" aria-hidden="true">
+                      {%- for i in (1..5) -%}
+                        <svg class="bsp__star bsp__star--filled" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      {%- endfor -%}
+                    </div>
+                    <span class="bsp__rating-count">({{ product.metafields.reviews.rating_count | default: '128' }})</span>
+                  </div>
+                {%- endif -%}
+
+                {%- comment %} ── Price Row ── {% endcomment %}
+                <div class="bsp__card-price-row">
+                  <span class="bsp__card-price">{{ product_price }}</span>
+                  {%- if on_sale -%}
+                    <span class="bsp__card-compare">{{ compare_price }}</span>
+                    <span class="bsp__card-save">Save {{ save_pct }}%</span>
+                  {%- endif -%}
+                </div>
+
+                {%- comment %} ── Color swatches (if variants have colors) ── {% endcomment %}
+                {%- assign has_color = false -%}
+                {%- for option in product.options -%}
+                  {%- if option == 'Color' or option == 'Colour' -%}
+                    {%- assign has_color = true -%}
+                    {%- assign color_option_idx = forloop.index0 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+
+                {%- if has_color -%}
+                  <div class="bsp__swatches" aria-label="Available colors" role="group">
+                    {%- assign shown_colors = '' -%}
+                    {%- for variant in product.variants -%}
+                      {%- assign color_val = variant.options[color_option_idx] -%}
+                      {%- unless shown_colors contains color_val -%}
+                        {%- assign shown_colors = shown_colors | append: color_val | append: ',' -%}
+                        <button
+                          class="bsp__swatch"
+                          style="background-color: {{ color_val | downcase | replace: ' ', '' }};"
+                          aria-label="{{ color_val }}"
+                          title="{{ color_val }}"
+                          type="button"
+                        ></button>
+                      {%- endunless -%}
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+
+              </div>
+            </div>
+          </div>
+
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- comment %} ── Demo/placeholder cards ── {% endcomment %}
+        {%- assign demo_products = 'Premium Dog Food,Cat Wellness Kit,Aquarium Starter,Bird Seed Mix,Pet Grooming Set,Cozy Pet Bed,Interactive Toy,Vitamin Treats' | split: ',' -%}
+        {%- assign demo_prices = '$29.99,$34.99,$49.99,$18.99,$44.99,$59.99,$24.99,$19.99' | split: ',' -%}
+        {%- assign demo_vendors = 'PawLife,MeowCo,AquaWorld,FeatherFresh,GroomPro,ComfortPets,PlayPets,VitaPets' | split: ',' -%}
+        {%- assign demo_colors = '#E8D5C4,#D4C5E2,#C2DFE3,#C8E6C9,#FFE0B2,#E3E8F0,#FFF3E0,#F3E5F5' | split: ',' -%}
+
+        {%- for name in demo_products -%}
+          <div class="bsp__slide" data-index="{{ forloop.index0 }}">
+            <div class="bsp__card bsp__card--default" tabindex="0">
+              <div class="bsp__card-media">
+                <div class="bsp__card-badges" aria-hidden="true">
+                  {%- if forloop.index <= 3 -%}
+                    <span class="bsp__badge bsp__badge--hot">🔥 Best Seller</span>
+                  {%- endif -%}
+                </div>
+                <button class="bsp__wishlist" aria-label="Add to wishlist" type="button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </button>
+                <div class="bsp__card-img-link">
+                  <div
+                    class="bsp__card-img-placeholder"
+                    style="background: linear-gradient(135deg, {{ demo_colors[forloop.index0] }}, #f0ece4);"
+                    aria-hidden="true"
+                  >
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="1" opacity="0.25">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                  </div>
+                  <div class="bsp__quick-view" aria-hidden="true"><span>Quick View</span></div>
+                </div>
+                <div class="bsp__atc-panel" aria-hidden="true">
+                  <div class="bsp__atc-form">
+                    <button type="button" class="bsp__atc-btn">
+                      <span class="bsp__atc-btn-icon" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                          <line x1="3" y1="6" x2="21" y2="6"/>
+                          <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                      </span>
+                      <span class="bsp__atc-btn-text">Add to Cart</span>
+                      <span class="bsp__atc-btn-price">{{ demo_prices[forloop.index0] }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="bsp__card-info">
+                <span class="bsp__card-vendor">{{ demo_vendors[forloop.index0] }}</span>
+                <h3 class="bsp__card-title">
+                  <span class="bsp__card-title-link">{{ name }}</span>
+                </h3>
+                <div class="bsp__card-rating" aria-label="Rating: 4.8 out of 5">
+                  <div class="bsp__stars" aria-hidden="true">
+                    {%- for i in (1..5) -%}
+                      <svg class="bsp__star bsp__star--filled" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    {%- endfor -%}
+                  </div>
+                  <span class="bsp__rating-count">({{ forloop.index | times: 23 | plus: 45 }})</span>
+                </div>
+                <div class="bsp__card-price-row">
+                  <span class="bsp__card-price">{{ demo_prices[forloop.index0] }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+
+    </div>
+
+    {%- comment %} ── Drag hint overlay ── {% endcomment %}
+    <div class="bsp__drag-hint" id="bsp-drag-hint-{{ section.id }}" aria-hidden="true">
+      <div class="bsp__drag-hint-inner">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M5 12h14M2 9l3 3-3 3M22 9l-3 3 3 3"/>
+        </svg>
+        <span>Drag to explore</span>
+      </div>
+    </div>
+  </div>
+
+  {%- comment %} ── Progress Bar ── {% endcomment %}
+  <div class="bsp__progress-wrap" aria-hidden="true">
+    <div class="bsp__progress-track">
+      <div
+        class="bsp__progress-fill"
+        id="bsp-progress-{{ section.id }}"
+      ></div>
+    </div>
+  </div>
+
+  {%- comment %} ── Dots ── {% endcomment %}
+  <div
+    class="bsp__dots"
+    id="bsp-dots-{{ section.id }}"
+    role="tablist"
+    aria-label="Product slides"
+  >
+  </div>
+
+</section>
+
+<style>
+/* ════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }},
+#bsp-{{ section.id }} * {
+  box-sizing: border-box;
+}
+
+/* ════════════════════════════════════════════════
+   SECTION
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} {
+  --bsp-radius: 20px;
+  --bsp-card-w: clamp(240px, 26vw, 310px);
+  --bsp-card-h: clamp(320px, 42vw, 440px);
+  --bsp-gap: clamp(14px, 1.8vw, 22px);
+  --bsp-pad: clamp(20px, 5vw, 80px);
+  --bsp-transition: 0.52s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --bsp-atc-h: 76px;
+
+  position: relative;
+  width: 100%;
+  padding: clamp(52px, 8vw, 100px) 0 clamp(36px, 5vw, 64px);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── BG Decoratives ── */
+#bsp-{{ section.id }} .bsp__bg-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#bsp-{{ section.id }} .bsp__bg-blob--1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #ffb347, #ffcc02);
+  top: -160px; left: -100px;
+}
+
+#bsp-{{ section.id }} .bsp__bg-blob--2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #b3e5fc, #4fc3f7);
+  bottom: -100px; right: -80px;
+}
+
+/* ════════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 var(--bsp-pad);
+  margin-bottom: clamp(28px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+
+#bsp-{{ section.id }} .bsp__header-left {
+  flex: 1;
+  min-width: 200px;
+}
+
+#bsp-{{ section.id }} .bsp__header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+/* Eyebrow */
+#bsp-{{ section.id }} .bsp__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+#bsp-{{ section.id }} .bsp__eyebrow-pip {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--bsp-accent);
+  opacity: 0.8;
+}
+
+#bsp-{{ section.id }} .bsp__eyebrow-pip:last-of-type {
+  width: 4px;
+  height: 4px;
+  opacity: 0.4;
+}
+
+#bsp-{{ section.id }} .bsp__eyebrow-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--bsp-accent);
+}
+
+/* Title */
+#bsp-{{ section.id }} .bsp__title {
+  font-size: clamp(26px, 3.8vw, 48px);
+  font-weight: 850;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+#bsp-{{ section.id }} .bsp__subtitle {
+  font-size: clamp(14px, 1.4vw, 17px);
+  color: #7a6e65;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* View All link */
+#bsp-{{ section.id }} .bsp__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #3a3530;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1.8px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    background var(--bsp-transition),
+    border-color var(--bsp-transition),
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  white-space: nowrap;
+}
+
+#bsp-{{ section.id }} .bsp__view-all svg {
+  transition: transform 0.3s ease;
+}
+
+#bsp-{{ section.id }} .bsp__view-all:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+}
+
+#bsp-{{ section.id }} .bsp__view-all:hover svg {
+  transform: translateX(3px);
+}
+
+/* Nav buttons */
+#bsp-{{ section.id }} .bsp__nav {
+  display: flex;
+  gap: 8px;
+}
+
+#bsp-{{ section.id }} .bsp__nav-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  border: 1.8px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #3a3530;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+  will-change: transform;
+  flex-shrink: 0;
+}
+
+#bsp-{{ section.id }} .bsp__nav-btn:hover:not(:disabled) {
+  background: var(--bsp-accent);
+  color: #fff;
+  border-color: var(--bsp-accent);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+#bsp-{{ section.id }} .bsp__nav-btn:active {
+  transform: scale(0.95);
+}
+
+#bsp-{{ section.id }} .bsp__nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#bsp-{{ section.id }} .bsp__nav-btn:focus-visible {
+  outline: 3px solid var(--bsp-accent);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════
+   OUTER + TRACK
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__outer {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  cursor: grab;
+  padding: 16px 0 20px;
+}
+
+#bsp-{{ section.id }} .bsp__outer.is-dragging {
+  cursor: grabbing;
+}
+
+#bsp-{{ section.id }} .bsp__outer.is-dragging * {
+  pointer-events: none;
+  user-select: none;
+}
+
+#bsp-{{ section.id }} .bsp__track {
+  display: flex;
+  gap: var(--bsp-gap);
+  padding: 0 var(--bsp-pad);
+  will-change: transform;
+  width: max-content;
+}
+
+/* ════════════════════════════════════════════════
+   SLIDE
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__slide {
+  width: var(--bsp-card-w);
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateY(32px) scale(0.97);
+}
+
+/* ════════════════════════════════════════════════
+   CARD
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__card {
+  position: relative;
+  background: #fff;
+  border-radius: var(--bsp-radius);
+  overflow: hidden;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.04),
+    0 8px 24px rgba(0,0,0,0.07);
+  transition:
+    transform var(--bsp-transition),
+    box-shadow var(--bsp-transition);
+  will-change: transform, box-shadow;
+  outline: none;
+  height: 100%;
+}
+
+/* ════════════════════════════════════════════════
+   CARD MEDIA
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__card-media {
+  position: relative;
+  width: 100%;
+  height: var(--bsp-card-h);
+  overflow: hidden;
+  background: #f5f3ef;
+  border-radius: var(--bsp-radius) var(--bsp-radius) 0 0;
+}
+
+/* Images */
+#bsp-{{ section.id }} .bsp__card-img-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#bsp-{{ section.id }} .bsp__card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition:
+    transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.45s ease;
+  will-change: transform, opacity;
+}
+
+#bsp-{{ section.id }} .bsp__card-img--primary {
+  opacity: 1;
+  transform: scale(1.0);
+  z-index: 1;
+}
+
+#bsp-{{ section.id }} .bsp__card-img--secondary {
+  opacity: 0;
+  transform: scale(1.04);
+  z-index: 2;
+}
+
+#bsp-{{ section.id }} .bsp__card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9e8f7f;
+}
+
+/* Quick view */
+#bsp-{{ section.id }} .bsp__quick-view {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.88);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 9px 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+  z-index: 6;
+  white-space: nowrap;
+}
+
+/* Badges */
+#bsp-{{ section.id }} .bsp__card-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 8;
+  pointer-events: none;
+}
+
+#bsp-{{ section.id }} .bsp__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+#bsp-{{ section.id }} .bsp__badge--hot {
+  background: rgba(255,255,255,0.9);
+  color: #e65100;
+  border: 1px solid rgba(230,81,0,0.15);
+}
+
+#bsp-{{ section.id }} .bsp__badge--sale {
+  background: #ff5252;
+  color: #fff;
+}
+
+#bsp-{{ section.id }} .bsp__badge--sold {
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+}
+
+/* Wishlist */
+#bsp-{{ section.id }} .bsp__wishlist {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 8;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0,0,0,0.07);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3a3530;
+  transition:
+    transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+    background 0.3s ease,
+    color 0.3s ease;
+  will-change: transform;
+}
+
+#bsp-{{ section.id }} .bsp__wishlist:hover,
+#bsp-{{ section.id }} .bsp__wishlist.is-active {
+  transform: scale(1.15);
+  background: #ff5252;
+  color: #fff;
+  border-color: transparent;
+}
+
+#bsp-{{ section.id }} .bsp__wishlist:hover svg path,
+#bsp-{{ section.id }} .bsp__wishlist.is-active svg path {
+  fill: currentColor;
+}
+
+#bsp-{{ section.id }} .bsp__wishlist:focus-visible {
+  outline: 3px solid var(--bsp-accent);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════
+   ADD TO CART SLIDE-UP PANEL
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__atc-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 7;
+  padding: 12px 12px 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.98) 32%,
+    #fff 100%
+  );
+  transform: translateY(100%);
+  transition: transform 0.48s cubic-bezier(0.34, 1.4, 0.64, 1);
+  will-change: transform;
+  border-radius: 0 0 var(--bsp-radius) var(--bsp-radius);
+}
+
+#bsp-{{ section.id }} .bsp__atc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#bsp-{{ section.id }} .bsp__variant-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e0d8;
+  background: #faf9f7;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3a3530;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.25s ease;
+  font-family: inherit;
+}
+
+#bsp-{{ section.id }} .bsp__variant-select:focus {
+  border-color: var(--bsp-accent);
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 16px;
+  background: linear-gradient(
+    135deg,
+    var(--bsp-accent) 0%,
+    color-mix(in srgb, var(--bsp-accent) 80%, #ff5500) 100%
+  );
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.28s ease,
+    filter 0.28s ease;
+  will-change: transform;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.0) 100%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn:hover::before {
+  transform: translateX(120%);
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn:hover:not(:disabled) {
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  filter: brightness(1.05);
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn--soldout {
+  background: #d4cfc6;
+  cursor: default;
+  color: #8a8278;
+  justify-content: center;
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn-text {
+  flex: 1;
+  text-align: left;
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn-price {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+/* ATC success state */
+#bsp-{{ section.id }} .bsp__atc-btn.is-success {
+  background: linear-gradient(135deg, #43a047, #66bb6a);
+}
+
+#bsp-{{ section.id }} .bsp__atc-btn.is-loading {
+  pointer-events: none;
+  filter: brightness(0.9);
+}
+
+/* ════════════════════════════════════════════════
+   CARD INFO
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__card-info {
+  padding: clamp(14px, 1.8vw, 18px) clamp(14px, 1.8vw, 18px) clamp(16px, 2vw, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#bsp-{{ section.id }} .bsp__card-vendor {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bsp-accent);
+}
+
+#bsp-{{ section.id }} .bsp__card-title {
+  font-size: clamp(14px, 1.5vw, 16px);
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+#bsp-{{ section.id }} .bsp__card-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#bsp-{{ section.id }} .bsp__card-title-link:hover {
+  color: var(--bsp-accent);
+}
+
+/* Stars */
+#bsp-{{ section.id }} .bsp__card-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#bsp-{{ section.id }} .bsp__stars {
+  display: flex;
+  gap: 1.5px;
+}
+
+#bsp-{{ section.id }} .bsp__star--filled {
+  color: #fbbf24;
+}
+
+#bsp-{{ section.id }} .bsp__rating-count {
+  font-size: 12px;
+  color: #9e8f7f;
+  font-weight: 500;
+}
+
+/* Price row */
+#bsp-{{ section.id }} .bsp__card-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#bsp-{{ section.id }} .bsp__card-price {
+  font-size: clamp(16px, 1.7vw, 19px);
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+#bsp-{{ section.id }} .bsp__card-compare {
+  font-size: 13px;
+  font-weight: 500;
+  color: #b0a89e;
+  text-decoration: line-through;
+}
+
+#bsp-{{ section.id }} .bsp__card-save {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #ff5252;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+/* Swatches */
+#bsp-{{ section.id }} .bsp__swatches {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+#bsp-{{ section.id }} .bsp__swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  padding: 0;
+}
+
+#bsp-{{ section.id }} .bsp__swatch:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 2.5px #fff, 0 0 0 4px rgba(0,0,0,0.2);
+}
+
+/* ════════════════════════════════════════════════
+   HOVER STATES (desktop)
+════════════════════════════════════════════════ */
+@media (hover: hover) and (pointer: fine) {
+
+  /* Card lift */
+  #bsp-{{ section.id }} .bsp__card:hover,
+  #bsp-{{ section.id }} .bsp__card:focus-visible {
+    transform: translateY(-6px);
+    box-shadow:
+      0 20px 56px rgba(0,0,0,0.13),
+      0 6px 16px rgba(0,0,0,0.08);
+  }
+
+  /* Primary image zoom */
+  #bsp-{{ section.id }} .bsp__card:hover .bsp__card-img--primary,
+  #bsp-{{ section.id }} .bsp__card:focus-visible .bsp__card-img--primary {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+
+  /* Secondary image fade in */
+  #bsp-{{ section.id }} .bsp__card:hover .bsp__card-img--secondary,
+  #bsp-{{ section.id }} .bsp__card:focus-visible .bsp__card-img--secondary {
+    opacity: 1;
+    transform: scale(1.0);
+  }
+
+  /* Quick view reveal */
+  #bsp-{{ section.id }} .bsp__card:hover .bsp__quick-view,
+  #bsp-{{ section.id }} .bsp__card:focus-visible .bsp__quick-view {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* ATC slide up */
+  #bsp-{{ section.id }} .bsp__card:hover .bsp__atc-panel,
+  #bsp-{{ section.id }} .bsp__card:focus-visible .bsp__atc-panel {
+    transform: translateY(0%);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   DRAG HINT
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__drag-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 20;
+}
+
+#bsp-{{ section.id }} .bsp__drag-hint.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+#bsp-{{ section.id }} .bsp__drag-hint-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(26, 26, 26, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+/* ════════════════════════════════════════════════
+   PROGRESS BAR
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__progress-wrap {
+  padding: 0 var(--bsp-pad);
+  margin-top: 24px;
+}
+
+#bsp-{{ section.id }} .bsp__progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#bsp-{{ section.id }} .bsp__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--bsp-accent), color-mix(in srgb, var(--bsp-accent) 70%, #ff5500));
+  border-radius: 999px;
+  width: 0%;
+  transition: width 0.3s ease;
+  will-change: width;
+}
+
+/* ════════════════════════════════════════════════
+   DOTS
+════════════════════════════════════════════════ */
+#bsp-{{ section.id }} .bsp__dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 0 var(--bsp-pad);
+}
+
+#bsp-{{ section.id }} .bsp__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.15);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: width 0.3s ease, background 0.3s ease;
+  flex-shrink: 0;
+}
+
+#bsp-{{ section.id }} .bsp__dot.is-active {
+  width: 22px;
+  background: var(--bsp-accent);
+}
+
+/* ════════════════════════════════════════════════
+   MOBILE
+════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  #bsp-{{ section.id }} {
+    --bsp-card-w: 72vw;
+    --bsp-card-h: 280px;
+  }
+
+  #bsp-{{ section.id }} .bsp__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  #bsp-{{ section.id }} .bsp__header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Mobile: always show ATC */
+  #bsp-{{ section.id }} .bsp__atc-panel {
+    transform: translateY(0%);
+  }
+
+  #bsp-{{ section.id }} .bsp__quick-view {
+    display: none;
+  }
+
+  /* Larger touch target for wishlist */
+  #bsp-{{ section.id }} .bsp__wishlist {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   TABLET
+════════════════════════════════════════════════ */
+@media (min-width: 768px) and (max-width: 1100px) {
+  #bsp-{{ section.id }} {
+    --bsp-card-w: clamp(220px, 32vw, 290px);
+    --bsp-card-h: clamp(280px, 40vw, 400px);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   REDUCED MOTION
+════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  #bsp-{{ section.id }} .bsp__card,
+  #bsp-{{ section.id }} .bsp__card-img,
+  #bsp-{{ section.id }} .bsp__atc-panel,
+  #bsp-{{ section.id }} .bsp__quick-view,
+  #bsp-{{ section.id }} .bsp__card-img--secondary {
+    transition: none !important;
+  }
+
+  #bsp-{{ section.id }} .bsp__slide {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  #bsp-{{ section.id }} .bsp__atc-panel {
+    transform: translateY(0%) !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ─────────────────────────────────────────────────────
+     CONFIG
+  ───────────────────────────────────────────────────── */
+  var SID          = '{{ section.id }}';
+  var AUTOPLAY     = {{ autoplay }};
+  var AUTOPLAY_SPD = {{ autoplay_speed | times: 1000 }};
+  var GSAP_SRC     = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  var ST_SRC       = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+  var DR_SRC       = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js';
+  /* NOTE: InertiaPlugin is Club GSAP (paid) and NOT on the free CDN.
+     It has been removed from the load chain to prevent bootstrap failure. */
+
+  /* ─────────────────────────────────────────────────────
+     UTILS
+  ───────────────────────────────────────────────────── */
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('script[src="' + src + '"]')) { res(); return; }
+      var s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  function clamp(val, min, max) {
+    return Math.min(Math.max(val, min), max);
+  }
+
+  /* ─────────────────────────────────────────────────────
+     FALLBACK — make everything visible (no GSAP)
+  ───────────────────────────────────────────────────── */
+  function revealAll(section) {
+    section.querySelectorAll('.bsp__slide').forEach(function (slide) {
+      slide.style.cssText += 'opacity:1!important;transform:none!important;';
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────
+     FALLBACK NAV — native scroll, no GSAP required
+  ───────────────────────────────────────────────────── */
+  function fallbackNav(section) {
+    var slides  = section.querySelectorAll('.bsp__slide');
+    var outer   = section.querySelector('.bsp__outer');
+    var prevBtn = section.querySelector('.bsp__nav-btn--prev');
+    var nextBtn = section.querySelector('.bsp__nav-btn--next');
+    var current = 0;
+
+    if (!outer || !slides.length) return;
+
+    outer.style.overflowX      = 'auto';
+    outer.style.scrollSnapType = 'x mandatory';
+    outer.style.cursor         = 'grab';
+    slides.forEach(function (s) { s.style.scrollSnapAlign = 'start'; });
+
+    function scrollTo(idx) {
+      current = clamp(idx, 0, slides.length - 1);
+      slides[current].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      if (prevBtn) prevBtn.disabled = current === 0;
+      if (nextBtn) nextBtn.disabled = current >= slides.length - 1;
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { scrollTo(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { scrollTo(current + 1); });
+    scrollTo(0);
+  }
+
+  /* ─────────────────────────────────────────────────────
+     MAIN INIT
+  ───────────────────────────────────────────────────── */
+  function init() {
+    var section  = document.getElementById('bsp-' + SID);
+    if (!section) return;
+
+    var gsap      = window.gsap;
+    var ST        = window.ScrollTrigger;
+    var Draggable = window.Draggable;
+
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isMobile       = window.matchMedia('(max-width: 767px)').matches;
+
+    if (!gsap) { revealAll(section); fallbackNav(section); return; }
+
+    if (ST)        gsap.registerPlugin(ST);
+    if (Draggable) gsap.registerPlugin(Draggable);
+
+    /* ── DOM refs ── */
+    var outer    = section.querySelector('.bsp__outer');
+    var track    = section.querySelector('.bsp__track');
+    var slides   = section.querySelectorAll('.bsp__slide');
+    var prevBtn  = section.querySelector('.bsp__nav-btn--prev');
+    var nextBtn  = section.querySelector('.bsp__nav-btn--next');
+    var progress = section.querySelector('.bsp__progress-fill');
+    var dotsWrap = section.querySelector('.bsp__dots');
+    var dragHint = section.querySelector('.bsp__drag-hint');
+    var header   = section.querySelector('.bsp__header');
+
+    var totalSlides  = slides.length;
+    var currentIndex = 0;
+    var isAnimating  = false;
+    var autoTimer    = null;
+
+    if (!totalSlides || !track) { revealAll(section); fallbackNav(section); return; }
+
+    /* ─────────────────────────────────────────────
+       BUILD DOTS
+    ───────────────────────────────────────────── */
+    var dots = [];
+    slides.forEach(function (_, i) {
+      var dot = document.createElement('button');
+      dot.className = 'bsp__dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', 'Go to product ' + (i + 1));
+      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      dot.setAttribute('data-index', i);
+      dot.addEventListener('click', function () { goTo(i, true); });
+      dotsWrap.appendChild(dot);
+      dots.push(dot);
+    });
+
+    /* ─────────────────────────────────────────────
+       CARD WIDTH HELPER
+    ───────────────────────────────────────────── */
+    function getCardWidth() {
+      if (!slides[0]) return 300;
+      var gap = parseFloat(getComputedStyle(track).gap) || 0;
+      return slides[0].offsetWidth + gap;
+    }
+
+    /* ─────────────────────────────────────────────
+       MAX X (prevent over-scroll past last card)
+    ───────────────────────────────────────────── */
+    function getMaxX() {
+      var trackW = track.scrollWidth;
+      var outerW = outer.offsetWidth;
+      var pad    = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+      return -(trackW - outerW - pad);
+    }
+
+    /* ─────────────────────────────────────────────
+       GET X FOR INDEX
+       FIX: removed incorrect + pad offset that was
+       shifting cards right on every navigation step
+    ───────────────────────────────────────────── */
+    function getXForIndex(idx) {
+      var cardW = getCardWidth();
+      var x     = -(idx * cardW);
+      return clamp(x, getMaxX(), 0);
+    }
+
+    /* ─────────────────────────────────────────────
+       UPDATE UI
+    ───────────────────────────────────────────── */
+    function updateUI(idx) {
+      dots.forEach(function (d, i) {
+        var active = i === idx;
+        d.classList.toggle('is-active', active);
+        d.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      if (progress) {
+        var pct = totalSlides > 1
+          ? (idx / (totalSlides - 1)) * 100
+          : 100;
+        progress.style.width = pct + '%';
+      }
+
+      if (prevBtn) prevBtn.disabled = idx === 0;
+      if (nextBtn) nextBtn.disabled = idx >= totalSlides - 1;
+    }
+
+    /* ─────────────────────────────────────────────
+       GO TO SLIDE
+    ───────────────────────────────────────────── */
+    function goTo(idx, userAction) {
+      if (isAnimating && !userAction) return;
+      idx = clamp(idx, 0, totalSlides - 1);
+
+      if (idx === currentIndex && userAction) return;
+      currentIndex = idx;
+
+      isAnimating = true;
+      var targetX = getXForIndex(idx);
+
+      gsap.to(track, {
+        x: targetX,
+        duration: prefersReduced ? 0 : 0.72,
+        ease: 'power3.out',
+        onComplete: function () { isAnimating = false; }
+      });
+
+      updateUI(idx);
+
+      if (userAction && AUTOPLAY) {
+        stopAutoplay();
+        startAutoplay();
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       NAV BUTTONS
+    ───────────────────────────────────────────── */
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        goTo(currentIndex - 1, true);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        goTo(currentIndex + 1, true);
+      });
+    }
+
+    /* Initial state */
+    updateUI(0);
+    gsap.set(track, { x: getXForIndex(0) });
+
+    /* ─────────────────────────────────────────────
+       GSAP DRAGGABLE
+    ───────────────────────────────────────────── */
+    if (Draggable && !isMobile) {
+      var draggableInst = Draggable.create(track, {
+        type: 'x',
+        bounds: {
+          minX: getMaxX(),
+          maxX: 0
+        },
+        /* inertia requires paid InertiaPlugin — disabled */
+        inertia: false,
+        edgeResistance: 0.75,
+        snap: {
+          x: function (rawX) {
+            var cardW = getCardWidth();
+            var idx   = Math.round(-rawX / cardW);
+            idx = clamp(idx, 0, totalSlides - 1);
+            return getXForIndex(idx);
+          }
+        },
+        onDragStart: function () {
+          outer.classList.add('is-dragging');
+          stopAutoplay();
+          hideDragHint();
+        },
+        onDragEnd: function () {
+          outer.classList.remove('is-dragging');
+
+          var currentX = gsap.getProperty(track, 'x');
+          var cardW    = getCardWidth();
+          var newIdx   = Math.round(-currentX / cardW);
+          newIdx = clamp(newIdx, 0, totalSlides - 1);
+
+          if (newIdx !== currentIndex) {
+            currentIndex = newIdx;
+            updateUI(newIdx);
+          }
+
+          if (AUTOPLAY) startAutoplay();
+        },
+        onClick: function (e) {
+          if (Math.abs(this.deltaX) < 5 && Math.abs(this.deltaY) < 5) {
+            var link = e.target.closest('a');
+            if (link) window.location.href = link.href;
+          }
+        }
+      })[0];
+
+      window.addEventListener('resize', function () {
+        if (draggableInst) {
+          draggableInst.vars.bounds = {
+            minX: getMaxX(),
+            maxX: 0
+          };
+          draggableInst.applyBounds();
+        }
+        gsap.set(track, { x: getXForIndex(currentIndex) });
+        updateUI(currentIndex);
+      });
+
+    } else {
+      /* Mobile: native scroll */
+      if (outer) {
+        outer.style.overflowX      = 'auto';
+        outer.style.scrollSnapType = 'x mandatory';
+        track.style.width          = 'max-content';
+
+        slides.forEach(function (s) {
+          s.style.scrollSnapAlign = 'start';
+        });
+
+        var scrollTick = false;
+        outer.addEventListener('scroll', function () {
+          if (scrollTick) return;
+          scrollTick = true;
+          requestAnimationFrame(function () {
+            var idx = Math.round(outer.scrollLeft / getCardWidth());
+            idx = clamp(idx, 0, totalSlides - 1);
+            if (idx !== currentIndex) {
+              currentIndex = idx;
+              updateUI(idx);
+            }
+            scrollTick = false;
+          });
+        }, { passive: true });
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       KEYBOARD NAVIGATION
+    ───────────────────────────────────────────── */
+    outer && outer.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(currentIndex - 1, true); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(currentIndex + 1, true); }
+    });
+
+    /* ─────────────────────────────────────────────
+       AUTOPLAY
+    ───────────────────────────────────────────── */
+    function startAutoplay() {
+      if (!AUTOPLAY || prefersReduced) return;
+      autoTimer = setInterval(function () {
+        var next = currentIndex + 1 >= totalSlides ? 0 : currentIndex + 1;
+        goTo(next, false);
+      }, AUTOPLAY_SPD);
+    }
+
+    function stopAutoplay() {
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    }
+
+    startAutoplay();
+
+    section.addEventListener('mouseenter', stopAutoplay);
+    section.addEventListener('mouseleave', function () {
+      if (AUTOPLAY) startAutoplay();
+    });
+
+    /* ─────────────────────────────────────────────
+       DRAG HINT
+    ───────────────────────────────────────────── */
+    function showDragHint() {
+      if (!dragHint || isMobile) return;
+      dragHint.classList.add('is-visible');
+      setTimeout(hideDragHint, 2200);
+    }
+
+    function hideDragHint() {
+      if (dragHint) dragHint.classList.remove('is-visible');
+    }
+
+    /* ─────────────────────────────────────────────
+       SCROLL ENTRANCE ANIMATIONS
+    ───────────────────────────────────────────── */
+    if (ST && !prefersReduced) {
+
+      if (header) {
+        var hEls = [
+          header.querySelector('.bsp__eyebrow'),
+          header.querySelector('.bsp__title'),
+          header.querySelector('.bsp__subtitle')
+        ].filter(Boolean);
+
+        gsap.fromTo(hEls,
+          { y: 22, opacity: 0 },
+          {
+            y: 0, opacity: 1,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: header,
+              start: 'top 88%',
+              once: true
+            }
+          }
+        );
+      }
+
+      gsap.fromTo(slides,
+        { y: 32, opacity: 0, scale: 0.97 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.68,
+          stagger: 0.09,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: outer,
+            start: 'top 85%',
+            once: true,
+            onEnter: function () {
+              setTimeout(showDragHint, 600);
+            }
+          }
+        }
+      );
+
+    } else {
+      revealAll(section);
+    }
+
+    /* ─────────────────────────────────────────────
+       ADD TO CART — AJAX
+    ───────────────────────────────────────────── */
+    section.querySelectorAll('.bsp__atc-form').forEach(function (form) {
+      if (!form.action) return;
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var btn       = form.querySelector('.bsp__atc-btn');
+        var btnText   = form.querySelector('.bsp__atc-btn-text');
+        var variantId = form.querySelector('[name="id"]').value;
+        var qty       = form.querySelector('[name="quantity"]')
+                          ? form.querySelector('[name="quantity"]').value
+                          : 1;
+
+        if (!btn || btn.classList.contains('is-loading')) return;
+
+        btn.classList.add('is-loading');
+        var originalText = btnText ? btnText.textContent : '';
+        if (btnText) btnText.textContent = 'Adding…';
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ id: variantId, quantity: parseInt(qty) })
+        })
+        .then(function (res) {
+          if (!res.ok) throw new Error('Cart error');
+          return res.json();
+        })
+        .then(function () {
+          btn.classList.remove('is-loading');
+          btn.classList.add('is-success');
+          if (btnText) btnText.textContent = '✓ Added!';
+
+          document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+          document.dispatchEvent(new CustomEvent('theme:cart:open', { bubbles: true }));
+
+          fetch('/cart.js')
+            .then(function (r) { return r.json(); })
+            .then(function (cart) {
+              var bubbles = document.querySelectorAll('.cart-count, .cart__count, [data-cart-count]');
+              bubbles.forEach(function (b) { b.textContent = cart.item_count; });
+            });
+
+          setTimeout(function () {
+            btn.classList.remove('is-success');
+            if (btnText) btnText.textContent = originalText;
+          }, 2200);
+        })
+        .catch(function () {
+          btn.classList.remove('is-loading');
+          if (btnText) {
+            btnText.textContent = 'Try again';
+            setTimeout(function () { btnText.textContent = originalText; }, 2000);
+          }
+        });
+      });
+    });
+
+    /* ─────────────────────────────────────────────
+       WISHLIST TOGGLE
+    ───────────────────────────────────────────── */
+    section.querySelectorAll('.bsp__wishlist').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.toggle('is-active');
+
+        if (gsap) {
+          gsap.fromTo(this,
+            { scale: 1 },
+            {
+              scale: 1.35,
+              duration: 0.15,
+              ease: 'power2.out',
+              yoyo: true,
+              repeat: 1,
+              onComplete: function () {
+                gsap.set(this.targets()[0], { scale: 1 });
+              }
+            }
+          );
+        }
+      });
+    });
+
+  } /* end init */
+
+  /* ─────────────────────────────────────────────
+     BOOTSTRAP
+     FIX: InertiaPlugin removed from chain.
+     It is Club GSAP (paid) and 404s on the free
+     CDN, which caused the entire .catch() to fire
+     before init() ever ran — breaking all buttons
+     and drag functionality completely.
+  ───────────────────────────────────────────── */
+  function bootstrap() {
+    loadScript(GSAP_SRC)
+      .then(function () {
+        return Promise.all([
+          loadScript(ST_SRC),
+          loadScript(DR_SRC)
+        ]);
+      })
+      .then(function () {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            requestAnimationFrame(function () {
+              requestAnimationFrame(init);
+            });
+          });
+        } else {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(init);
+          });
+        }
+      })
+      .catch(function () {
+        /* GSAP CDN blocked or failed — fall back gracefully */
+        var sec = document.getElementById('bsp-' + SID);
+        if (sec) {
+          revealAll(sec);
+          fallbackNav(sec);
+        }
+      });
+  }
+
+  bootstrap();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "🛒 Best Sellers Slider",
+  "tag": "section",
+  "class": "section-best-sellers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "✍️ Content"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Best Selling Products"
+    },
+    {
+      "type": "textarea",
+      "id": "section_subtitle",
+      "label": "Subtitle",
+      "default": "Handpicked favourites your pets will absolutely love."
+    },
+    {
+      "type": "url",
+      "id": "view_all_link",
+      "label": "View All Link"
+    },
+    {
+      "type": "header",
+      "content": "🛍️ Products"
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Product Collection",
+      "info": "Select a collection to pull products from automatically."
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Max Products to Show",
+      "min": 4,
+      "max": 16,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FDF9F4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#FF7A35",
+      "info": "Used for buttons, badges, eyebrow text and progress bar."
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card Style",
+      "options": [
+        { "value": "default", "label": "Default (white card)" },
+        { "value": "minimal", "label": "Minimal (no shadow)" },
+        { "value": "bordered", "label": "Bordered" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "⚙️ Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay Speed",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "unit": "s",
+      "default": 4,
+      "info": "Seconds between slides. Only active if autoplay is enabled."
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Card Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show Star Ratings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show 'Best Seller' Badge",
+      "default": true,
+      "info": "Shown on first 3 products automatically."
+    }
+  ],
+  "presets": [
+    {
+      "name": "🛒 Best Sellers Slider",
+      "category": "Products"
+    }
+  ]
+}
+{% endschema %}

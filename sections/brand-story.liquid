@@ -1,0 +1,1635 @@
+
+{%- liquid
+  assign s   = section.settings
+  assign sid = 'bs-' | append: section.id
+
+  assign layout = s.layout | default: 'split-left'
+
+  assign bg_color = s.bg_color | default: '#F8F6F2'
+
+  assign overlay_color   = s.overlay_color   | default: '#1C1917'
+  assign overlay_opacity = s.overlay_opacity | default: 40
+  assign overlay_dec     = overlay_opacity   | divided_by: 100.0
+
+  assign text_color   = s.text_color   | default: '#1C1917'
+  assign sub_color    = s.sub_color    | default: '#6B6560'
+  assign accent_color = s.accent_color | default: '#D97757'
+  assign text_align   = s.text_align   | default: 'left'
+
+  assign media_image  = s.media_image
+  assign media_video  = s.media_video_url
+  assign image_alt    = s.image_alt | default: 'A warm moment between a pet and their owner'
+  assign use_video    = false
+  if media_video != blank
+    assign use_video  = true
+  endif
+
+  assign enable_parallax = s.enable_parallax
+
+  assign pad_top    = s.padding_top    | default: 100
+  assign pad_bottom = s.padding_bottom | default: 100
+-%}
+
+<section
+  id="{{ sid }}"
+  class="bs bs--{{ layout }}"
+  style="
+    background-color: {{ bg_color }};
+    padding-top:      {{ pad_top }}px;
+    padding-bottom:   {{ pad_bottom }}px;
+    --bs-accent:      {{ accent_color }};
+    --bs-text:        {{ text_color }};
+    --bs-sub:         {{ sub_color }};
+    --bs-align:       {{ text_align }};
+    --bs-bg:          {{ bg_color }};
+  "
+  aria-labelledby="{{ sid }}-heading"
+  data-bs-section
+>
+
+  {%- comment %} ════════════════════════════════════════════
+    LAYOUT C — Full-width overlay
+  ════════════════════════════════════════════════ {% endcomment %}
+  {%- if layout == 'overlay' %}
+
+    <div class="bs__overlay-wrap" data-bs-media-wrap>
+
+      {%- comment %} ── Media ── {% endcomment %}
+      <div class="bs__overlay-media" data-bs-media>
+        {%- if use_video %}
+          <video
+            class="bs__video"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+            data-bs-img
+          >
+            <source src="{{ media_video }}" type="video/mp4">
+          </video>
+        {%- elsif media_image != blank %}
+          {{
+            media_image
+            | image_url: width: 2000
+            | image_tag:
+              loading: 'lazy',
+              fetchpriority: 'high',
+              widths: '800, 1200, 1600, 2000',
+              sizes: '100vw',
+              alt: image_alt,
+              class: 'bs__img',
+              data-bs-img: ''
+          }}
+        {%- else %}
+          <div class="bs__img-placeholder bs__img-placeholder--overlay" data-bs-img>
+            <div class="bs__placeholder-pattern" aria-hidden="true"></div>
+          </div>
+        {%- endif %}
+      </div>
+
+      {%- comment %} ── Gradient overlay ── {% endcomment %}
+      <div
+        class="bs__overlay-gradient"
+        aria-hidden="true"
+        style="
+          background: linear-gradient(
+            {{ s.overlay_direction | default: '135deg' }},
+            {{ overlay_color }}{{ overlay_opacity | times: 2 | append: '' }} 0%,
+            {{ overlay_color }}{{ overlay_opacity | append: '' }} 45%,
+            rgba(0,0,0,0) 100%
+          );
+        "
+      ></div>
+
+      {%- comment %} ── Text content ── {% endcomment %}
+      <div class="bs__overlay-content" data-bs-content>
+        {% comment %} {%- render 'bs-text-block',
+          sid:          sid,
+          s:            s,
+          text_color:   text_color,
+          sub_color:    sub_color,
+          accent_color: accent_color,
+          text_align:   text_align
+        %} {% endcomment %}
+      </div>
+
+    </div>
+
+  {%- comment %} ════════════════════════════════════════════
+    LAYOUTS A & B — Split (text + image side by side)
+  ════════════════════════════════════════════════ {% endcomment %}
+  {%- else %}
+
+    <div class="bs__split" data-bs-split>
+
+      {%- comment %} ── Text column ── {% endcomment %}
+      <div class="bs__text-col" data-bs-content>
+
+        {%- comment %} Vertical line decoration {% endcomment %}
+        <div class="bs__vert-line" aria-hidden="true">
+          <span class="bs__vert-line-fill"></span>
+        </div>
+
+        {%- comment %} Label {% endcomment %}
+        {%- if s.label != blank %}
+          <p class="bs__label" data-bs-label>
+            <span class="bs__label-dot" aria-hidden="true"></span>
+            {{ s.label }}
+          </p>
+        {%- endif %}
+
+        {%- comment %} Heading {% endcomment %}
+        {%- if s.heading != blank %}
+          <h2
+            class="bs__heading"
+            id="{{ sid }}-heading"
+            data-bs-heading
+          >
+            {%- assign head_lines = s.heading | split: '.' %}
+            {%- for line in head_lines %}
+              {%- if line != blank %}
+                <span class="bs__heading-line" data-bs-line>
+                  <span class="bs__heading-inner">
+                    {{ line | strip }}{%- unless forloop.last %}.{%- endunless %}
+                  </span>
+                </span>
+                {%- unless forloop.last %}<br>{%- endunless %}
+              {%- endif %}
+            {%- endfor %}
+          </h2>
+        {%- endif %}
+
+        {%- comment %} Accent mark {% endcomment %}
+        <div class="bs__accent-mark" data-bs-mark aria-hidden="true">
+          <svg width="48" height="8" viewBox="0 0 48 8" fill="none">
+            <path d="M0 4 Q12 0 24 4 Q36 8 48 4"
+                  stroke="{{ accent_color }}" stroke-width="2.5"
+                  stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+
+        {%- comment %} Body text {% endcomment %}
+        {%- if s.body_text != blank %}
+          <p class="bs__body" data-bs-body>
+            {{ s.body_text }}
+          </p>
+        {%- endif %}
+
+        {%- comment %} Values list {% endcomment %}
+        {%- if s.show_values %}
+          <ul class="bs__values" data-bs-values aria-label="Our values">
+            {%- assign val_list = s.values_text | split: ',' %}
+            {%- for val in val_list %}
+              <li class="bs__value-item">
+                <span class="bs__value-dot" aria-hidden="true">✦</span>
+                <span>{{ val | strip }}</span>
+              </li>
+            {%- endfor %}
+          </ul>
+        {%- endif %}
+
+        {%- comment %} CTA link {% endcomment %}
+        {%- if s.cta_text != blank %}
+          <a
+            href="{{ s.cta_url | default: '/pages/about' }}"
+            class="bs__cta"
+            data-bs-cta
+            aria-label="{{ s.cta_text | escape }}"
+          >
+            <span class="bs__cta-text">{{ s.cta_text }}</span>
+            <span class="bs__cta-line" aria-hidden="true"></span>
+            <span class="bs__cta-arrow" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </a>
+        {%- endif %}
+
+        {%- comment %} Quote pull {% endcomment %}
+        {%- if s.show_quote and s.quote_text != blank %}
+          <blockquote class="bs__quote" data-bs-quote>
+            <p class="bs__quote-text">"{{ s.quote_text }}"</p>
+            {%- if s.quote_author != blank %}
+              <cite class="bs__quote-author">— {{ s.quote_author }}</cite>
+            {%- endif %}
+          </blockquote>
+        {%- endif %}
+
+      </div>{%- comment %} /.bs__text-col {% endcomment %}
+
+      {%- comment %} ── Image column ── {% endcomment %}
+      <div class="bs__img-col" data-bs-media-wrap>
+
+        <div class="bs__img-composition">
+
+          {%- comment %} Background blur shape {% endcomment %}
+          <div class="bs__img-blur-shape" aria-hidden="true"></div>
+
+          {%- comment %} Main image frame {% endcomment %}
+          <div class="bs__img-frame" data-bs-media>
+
+            {%- if use_video %}
+              <video
+                class="bs__video"
+                autoplay
+                muted
+                loop
+                playsinline
+                aria-hidden="true"
+                data-bs-img
+              >
+                <source src="{{ media_video }}" type="video/mp4">
+              </video>
+            {%- elsif media_image != blank %}
+              {{
+                media_image
+                | image_url: width: 1200
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '500, 700, 900, 1200',
+                  sizes: '(max-width: 767px) 90vw, 48vw',
+                  alt: image_alt,
+                  class: 'bs__img',
+                  data-bs-img: ''
+              }}
+            {%- else %}
+              <div class="bs__img-placeholder" data-bs-img>
+                <div class="bs__placeholder-inner" aria-hidden="true">
+                  <span class="bs__placeholder-emoji">🐾</span>
+                  <svg viewBox="0 0 400 480" fill="none"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="200" cy="300" rx="170" ry="180"
+                             fill="{{ accent_color }}" opacity="0.07"/>
+                    <ellipse cx="140" cy="130" rx="48" ry="66"
+                             fill="{{ accent_color }}" opacity="0.11"/>
+                    <ellipse cx="260" cy="130" rx="48" ry="66"
+                             fill="{{ accent_color }}" opacity="0.11"/>
+                    <ellipse cx="90"  cy="200" rx="38" ry="52"
+                             fill="{{ accent_color }}" opacity="0.08"/>
+                    <ellipse cx="310" cy="200" rx="38" ry="52"
+                             fill="{{ accent_color }}" opacity="0.08"/>
+                    <text x="200" y="340" text-anchor="middle"
+                          font-size="100" opacity="0.20">🐶</text>
+                    <text x="200" y="440" text-anchor="middle"
+                          font-size="13" fill="{{ sub_color }}"
+                          font-weight="500" opacity="0.45">
+                      Add your brand image above
+                    </text>
+                  </svg>
+                </div>
+              </div>
+            {%- endif %}
+
+            {%- comment %} Inner image overlay (very subtle) {% endcomment %}
+            {%- if overlay_opacity > 0 and layout != 'overlay' %}
+              <div
+                class="bs__img-tint"
+                aria-hidden="true"
+                style="
+                  background: {{ overlay_color }};
+                  opacity:    {{ overlay_dec | times: 0.3 }};
+                "
+              ></div>
+            {%- endif %}
+
+          </div>{%- comment %} /.bs__img-frame {% endcomment %}
+
+          {%- comment %} Floating emotion card {% endcomment %}
+          {%- if s.show_emotion_card %}
+            <div class="bs__emotion-card" data-bs-float aria-hidden="true">
+              <span class="bs__emotion-icon">{{ s.emotion_icon | default: '❤️' }}</span>
+              <div class="bs__emotion-text">
+                <span class="bs__emotion-num">{{ s.emotion_num | default: '50k+' }}</span>
+                <span class="bs__emotion-label">{{ s.emotion_label | default: 'Happy Families' }}</span>
+              </div>
+            </div>
+          {%- endif %}
+
+          {%- comment %} Corner decorative dot grid {% endcomment %}
+          <div class="bs__dot-grid" aria-hidden="true">
+            {%- for i in (1..16) %}
+              <span class="bs__dot"></span>
+            {%- endfor %}
+          </div>
+
+        </div>{%- comment %} /.bs__img-composition {% endcomment %}
+      </div>{%- comment %} /.bs__img-col {% endcomment %}
+
+    </div>{%- comment %} /.bs__split {% endcomment %}
+
+  {%- endif %}
+
+</section>
+
+
+{%- comment %}
+  ──────────────────────────────────────────
+  TEXT BLOCK SNIPPET (inline, overlay mode)
+  ──────────────────────────────────────────
+{% endcomment %}
+{%- comment %} In overlay mode we render text inline below {% endcomment %}
+{%- if layout == 'overlay' %}
+  {%- comment %} Content already rendered above via inline block {% endcomment %}
+{%- endif %}
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   STYLES
+══════════════════════════════════════════════════════════ {% endcomment %}
+<style>
+
+/* ── Utility ───────────────────────────────────────────────── */
+.visually-hidden {
+  position:absolute; width:1px; height:1px; padding:0;
+  margin:-1px; overflow:hidden; clip:rect(0,0,0,0);
+  white-space:nowrap; border:0;
+}
+
+/* ── Section base ──────────────────────────────────────────── */
+#{{ sid }} {
+  --bs-radius:     28px;
+  --bs-radius-sm:  14px;
+  --bs-ease:       cubic-bezier(0.22, 1, 0.36, 1);
+  --bs-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --bs-pad-h:      clamp(24px, 6vw, 100px);
+  position:        relative;
+  overflow:        hidden;
+  isolation:       isolate;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT A / B — SPLIT
+══════════════════════════════════════════════════════════ */
+.bs__split {
+  display:       grid;
+  align-items:   center;
+  gap:           clamp(48px, 6vw, 100px);
+  max-width:     1360px;
+  margin:        0 auto;
+  padding:       0 var(--bs-pad-h);
+}
+
+/* Layout A: text left, image right */
+#{{ sid }}.bs--split-left .bs__split {
+  grid-template-columns: 1fr 1.1fr;
+}
+/* Layout B: image left, text right */
+#{{ sid }}.bs--split-right .bs__split {
+  grid-template-columns: 1.1fr 1fr;
+}
+#{{ sid }}.bs--split-right .bs__text-col  { order: 2; }
+#{{ sid }}.bs--split-right .bs__img-col   { order: 1; }
+
+/* ── Text column ─────────────────────────────────────────── */
+.bs__text-col {
+  position:   relative;
+  padding-left: 28px;
+  text-align: var(--bs-align);
+}
+
+/* Vertical decorative line */
+.bs__vert-line {
+  position: absolute;
+  left:     0;
+  top:      8px;
+  bottom:   8px;
+  width:    2.5px;
+  background: color-mix(in srgb, var(--bs-accent) 15%, transparent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bs__vert-line-fill {
+  display:    block;
+  width:      100%;
+  height:     0%;
+  background: linear-gradient(
+    to bottom,
+    var(--bs-accent),
+    color-mix(in srgb, var(--bs-accent) 55%, transparent)
+  );
+  border-radius:inherit;
+  will-change:height;
+}
+{%- if text_align_d == 'center' %}
+  .bs__vert-line { display:none; }
+{%- endif %}
+
+/* Label */
+.bs__label {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            8px;
+  font-size:      0.73rem;
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--bs-accent);
+  margin:         0 0 18px;
+  opacity:        0;
+  transform:      translateY(16px);
+  will-change:    opacity, transform;
+}
+.bs__label-dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    var(--bs-accent);
+  flex-shrink:   0;
+  animation:     bs-dot-pulse 2s ease-in-out infinite;
+}
+@keyframes bs-dot-pulse {
+  0%,100% { opacity:1;   box-shadow:0 0 0 0 color-mix(in srgb,var(--bs-accent) 50%,transparent); }
+  50%     { opacity:0.6; box-shadow:0 0 0 5px transparent; }
+}
+
+/* Heading */
+.bs__heading {
+  font-size:      clamp(2rem, 4.5vw, 3.8rem);
+  font-weight:    800;
+  line-height:    1.10;
+  letter-spacing: -0.03em;
+  color:          var(--bs-text);
+  margin:         0 0 20px;
+  text-wrap:      balance;
+}
+.bs__heading-line {
+  display:  block;
+  overflow: hidden;
+  line-height: 1.15;
+}
+.bs__heading-inner {
+  display:    block;
+  opacity:    0;
+  transform:  translateY(105%);
+  will-change:opacity, transform;
+}
+
+/* Accent mark */
+.bs__accent-mark {
+  margin-bottom: 22px;
+  opacity:       0;
+  transform:     translateX(-8px);
+  will-change:   opacity, transform;
+  {%- if text_align == 'center' %}
+    display:flex;
+    justify-content:center;
+  {%- elsif text_align == 'right' %}
+    display:flex;
+    justify-content:flex-end;
+  {%- endif %}
+}
+
+/* Body */
+.bs__body {
+  font-size:   clamp(1rem, 1.6vw, 1.15rem);
+  color:       var(--bs-sub);
+  line-height: 1.78;
+  margin:      0 0 28px;
+  max-width:   460px;
+  font-weight: 400;
+  opacity:     0;
+  transform:   translateY(20px);
+  will-change: opacity, transform;
+  {%- if text_align == 'center' %}
+    margin-left:  auto;
+    margin-right: auto;
+  {%- elsif text_align == 'right' %}
+    margin-left: auto;
+  {%- endif %}
+}
+
+/* Values list */
+.bs__values {
+  list-style:    none;
+  margin:        0 0 28px;
+  padding:       0;
+  display:       flex;
+  flex-direction:column;
+  gap:           10px;
+  opacity:       0;
+  transform:     translateY(16px);
+  will-change:   opacity, transform;
+  {%- if text_align == 'center' %}
+    align-items: center;
+  {%- elsif text_align == 'right' %}
+    align-items: flex-end;
+  {%- endif %}
+}
+.bs__value-item {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  font-size:   0.88rem;
+  font-weight: 500;
+  color:       var(--bs-sub);
+}
+.bs__value-dot {
+  color:     var(--bs-accent);
+  font-size: 0.65rem;
+  flex-shrink:0;
+}
+
+/* CTA link */
+.bs__cta {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             10px;
+  text-decoration: none;
+  color:           var(--bs-text);
+  font-size:       0.92rem;
+  font-weight:     700;
+  letter-spacing:  0.04em;
+  position:        relative;
+  opacity:         0;
+  transform:       translateY(14px);
+  will-change:     opacity, transform;
+  transition:
+    color       0.28s ease,
+    gap         0.28s ease;
+}
+.bs__cta:hover,
+.bs__cta:focus-visible {
+  color:   var(--bs-accent);
+  gap:     14px;
+  outline: none;
+}
+.bs__cta:focus-visible {
+  outline:        2px solid var(--bs-accent);
+  outline-offset: 4px;
+  border-radius:  4px;
+}
+.bs__cta-line {
+  display:          block;
+  position:         absolute;
+  bottom:           -3px;
+  left:             0;
+  right:            0;
+  height:           1.5px;
+  background:       var(--bs-accent);
+  border-radius:    2px;
+  transform:        scaleX(0);
+  transform-origin: left;
+  transition:       transform 0.35s ease;
+}
+.bs__cta:hover   .bs__cta-line,
+.bs__cta:focus-visible .bs__cta-line { transform: scaleX(1); }
+.bs__cta-arrow {
+  display:    flex;
+  align-items:center;
+  transition: transform 0.28s ease;
+}
+.bs__cta:hover .bs__cta-arrow { transform: translateX(4px); }
+
+/* Quote */
+.bs__quote {
+  margin:        28px 0 0;
+  padding:       20px 24px;
+  border-left:   3px solid var(--bs-accent);
+  background:    color-mix(in srgb, var(--bs-accent) 5%, transparent);
+  border-radius: 0 var(--bs-radius-sm) var(--bs-radius-sm) 0;
+  opacity:       0;
+  transform:     translateX(-16px);
+  will-change:   opacity, transform;
+}
+.bs__quote-text {
+  font-size:   1rem;
+  font-style:  italic;
+  color:       var(--bs-sub);
+  line-height: 1.65;
+  margin:      0 0 8px;
+  font-weight: 400;
+}
+.bs__quote-author {
+  font-size:      0.76rem;
+  font-weight:    600;
+  color:          var(--bs-accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-style:     normal;
+  display:        block;
+}
+
+/* ── Image column ────────────────────────────────────────── */
+.bs__img-col {
+  position: relative;
+}
+.bs__img-composition {
+  position: relative;
+  display:  flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Background blur shape */
+.bs__img-blur-shape {
+  position:      absolute;
+  inset:         -8%;
+  background:    radial-gradient(
+                   ellipse 70% 70% at 50% 50%,
+                   color-mix(in srgb, var(--bs-accent) 12%, transparent),
+                   transparent 70%
+                 );
+  filter:        blur(48px);
+  border-radius: 50%;
+  pointer-events:none;
+  z-index:       0;
+  will-change:   transform;
+}
+
+/* Image frame */
+.bs__img-frame {
+  position:      relative;
+  width:         100%;
+  aspect-ratio:  3 / 4;
+  border-radius: 48% 52% 44% 56% / 52% 44% 56% 48%;
+  overflow:      hidden;
+  z-index:       2;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.08),
+    0 32px 80px rgba(0,0,0,0.12);
+  animation:     bs-frame-morph 14s ease-in-out infinite;
+  will-change:   border-radius;
+  cursor:        default;
+  transition:    box-shadow 0.55s ease;
+}
+.bs__img-frame:hover {
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.10),
+    0 40px 100px rgba(0,0,0,0.16);
+}
+@keyframes bs-frame-morph {
+  0%,100% { border-radius: 48% 52% 44% 56% / 52% 44% 56% 48%; }
+  25%     { border-radius: 56% 44% 52% 48% / 44% 56% 48% 52%; }
+  50%     { border-radius: 44% 56% 48% 52% / 56% 48% 52% 44%; }
+  75%     { border-radius: 52% 48% 56% 44% / 48% 52% 44% 56%; }
+}
+
+.bs__img {
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: center;
+  display:         block;
+  transform:       scale(1.08);
+  transition:      transform 0.70s ease;
+  will-change:     transform;
+}
+.bs__img-frame:hover .bs__img { transform: scale(1.09); }
+
+.bs__video {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  display:    block;
+}
+
+/* Image tint */
+.bs__img-tint {
+  position:       absolute;
+  inset:          0;
+  z-index:        2;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Placeholder */
+.bs__img-placeholder {
+  position: absolute;
+  inset:    0;
+  display:  flex;
+  align-items:center;
+  justify-content:center;
+  background: color-mix(in srgb, var(--bs-accent) 6%, transparent);
+}
+.bs__placeholder-inner {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            8px;
+  position:       relative;
+}
+.bs__placeholder-emoji {
+  font-size: 3rem;
+  position:  absolute;
+  top:       44%;
+  left:      50%;
+  transform: translate(-50%,-50%);
+  z-index:   2;
+  opacity:   0.4;
+}
+.bs__placeholder-inner svg { width:200px; height:auto; }
+
+/* Floating emotion card */
+.bs__emotion-card {
+  position:        absolute;
+  bottom:          8%;
+  left:            -10%;
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  background:      rgba(255,255,255,0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:          1px solid rgba(255,255,255,0.90);
+  border-radius:   16px;
+  padding:         12px 18px;
+  box-shadow:
+    0 4px 20px rgba(0,0,0,0.08),
+    0 1px 4px rgba(0,0,0,0.04);
+  z-index:         10;
+  opacity:         0;
+  will-change:     opacity, transform;
+  animation:       bs-float 5s ease-in-out infinite 1.5s;
+}
+@keyframes bs-float {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-10px); }
+}
+.bs__emotion-icon {
+  font-size:   1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.bs__emotion-text {
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+.bs__emotion-num {
+  font-size:   1.05rem;
+  font-weight: 800;
+  color:       var(--bs-text);
+  line-height: 1;
+  display:     block;
+}
+.bs__emotion-label {
+  font-size:   0.70rem;
+  font-weight: 500;
+  color:       var(--bs-sub);
+  display:     block;
+  line-height: 1.2;
+}
+
+/* Dot grid decoration */
+.bs__dot-grid {
+  position: absolute;
+  right:    -24px;
+  top:      -20px;
+  display:  grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:      10px;
+  z-index:  0;
+  opacity:  0.55;
+}
+.bs__dot {
+  width:         5px;
+  height:        5px;
+  border-radius: 50%;
+  background:    var(--bs-accent);
+  opacity:       0.4;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT C — OVERLAY
+══════════════════════════════════════════════════════════ */
+.bs--overlay {
+  padding-top:    0 !important;
+  padding-bottom: 0 !important;
+}
+.bs__overlay-wrap {
+  position:   relative;
+  width:      100%;
+  min-height: clamp(520px, 80vh, 860px);
+  display:    flex;
+  align-items:flex-end;
+  overflow:   hidden;
+}
+.bs__overlay-media {
+  position: absolute;
+  inset:    -12%;
+  z-index:  0;
+  will-change:transform;
+}
+.bs__overlay-media .bs__img {
+  position:       absolute;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  object-fit:     cover;
+  object-position:center;
+  transform:      none;
+  transition:     none;
+}
+.bs__overlay-media .bs__video {
+  position:   absolute;
+  inset:      0;
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+}
+.bs__overlay-media .bs__img-placeholder--overlay {
+  position:   absolute;
+  inset:      0;
+  width:      100%;
+  height:     100%;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--bs-accent) 18%, #F8F6F2),
+    color-mix(in srgb, var(--bs-accent) 8%, #F8F6F2)
+  );
+}
+.bs__placeholder-pattern {
+  position: absolute;
+  inset:    0;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--bs-accent) 20%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+  opacity: 0.4;
+}
+
+.bs__overlay-gradient {
+  position:       absolute;
+  inset:          0;
+  z-index:        1;
+  pointer-events: none;
+}
+
+.bs__overlay-content {
+  position: relative;
+  z-index:  2;
+  width:    100%;
+  max-width:1360px;
+  margin:   0 auto;
+  padding:  clamp(48px, 8vh, 100px) clamp(24px, 6vw, 100px);
+}
+
+/* Overlay text elements */
+.bs--overlay .bs__label {
+  color: rgba(255,255,255,0.80);
+}
+.bs--overlay .bs__label-dot {
+  background: rgba(255,255,255,0.80);
+}
+.bs--overlay .bs__heading-inner {
+  color: #fff;
+}
+.bs--overlay .bs__body {
+  color: rgba(255,255,255,0.75);
+}
+.bs--overlay .bs__cta {
+  color: #fff;
+}
+.bs--overlay .bs__cta:hover { color: rgba(255,255,255,0.80); }
+
+/* ══════════════════════════════════════════════════════════
+   SHARED TEXT ELEMENTS (both layouts)
+══════════════════════════════════════════════════════════ */
+
+/* Used in overlay mode — same rules rendered inline */
+.bs__overlay-content .bs__label,
+.bs__overlay-content .bs__heading,
+.bs__overlay-content .bs__body,
+.bs__overlay-content .bs__cta {
+  text-align: var(--bs-align);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Tablet ≤ 1024px
+══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .bs__split {
+    gap: clamp(36px, 5vw, 60px);
+  }
+  .bs__emotion-card { left:-4%; }
+  .bs__dot-grid     { display:none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile ≤ 767px
+══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  #{{ sid }}.bs--split-left  .bs__split,
+  #{{ sid }}.bs--split-right .bs__split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .bs__img-col  { order: -1; }
+  .bs__text-col {
+    order:        1;
+    padding-left: 0;
+    text-align:   center;
+  }
+  .bs__vert-line   { display:none; }
+  .bs__body        { max-width:100%; }
+  .bs__values      { align-items:center; }
+  .bs__cta         { margin:0 auto; }
+  .bs__label       { margin:0 auto 18px; }
+
+  .bs__img-frame   {
+    aspect-ratio: 1 / 1;
+    animation:    none;
+    border-radius:50%;
+  }
+  .bs__emotion-card { bottom:-5%; left:50%; transform:translateX(-50%); }
+
+  /* Overlay layout */
+  .bs__overlay-wrap { min-height: 70vh; align-items:center; }
+  .bs__overlay-content { text-align:center; padding-bottom:48px; }
+
+  #{{ sid }} {
+    padding-top:    clamp(48px, 10vw, {{ pad_top }}px) !important;
+    padding-bottom: clamp(48px, 10vw, {{ pad_bottom }}px) !important;
+  }
+}
+
+/* ── Reduced-motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .bs__img-frame {
+    animation: none !important;
+  }
+  .bs__emotion-card {
+    animation: none !important;
+  }
+  .bs__label-dot {
+    animation: none !important;
+  }
+  .bs__img,
+  .bs__cta,
+  .bs__cta-arrow,
+  .bs__cta-line {
+    transition: none !important;
+  }
+  /* Reveal everything */
+  .bs__label,
+  .bs__heading-inner,
+  .bs__accent-mark,
+  .bs__body,
+  .bs__values,
+  .bs__cta,
+  .bs__quote,
+  .bs__emotion-card {
+    opacity:   1 !important;
+    transform: none !important;
+  }
+  .bs__vert-line-fill { height:100% !important; }
+}
+</style>
+
+
+{%- comment %} ── OVERLAY LAYOUT: inline text block ── {% endcomment %}
+{%- if layout == 'overlay' %}
+  {%- comment %}
+    We render the text content directly inside .bs__overlay-content
+    (already done above in the HTML). This comment is just a marker.
+  {% endcomment %}
+{%- endif %}
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   JAVASCRIPT
+══════════════════════════════════════════════════════════ {% endcomment %}
+
+<script>
+/* ── Load GSAP once per page ─────────────────────────────── */
+(function () {
+  if (window.__bsGsap) return;
+  window.__bsGsap = 'loading';
+  const G = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  const T = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+  function load(src, cb) {
+    const el = document.createElement('script');
+    el.src = src; el.defer = true; el.onload = cb;
+    document.head.appendChild(el);
+  }
+  load(G, () => load(T, () => {
+    window.__bsGsap = 'ready';
+    document.dispatchEvent(new CustomEvent('bs:gsap-ready'));
+  }));
+}());
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  const sid    = '{{ sid }}';
+  const noMo   = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const mobile = () => window.matchMedia('(max-width:767px)').matches;
+  const S      = (sel, ctx) => (ctx || document).querySelector(sel);
+  const SA     = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
+
+  const section = document.getElementById(sid);
+  if (!section) return;
+
+  const layout = '{{ layout }}';
+
+  /* ── DOM refs ─────────────────────────────────────────── */
+  const mediaWrap    = S('[data-bs-media-wrap]',  section);
+  const mediaEl      = S('[data-bs-media]',        section);
+  const mediaImg     = S('[data-bs-img]',          section);
+  const contentEl    = S('[data-bs-content]',      section);
+  const labelEl      = S('[data-bs-label]',        section);
+  const headLines    = SA('.bs__heading-inner',    section);
+  const accentMark   = S('[data-bs-mark]',         section);
+  const bodyEl       = S('[data-bs-body]',         section);
+  const valuesEl     = S('[data-bs-values]',       section);
+  const ctaEl        = S('[data-bs-cta]',          section);
+  const quoteEl      = S('[data-bs-quote]',        section);
+  const vertLine     = S('.bs__vert-line-fill',    section);
+  const emotionCard  = S('[data-bs-float]',        section);
+  const blurShape    = S('.bs__img-blur-shape',    section);
+
+  let ctx = null;
+
+  /* ══════════════════════════════════════════════════════
+     INIT ANIMATIONS
+  ══════════════════════════════════════════════════════ */
+  function initAnimations () {
+    if (!window.gsap) {
+      revealAll(); return;
+    }
+    if (noMo()) { revealAll(); return; }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    ctx = gsap.context(() => {
+
+      /* ── Common trigger config ────────────────────────── */
+      const triggerBase = {
+        trigger: section,
+        start:   'top 78%',
+        once:    true,
+      };
+
+      /* ══════════════════════════════════════════════════
+         1. PARALLAX — image moves slower than scroll
+      ══════════════════════════════════════════════════ */
+      const parallaxTarget = layout === 'overlay' ? mediaEl : mediaImg;
+
+      if (parallaxTarget && {{ enable_parallax | default: true | json }}) {
+        const intensity = mobile() ? 10 : 22;
+        gsap.to(parallaxTarget, {
+          yPercent: intensity,
+          ease:     'none',
+          scrollTrigger: {
+            trigger: section,
+            start:   'top bottom',
+            end:     'bottom top',
+            scrub:   1.6,
+          },
+        });
+      }
+
+      /* ── Blur shape parallax (split layouts) ─────────── */
+      if (blurShape && layout !== 'overlay') {
+        gsap.to(blurShape, {
+          yPercent: -14,
+          ease:     'none',
+          scrollTrigger: {
+            trigger: section,
+            start:   'top bottom',
+            end:     'bottom top',
+            scrub:   2,
+          },
+        });
+      }
+
+      /* ══════════════════════════════════════════════════
+         2. IMAGE SCALE on scroll (subtle zoom-in)
+      ══════════════════════════════════════════════════ */
+      if (mediaImg && !mobile()) {
+        gsap.to(mediaImg, {
+          scale:    1.08,
+          ease:     'none',
+          scrollTrigger: {
+            trigger: section,
+            start:   'top bottom',
+            end:     'center top',
+            scrub:   2,
+          },
+        });
+      }
+
+      /* ══════════════════════════════════════════════════
+         3. MEDIA FRAME reveal
+      ══════════════════════════════════════════════════ */
+      const mediaRevealTarget = layout === 'overlay'
+        ? null
+        : S('.bs__img-frame', section);
+
+      if (mediaRevealTarget) {
+        gsap.fromTo(mediaRevealTarget,
+          { opacity:0, x: layout === 'split-right' ? -40 : 40, scale:0.94 },
+          {
+            opacity:  1,
+            x:        0,
+            scale:    1,
+            duration: 1.10,
+            ease:     'power3.out',
+            scrollTrigger: {
+              ...triggerBase,
+              start: 'top 80%',
+            },
+          }
+        );
+      }
+
+      /* ══════════════════════════════════════════════════
+         4. TEXT ELEMENTS — staggered reveal
+      ══════════════════════════════════════════════════ */
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          ...triggerBase,
+          start: 'top 75%',
+        },
+        defaults: { ease:'power3.out' },
+      });
+
+      /* Vertical line draw */
+      if (vertLine) {
+        tl.to(vertLine, { height:'100%', duration:0.90 }, 0);
+      }
+
+      /* Label */
+      if (labelEl) {
+        tl.to(labelEl, {
+          opacity:1, y:0, duration:0.55,
+        }, 0.15);
+      }
+
+      /* Heading lines — cascade */
+      if (headLines.length) {
+        tl.to(headLines, {
+          opacity:  1,
+          y:        '0%',
+          duration: 0.70,
+          stagger:  0.12,
+          ease:     'power3.out',
+        }, labelEl ? 0.32 : 0.15);
+      }
+
+      /* Accent wave mark */
+      if (accentMark) {
+        tl.to(accentMark, {
+          opacity:1, x:0, duration:0.50,
+        }, '-=0.35');
+      }
+
+      /* Body */
+      if (bodyEl) {
+        tl.to(bodyEl, {
+          opacity:1, y:0, duration:0.60,
+        }, '-=0.38');
+      }
+
+      /* Values */
+      if (valuesEl) {
+        const items = SA('.bs__value-item', valuesEl);
+        tl.to(items, {
+          opacity:  1,
+          y:        0,
+          duration: 0.45,
+          stagger:  0.08,
+        }, '-=0.35');
+        gsap.set(items, { opacity:0, y:12 });
+      }
+
+      /* CTA */
+      if (ctaEl) {
+        tl.to(ctaEl, {
+          opacity:1, y:0, duration:0.55,
+          ease:'back.out(1.4)',
+        }, '-=0.30');
+      }
+
+      /* Quote */
+      if (quoteEl) {
+        tl.to(quoteEl, {
+          opacity:1, x:0, duration:0.60,
+          ease:'power2.out',
+        }, '-=0.25');
+      }
+
+      /* ══════════════════════════════════════════════════
+         5. EMOTION CARD reveal
+      ══════════════════════════════════════════════════ */
+      if (emotionCard) {
+        gsap.to(emotionCard, {
+          opacity:  1,
+          y:        0,
+          scale:    1,
+          duration: 0.65,
+          delay:    0.90,
+          ease:     'back.out(1.6)',
+          scrollTrigger: triggerBase,
+        });
+        gsap.set(emotionCard, { scale:0.85, y:16 });
+      }
+
+      /* ══════════════════════════════════════════════════
+         6. SECTION EXIT — gentle fade & drift up
+      ══════════════════════════════════════════════════ */
+      if (!mobile()) {
+        gsap.to(section, {
+          opacity:   0.70,
+          yPercent:  -3,
+          ease:      'none',
+          scrollTrigger: {
+            trigger: section,
+            start:   'bottom 30%',
+            end:     'bottom top',
+            scrub:   true,
+          },
+        });
+      }
+
+    }, section);
+  }
+
+  /* ── Fallback: reveal all ─────────────────────────────── */
+  function revealAll () {
+    const els = [
+      labelEl, accentMark, bodyEl,
+      valuesEl, ctaEl, quoteEl, emotionCard,
+    ];
+    els.forEach(el => {
+      if (!el) return;
+      el.style.opacity   = '1';
+      el.style.transform = 'none';
+    });
+    headLines.forEach(el => {
+      el.style.opacity   = '1';
+      el.style.transform = 'none';
+    });
+    if (vertLine) vertLine.style.height = '100%';
+
+    const mediaFrame = S('.bs__img-frame', section);
+    if (mediaFrame) {
+      mediaFrame.style.opacity   = '1';
+      mediaFrame.style.transform = 'none';
+    }
+  }
+
+  /* ── Boot ───────────────────────────────────────────────── */
+  function boot() {
+    if (window.__bsGsap === 'ready') {
+      initAnimations();
+    } else {
+      document.addEventListener('bs:gsap-ready', initAnimations, { once:true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once:true });
+  } else {
+    boot();
+  }
+
+  /* ── Theme editor ─────────────────────────────────────── */
+  document.addEventListener('shopify:section:unload', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    if (ctx) ctx.revert();
+  });
+  document.addEventListener('shopify:section:load', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    boot();
+  });
+
+}());
+</script>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   SCHEMA
+══════════════════════════════════════════════════════════ {% endcomment %}
+{% schema %}
+{
+  "name": "🐾 Brand Story",
+  "tag":  "section",
+  "class":"section-brand-story",
+  "limit": 2,
+
+  "settings": [
+
+    {
+      "type":    "header",
+      "content": "🗂 Layout"
+    },
+    {
+      "type":    "select",
+      "id":      "layout",
+      "label":   "Layout Style",
+      "options": [
+        { "value": "split-left",  "label": "Split — Text Left, Image Right" },
+        { "value": "split-right", "label": "Split — Image Left, Text Right" },
+        { "value": "overlay",     "label": "Overlay — Full-width Image + Text" }
+      ],
+      "default": "split-left",
+      "info":    "Choose how the content is arranged."
+    },
+    {
+      "type":    "select",
+      "id":      "text_align",
+      "label":   "Text Alignment",
+      "options": [
+        { "value":"left",   "label":"Left"   },
+        { "value":"center", "label":"Center" },
+        { "value":"right",  "label":"Right"  }
+      ],
+      "default": "left"
+    },
+    {
+      "type":    "range",
+      "id":      "padding_top",
+      "label":   "Section Padding — Top",
+      "min":     0,
+      "max":     200,
+      "step":    5,
+      "unit":    "px",
+      "default": 100
+    },
+    {
+      "type":    "range",
+      "id":      "padding_bottom",
+      "label":   "Section Padding — Bottom",
+      "min":     0,
+      "max":     200,
+      "step":    5,
+      "unit":    "px",
+      "default": 100
+    },
+
+    {
+      "type":    "header",
+      "content": "🖼 Media"
+    },
+    {
+      "type":    "image_picker",
+      "id":      "media_image",
+      "label":   "Image",
+      "info":    "Portrait orientation (3:4) recommended for Split layouts. Use WebP, min 1200px."
+    },
+    {
+      "type":    "text",
+      "id":      "media_video_url",
+      "label":   "Video URL (.mp4 only — optional)",
+      "info":    "If set, video plays instead of image. Use a short looping clip (5–15s)."
+    },
+    {
+      "type":    "text",
+      "id":      "image_alt",
+      "label":   "Image Alt Text",
+      "default": "A warm moment between a pet and their owner"
+    },
+
+    {
+      "type":    "header",
+      "content": "🎨 Overlay (image tint / background)"
+    },
+    {
+      "type":    "color",
+      "id":      "overlay_color",
+      "label":   "Overlay Color",
+      "default": "#1C1917",
+      "info":    "Applied over the image. Used most in Overlay layout."
+    },
+    {
+      "type":    "range",
+      "id":      "overlay_opacity",
+      "label":   "Overlay Opacity",
+      "min":     0,
+      "max":     85,
+      "step":    5,
+      "unit":    "%",
+      "default": 40
+    },
+    {
+      "type":    "select",
+      "id":      "overlay_direction",
+      "label":   "Overlay Gradient Direction",
+      "options": [
+        { "value":"135deg", "label":"Diagonal ↘"    },
+        { "value":"to top", "label":"Bottom to Top"  },
+        { "value":"to left","label":"Right to Left"  },
+        { "value":"to right","label":"Left to Right" }
+      ],
+      "default": "135deg"
+    },
+
+    {
+      "type":    "header",
+      "content": "🎨 Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "bg_color",
+      "label":   "Section Background",
+      "default": "#F8F6F2",
+      "info":    "Default is warm cream. Never black."
+    },
+    {
+      "type":    "color",
+      "id":      "text_color",
+      "label":   "Heading Color",
+      "default": "#1C1917"
+    },
+    {
+      "type":    "color",
+      "id":      "sub_color",
+      "label":   "Body / Subtext Color",
+      "default": "#6B6560"
+    },
+    {
+      "type":    "color",
+      "id":      "accent_color",
+      "label":   "Accent Color",
+      "default": "#D97757"
+    },
+
+    {
+      "type":    "header",
+      "content": "✏️ Text Content"
+    },
+    {
+      "type":    "text",
+      "id":      "label",
+      "label":   "Eyebrow Label",
+      "default": "Our Story"
+    },
+    {
+      "type":    "textarea",
+      "id":      "heading",
+      "label":   "Main Heading",
+      "default": "More Than Pets. Family.",
+      "info":    "Keep it to 1–2 lines. Use a period (.) to create line breaks in the animation."
+    },
+    {
+      "type":    "textarea",
+      "id":      "body_text",
+      "label":   "Body Text",
+      "default": "We believe every pet deserves love, comfort, and the best care — just like family.",
+      "info":    "Max 2 short sentences. Less is more."
+    },
+    {
+      "type":    "text",
+      "id":      "cta_text",
+      "label":   "CTA Link Text",
+      "default": "Read Our Story"
+    },
+    {
+      "type":  "url",
+      "id":    "cta_url",
+      "label": "CTA Link URL"
+    },
+
+    {
+      "type":    "header",
+      "content": "💬 Pull Quote (optional)"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_quote",
+      "label":   "Show Quote Block",
+      "default": false
+    },
+    {
+      "type":    "textarea",
+      "id":      "quote_text",
+      "label":   "Quote Text",
+      "default": "Every wag, purr, and nuzzle reminded us why we started."
+    },
+    {
+      "type":    "text",
+      "id":      "quote_author",
+      "label":   "Quote Author",
+      "default": "Sarah & Max, Founders"
+    },
+
+    {
+      "type":    "header",
+      "content": "🌿 Values List (optional)"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_values",
+      "label":   "Show Values List",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "values_text",
+      "label":   "Values (comma-separated)",
+      "default": "Ethically sourced, Vet-approved, Eco-friendly packaging"
+    },
+
+    {
+      "type":    "header",
+      "content": "❤️ Floating Stat Card"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_emotion_card",
+      "label":   "Show Floating Stat Card",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "emotion_icon",
+      "label":   "Card Icon (emoji)",
+      "default": "❤️"
+    },
+    {
+      "type":    "text",
+      "id":      "emotion_num",
+      "label":   "Card Number",
+      "default": "50k+"
+    },
+    {
+      "type":    "text",
+      "id":      "emotion_label",
+      "label":   "Card Label",
+      "default": "Happy Families"
+    },
+
+    {
+      "type":    "header",
+      "content": "✨ Animation"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "enable_parallax",
+      "label":   "Enable Parallax Scroll",
+      "default": true,
+      "info":    "Image moves at a different speed than scroll for depth effect."
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name":     "🐾 Brand Story",
+      "category": "Brand",
+      "settings": {
+        "layout":            "split-left",
+        "text_align":        "left",
+        "padding_top":       100,
+        "padding_bottom":    100,
+        "image_alt":         "A warm moment between a pet and their owner",
+        "overlay_color":     "#1C1917",
+        "overlay_opacity":   40,
+        "overlay_direction": "135deg",
+        "bg_color":          "#F8F6F2",
+        "text_color":        "#1C1917",
+        "sub_color":         "#6B6560",
+        "accent_color":      "#D97757",
+        "label":             "Our Story",
+        "heading":           "More Than Pets. Family.",
+        "body_text":         "We believe every pet deserves love, comfort, and the best care — just like family.",
+        "cta_text":          "Read Our Story",
+        "show_quote":        false,
+        "quote_text":        "Every wag, purr, and nuzzle reminded us why we started.",
+        "quote_author":      "Sarah & Max, Founders",
+        "show_values":       true,
+        "values_text":       "Ethically sourced, Vet-approved, Eco-friendly packaging",
+        "show_emotion_card": true,
+        "emotion_icon":      "❤️",
+        "emotion_num":       "50k+",
+        "emotion_label":     "Happy Families",
+        "enable_parallax":   true
+      }
+    },
+    {
+      "name":     "🐾 Brand Story — Cinematic Overlay",
+      "category": "Brand",
+      "settings": {
+        "layout":            "overlay",
+        "text_align":        "left",
+        "padding_top":       0,
+        "padding_bottom":    0,
+        "overlay_color":     "#1C1917",
+        "overlay_opacity":   55,
+        "overlay_direction": "to right",
+        "bg_color":          "#F8F6F2",
+        "text_color":        "#FFFFFF",
+        "sub_color":         "#D6CFC6",
+        "accent_color":      "#D97757",
+        "label":             "Why We Care",
+        "heading":           "More Than Pets. Family.",
+        "body_text":         "We believe every pet deserves love, comfort, and the best care — just like family.",
+        "cta_text":          "Discover Our Mission",
+        "show_values":       false,
+        "show_emotion_card": false,
+        "enable_parallax":   true
+      }
+    }
+  ]
+}
+{% endschema %}

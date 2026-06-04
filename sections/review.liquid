@@ -1,0 +1,1080 @@
+
+{% liquid
+  assign top_count = 0
+  assign bottom_count = 0
+
+  for block in section.blocks
+    if block.settings.row == 'top'
+      assign top_count = top_count | plus: 1
+    else
+      assign bottom_count = bottom_count | plus: 1
+    endif
+  endfor
+%}
+
+{% capture top_cards %}
+  {% for block in section.blocks %}
+    {% if block.settings.row == 'top' %}
+      {% liquid
+        assign fallback_source = block.settings.name | default: block.settings.title
+        assign fallback_letter = fallback_source | slice: 0, 1 | upcase
+        assign image_alt = block.settings.image.alt | default: block.settings.name | default: block.settings.title | escape
+      %}
+
+      <article class="mtm-card" {{ block.shopify_attributes }}>
+        {% if section.settings.show_quote_icon and section.settings.quote_icon != blank %}
+          <div class="mtm-card__quote" aria-hidden="true">{{ section.settings.quote_icon | escape }}</div>
+        {% endif %}
+
+        {% if block.settings.title != blank %}
+          <h3 class="mtm-card__title">{{ block.settings.title | escape }}</h3>
+        {% endif %}
+
+        {% if block.settings.content != blank %}
+          <div class="mtm-card__content">
+            {{ block.settings.content | escape | newline_to_br }}
+          </div>
+        {% endif %}
+
+        {% if block.settings.image != blank or block.settings.name != blank or block.settings.designation != blank %}
+          <div class="mtm-card__author">
+            {% if block.settings.image != blank %}
+              {{ block.settings.image | image_url: width: 160 | image_tag: class: 'mtm-card__image', loading: 'lazy', alt: image_alt }}
+            {% elsif section.settings.show_avatar_fallback %}
+              <div class="mtm-card__fallback" aria-hidden="true">
+                {{ fallback_letter | default: 'A' }}
+              </div>
+            {% endif %}
+
+            <div class="mtm-card__author-info">
+              {% if block.settings.name != blank %}
+                <div class="mtm-card__name">{{ block.settings.name | escape }}</div>
+              {% endif %}
+
+              {% if block.settings.designation != blank %}
+                <div class="mtm-card__designation">{{ block.settings.designation | escape }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+{% capture bottom_cards %}
+  {% for block in section.blocks %}
+    {% if block.settings.row == 'bottom' %}
+      {% liquid
+        assign fallback_source = block.settings.name | default: block.settings.title
+        assign fallback_letter = fallback_source | slice: 0, 1 | upcase
+        assign image_alt = block.settings.image.alt | default: block.settings.name | default: block.settings.title | escape
+      %}
+
+      <article class="mtm-card" {{ block.shopify_attributes }}>
+        {% if section.settings.show_quote_icon and section.settings.quote_icon != blank %}
+          <div class="mtm-card__quote" aria-hidden="true">{{ section.settings.quote_icon | escape }}</div>
+        {% endif %}
+
+        {% if block.settings.title != blank %}
+          <h3 class="mtm-card__title">{{ block.settings.title | escape }}</h3>
+        {% endif %}
+
+        {% if block.settings.content != blank %}
+          <div class="mtm-card__content">
+            {{ block.settings.content | escape | newline_to_br }}
+          </div>
+        {% endif %}
+
+        {% if block.settings.image != blank or block.settings.name != blank or block.settings.designation != blank %}
+          <div class="mtm-card__author">
+            {% if block.settings.image != blank %}
+              {{ block.settings.image | image_url: width: 160 | image_tag: class: 'mtm-card__image', loading: 'lazy', alt: image_alt }}
+            {% elsif section.settings.show_avatar_fallback %}
+              <div class="mtm-card__fallback" aria-hidden="true">
+                {{ fallback_letter | default: 'A' }}
+              </div>
+            {% endif %}
+
+            <div class="mtm-card__author-info">
+              {% if block.settings.name != blank %}
+                <div class="mtm-card__name">{{ block.settings.name | escape }}</div>
+              {% endif %}
+
+              {% if block.settings.designation != blank %}
+                <div class="mtm-card__designation">{{ block.settings.designation | escape }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </article>
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+<style>
+  #MarqueeTestimonials-{{ section.id }} {
+    --mtm-section-bg: {{ section.settings.section_bg }};
+    --mtm-container-bg: {{ section.settings.container_bg }};
+    --mtm-max-width: {{ section.settings.max_width }}px;
+
+    --mtm-section-padding-top: {{ section.settings.padding_top }}px;
+    --mtm-section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --mtm-section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --mtm-section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+
+    --mtm-container-radius: {{ section.settings.container_radius }}px;
+    --mtm-container-padding-x: {{ section.settings.container_padding_x }}px;
+    --mtm-container-padding-y: {{ section.settings.container_padding_y }}px;
+    --mtm-container-padding-x-mobile: {{ section.settings.container_padding_x_mobile }}px;
+    --mtm-container-padding-y-mobile: {{ section.settings.container_padding_y_mobile }}px;
+
+    --mtm-row-gap: {{ section.settings.row_gap }}px;
+    --mtm-card-gap: {{ section.settings.card_gap }}px;
+    --mtm-card-gap-mobile: {{ section.settings.card_gap_mobile }}px;
+
+    --mtm-top-duration: {{ section.settings.top_duration }}s;
+    --mtm-bottom-duration: {{ section.settings.bottom_duration }}s;
+
+    --mtm-card-width: {{ section.settings.card_width }}px;
+    --mtm-card-width-mobile: {{ section.settings.card_width_mobile }}px;
+    --mtm-card-min-height: {{ section.settings.card_min_height }}px;
+    --mtm-card-min-height-mobile: {{ section.settings.card_min_height_mobile }}px;
+    --mtm-card-padding: {{ section.settings.card_padding }}px;
+    --mtm-card-padding-mobile: {{ section.settings.card_padding_mobile }}px;
+
+    --mtm-card-bg: {{ section.settings.card_bg }};
+    --mtm-card-border: {{ section.settings.card_border_color }};
+    --mtm-card-border-width: {{ section.settings.card_border_width }}px;
+    --mtm-card-radius: {{ section.settings.card_radius }}px;
+
+    --mtm-heading-color: {{ section.settings.heading_color }};
+    --mtm-subheading-color: {{ section.settings.subheading_color }};
+    --mtm-title-color: {{ section.settings.title_color }};
+    --mtm-text-color: {{ section.settings.text_color }};
+    --mtm-muted-color: {{ section.settings.muted_color }};
+    --mtm-quote-color: {{ section.settings.quote_color }};
+
+    --mtm-heading-size: {{ section.settings.heading_size }}px;
+    --mtm-title-size: {{ section.settings.title_font_size }}px;
+    --mtm-content-size: {{ section.settings.content_font_size }}px;
+    --mtm-name-size: {{ section.settings.name_font_size }}px;
+    --mtm-designation-size: {{ section.settings.designation_font_size }}px;
+    --mtm-quote-size: {{ section.settings.quote_size }}px;
+    --mtm-avatar-size: {{ section.settings.avatar_size }}px;
+
+    --mtm-fade-width: {{ section.settings.fade_width }}px;
+    --mtm-active-fade: clamp(24px, 8vw, var(--mtm-fade-width));
+
+    background: var(--mtm-section-bg);
+    padding: var(--mtm-section-padding-top) 16px var(--mtm-section-padding-bottom);
+  }
+
+  #MarqueeTestimonials-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-inner {
+    max-width: var(--mtm-max-width);
+    margin: 0 auto;
+    background: var(--mtm-container-bg);
+    border-radius: var(--mtm-container-radius);
+    overflow: hidden;
+    padding: var(--mtm-container-padding-y) var(--mtm-container-padding-x);
+  }
+  @media screen and (max-width: 749px) {
+  #MarqueeTestimonials-{{ section.id }} .mtm-row--fade {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-heading {
+    text-align: {{ section.settings.heading_alignment }};
+    margin-bottom: 28px;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-heading__title {
+    margin: 0;
+    color: var(--mtm-heading-color);
+    font-size: var(--mtm-heading-size);
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-heading__subtitle {
+    margin-top: 12px;
+    color: var(--mtm-subheading-color);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-marquees {
+    display: grid;
+    gap: var(--mtm-row-gap);
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-row {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    direction: ltr;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-row--fade {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 var(--mtm-active-fade),
+      #000 calc(100% - var(--mtm-active-fade)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 var(--mtm-active-fade),
+      #000 calc(100% - var(--mtm-active-fade)),
+      transparent 100%
+    );
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-track {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    will-change: transform;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-track--right {
+    animation: mtm-scroll-right-{{ section.id }} var(--mtm-top-duration) linear infinite;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-track--left {
+    animation: mtm-scroll-left-{{ section.id }} var(--mtm-bottom-duration) linear infinite;
+  }
+
+  {% if section.settings.pause_on_hover %}
+    #MarqueeTestimonials-{{ section.id }}:hover .mtm-track {
+      animation-play-state: paused;
+    }
+  {% endif %}
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-group {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: var(--mtm-card-gap);
+    padding-right: var(--mtm-card-gap);
+    flex: 0 0 auto;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card {
+    width: var(--mtm-card-width);
+    min-height: var(--mtm-card-min-height);
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: var(--mtm-card-padding);
+    border-radius: var(--mtm-card-radius);
+    border: var(--mtm-card-border-width) solid var(--mtm-card-border);
+    background: var(--mtm-card-bg);
+    color: var(--mtm-text-color);
+    box-shadow: {% if section.settings.enable_shadow %}0 14px 40px rgba(17, 24, 39, 0.08){% else %}none{% endif %};
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__quote {
+    color: var(--mtm-quote-color);
+    font-size: var(--mtm-quote-size);
+    line-height: 0.8;
+    font-family: Georgia, serif;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__title {
+    margin: 0;
+    color: var(--mtm-title-color);
+    font-size: var(--mtm-title-size);
+    line-height: 1.38;
+    font-weight: 700;
+    overflow-wrap: break-word;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__content {
+    margin-top: 10px;
+    color: var(--mtm-text-color);
+    font-size: var(--mtm-content-size);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__author {
+    margin-top: auto;
+    padding-top: 26px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__image,
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__fallback {
+    width: var(--mtm-avatar-size);
+    height: var(--mtm-avatar-size);
+    border-radius: 999px;
+    flex: 0 0 var(--mtm-avatar-size);
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__image {
+    object-fit: cover;
+    display: block;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__fallback {
+    display: grid;
+    place-items: center;
+    background: var(--mtm-quote-color);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__author-info {
+    min-width: 0;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__name {
+    color: var(--mtm-title-color);
+    font-size: var(--mtm-name-size);
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-card__designation {
+    margin-top: 3px;
+    color: var(--mtm-muted-color);
+    font-size: var(--mtm-designation-size);
+    line-height: 1.35;
+  }
+
+  #MarqueeTestimonials-{{ section.id }} .mtm-empty {
+    padding: 24px;
+    border: 1px dashed var(--mtm-card-border);
+    border-radius: 12px;
+    color: var(--mtm-muted-color);
+    text-align: center;
+  }
+
+  @keyframes mtm-scroll-left-{{ section.id }} {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-10%, 0, 0);
+    }
+  }
+
+  @keyframes mtm-scroll-right-{{ section.id }} {
+    from {
+      transform: translate3d(-10%, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #MarqueeTestimonials-{{ section.id }} {
+      padding: var(--mtm-section-padding-top-mobile) 12px var(--mtm-section-padding-bottom-mobile);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-inner {
+      padding: var(--mtm-container-padding-y-mobile) var(--mtm-container-padding-x-mobile);
+      border-radius: calc(var(--mtm-container-radius) * 0.75);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-heading {
+      margin-bottom: 22px;
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-heading__title {
+      font-size: calc(var(--mtm-heading-size) * 0.78);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-heading__subtitle {
+      font-size: 14px;
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-marquees {
+      gap: calc(var(--mtm-row-gap) * 0.75);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-group {
+      gap: var(--mtm-card-gap-mobile);
+      padding-right: var(--mtm-card-gap-mobile);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-card {
+      width: min(var(--mtm-card-width-mobile), calc(100vw - 48px));
+      min-height: var(--mtm-card-min-height-mobile);
+      padding: var(--mtm-card-padding-mobile);
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-card__title {
+      font-size: max(14px, calc(var(--mtm-title-size) * 0.92));
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-card__content {
+      font-size: max(12px, calc(var(--mtm-content-size) * 0.95));
+    }
+
+    #MarqueeTestimonials-{{ section.id }} .mtm-card__author {
+      padding-top: 22px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #MarqueeTestimonials-{{ section.id }} .mtm-track {
+      animation: none !important;
+      transform: translate3d(0, 0, 0) !important;
+    }
+  }
+</style>
+
+<section
+  id="MarqueeTestimonials-{{ section.id }}"
+  class="mtm-section"
+>
+  <div class="mtm-inner">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="mtm-heading">
+        {% if section.settings.heading != blank %}
+          <h2 class="mtm-heading__title">{{ section.settings.heading | escape }}</h2>
+        {% endif %}
+
+        {% if section.settings.subheading != blank %}
+          <div class="mtm-heading__subtitle">
+            {{ section.settings.subheading | escape | newline_to_br }}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="mtm-marquees">
+      {% if top_count > 0 %}
+        <div class="mtm-row {% if section.settings.enable_fade %}mtm-row--fade{% endif %}" aria-label="Top scrolling row">
+          <div class="mtm-track mtm-track--right">
+            {% for repeat in (1..10) %}
+              <div class="mtm-group" {% unless forloop.first %}aria-hidden="true"{% endunless %}>
+                {{ top_cards }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% elsif request.design_mode %}
+        <div class="mtm-empty">Top row er jonno card block add korun.</div>
+      {% endif %}
+
+      {% if bottom_count > 0 %}
+        <div class="mtm-row {% if section.settings.enable_fade %}mtm-row--fade{% endif %}" aria-label="Bottom scrolling row">
+          <div class="mtm-track mtm-track--left">
+            {% for repeat in (1..10) %}
+              <div class="mtm-group" {% unless forloop.first %}aria-hidden="true"{% endunless %}>
+                {{ bottom_cards }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% elsif request.design_mode %}
+        <div class="mtm-empty">Bottom row er jonno card block add korun.</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Two Row Scrolling Cards",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What our clients say"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Top row scrolls right and bottom row scrolls left."
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading alignment",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#111827"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading color",
+      "default": "#6B7280"
+    },
+    {
+      "type": "header",
+      "content": "Layout and background"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#3149F5"
+    },
+    {
+      "type": "color",
+      "id": "container_bg",
+      "label": "Container background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Container max width",
+      "min": 900,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1300
+    },
+    {
+      "type": "range",
+      "id": "container_radius",
+      "label": "Container radius",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Section padding top desktop",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Section padding bottom desktop",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Section padding top mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Section padding bottom mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "container_padding_x",
+      "label": "Container horizontal padding desktop",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "container_padding_y",
+      "label": "Container vertical padding desktop",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "container_padding_x_mobile",
+      "label": "Container horizontal padding mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "container_padding_y_mobile",
+      "label": "Container vertical padding mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Gap between two rows",
+      "min": 8,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Card gap desktop",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_gap_mobile",
+      "label": "Card gap mobile",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_fade",
+      "label": "Enable left/right fade",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "fade_width",
+      "label": "Fade width",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "top_duration",
+      "label": "Top row duration - lower is faster",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "unit": "s",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "bottom_duration",
+      "label": "Bottom row duration - lower is faster",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "unit": "s",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Card width desktop",
+      "min": 220,
+      "max": 520,
+      "step": 10,
+      "unit": "px",
+      "default": 340
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "label": "Card width mobile",
+      "min": 220,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "card_min_height",
+      "label": "Card minimum height desktop",
+      "min": 120,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "card_min_height_mobile",
+      "label": "Card minimum height mobile",
+      "min": 120,
+      "max": 320,
+      "step": 10,
+      "unit": "px",
+      "default": 210
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Card padding desktop",
+      "min": 12,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "card_padding_mobile",
+      "label": "Card padding mobile",
+      "min": 12,
+      "max": 44,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#F5F6F8"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border color",
+      "default": "#E5E7EB"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "label": "Card border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_shadow",
+      "label": "Enable card shadow",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Text and icon"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quote_icon",
+      "label": "Show quote icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_icon",
+      "label": "Quote icon/text",
+      "default": "“"
+    },
+    {
+      "type": "color",
+      "id": "quote_color",
+      "label": "Quote/icon color",
+      "default": "#3150FF"
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "label": "Quote icon size",
+      "min": 20,
+      "max": 70,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title/name color",
+      "default": "#111827"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Content color",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Designation color",
+      "default": "#9CA3AF"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Card title size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "content_font_size",
+      "label": "Card content size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "name_font_size",
+      "label": "Name size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "designation_font_size",
+      "label": "Designation size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "avatar_size",
+      "label": "Image/avatar size",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "checkbox",
+      "id": "show_avatar_fallback",
+      "label": "Show letter avatar when image is empty",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Scrolling card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "row",
+          "label": "Card row",
+          "default": "top",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top row - scroll right"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom row - scroll left"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image/avatar"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Creative geniuses who listen, understand, and craft captivating visuals."
+        },
+        {
+          "type": "textarea",
+          "id": "content",
+          "label": "Content",
+          "default": "Add your custom content here."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Gabrielle Williams"
+        },
+        {
+          "type": "text",
+          "id": "designation",
+          "label": "Designation",
+          "default": "CEO and Co-founder of ABC Company"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 30,
+  "presets": [
+    {
+      "name": "Two Row Scrolling Cards",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "row": "top",
+            "title": "Creative geniuses who listen, understand, and craft captivating visuals - an agency that truly understands our needs.",
+            "content": "",
+            "name": "Gabrielle Williams",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "row": "top",
+            "title": "Exceeded our expectations with innovative designs that brought our vision to life - a truly remarkable creative agency.",
+            "content": "",
+            "name": "Samantha Johnson",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "row": "top",
+            "title": "Their ability to capture our brand essence in every project is unparalleled - an invaluable creative collaborator.",
+            "content": "",
+            "name": "Isabella Rodriguez",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "row": "bottom",
+            "title": "From concept to execution, their creativity knows no bounds - a game-changer for our brand’s success.",
+            "content": "",
+            "name": "Natalie Martinez",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "row": "bottom",
+            "title": "A refreshing and imaginative agency that consistently delivers exceptional results - highly recommended for any project.",
+            "content": "",
+            "name": "Victoria Thompson",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "row": "bottom",
+            "title": "Their team’s artistic flair and strategic approach resulted in remarkable campaigns - a reliable creative partner.",
+            "content": "",
+            "name": "John Peter",
+            "designation": "CEO and Co-founder of ABC Company"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,394 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero_premium_UWwWCP": {
+      "type": "hero-premium",
+      "name": "🐾 Hero — Premium",
+      "settings": {
+        "eyebrow": "✦ New Collection 2025",
+        "heading": "Care They Deserve. Style They Love.",
+        "subheading": "Premium essentials for your happy, healthy pets.",
+        "cta_text": "Shop Now",
+        "cta_url": "",
+        "cta2_text": "Our Story",
+        "cta2_url": "",
+        "image_desktop": "shopify://shop_images/dog_202605041232.jpg",
+        "image_mobile": "shopify://shop_images/dog_202605041232.jpg",
+        "image_alt": "Happy dog enjoying premium pet products",
+        "overlay_opacity": 0,
+        "overlay_color": "#f8f6f2",
+        "bg_color": "#f8f6f2",
+        "gradient_from": "",
+        "gradient_to": "",
+        "gradient_angle": 135,
+        "text_color": "#1c1917",
+        "sub_color": "#6b6560",
+        "accent_color": "#d97757",
+        "heading_size_desktop": 72,
+        "heading_size_mobile": 38,
+        "sub_size_desktop": 18,
+        "sub_size_mobile": 15,
+        "text_align_desktop": "left",
+        "text_align_mobile": "center",
+        "show_feature_pills": false,
+        "feature_pills": "Vet Approved, Free Shipping, 30-Day Returns, Eco Friendly",
+        "show_social_proof": false,
+        "social_proof_text": "Trusted by 50,000+ pet parents",
+        "show_stat_cards": false,
+        "stat_a_num": "50k+",
+        "stat_a_label": "Happy Pets",
+        "stat_b_num": "4.9",
+        "stat_b_label": "Avg Rating",
+        "show_stat_c": false,
+        "stat_c_num": "100%",
+        "stat_c_label": "Natural",
+        "show_new_badge": false,
+        "new_badge_text": "🆕 Just Arrived",
+        "show_scroll_cue": false,
+        "show_mobile_sticky_cta": true
+      }
+    },
+    "custom_hero_kLft9g": {
+      "type": "custom-hero",
+      "disabled": true,
+      "name": "Pet Hero",
+      "settings": {
+        "desktop_image": "shopify://shop_images/Pets_in_modern_pet_shop_202605041145.jpg",
+        "mobile_image": "shopify://shop_images/Pets_in_modern_pet_shop_202605041148.jpg",
+        "image_position": "center center",
+        "heading": "Your Pet Deserves the Best",
+        "subheading": "Premium food, toys & accessories delivered with love",
+        "button_text": "Shop Now",
+        "button_link": "",
+        "show_secondary_badge": false,
+        "badge_text": "Trusted by 50k+ pet parents",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 10,
+        "content_alignment": "center",
+        "desktop_heading_size": 64,
+        "desktop_sub_size": 19,
+        "mobile_heading_size": 36,
+        "mobile_sub_size": 15,
+        "show_decorative_elements": true,
+        "show_scroll_indicator": false
+      }
+    },
+    "feature_section_93hjcz": {
+      "type": "feature-section",
+      "blocks": {
+        "category_CWh3Az": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/dog_202605041209.jpg",
+            "placeholder_color": "#e8e4dc",
+            "category_name": "Dog",
+            "category_description": "Premium essentials for your pup",
+            "category_link": "",
+            "badge_text": "Best Sellers",
+            "product_count": "240+ Products",
+            "glow_color": "#ffa45b",
+            "text_position": "bottom-left",
+            "card_size": "normal"
+          }
+        },
+        "category_RJgQMe": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/cat_202605041210.jpg",
+            "placeholder_color": "#e8e4dc",
+            "category_name": "Cat",
+            "category_description": "Everything your feline needs",
+            "category_link": "",
+            "badge_text": "",
+            "product_count": "180+ Products",
+            "glow_color": "#b08cff",
+            "text_position": "bottom-left",
+            "card_size": "normal"
+          }
+        },
+        "category_fpgjJR": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/fish_202605041211.jpg",
+            "placeholder_color": "#e8e4dc",
+            "category_name": "Fish",
+            "category_description": "Aquatic care made simple",
+            "category_link": "",
+            "badge_text": "New Arrivals",
+            "product_count": "95+ Products",
+            "glow_color": "#4ed6ff",
+            "text_position": "bottom-left",
+            "card_size": "normal"
+          }
+        },
+        "category_P6Ua8N": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Birds_in_pet_shop_cages_202605041215.jpg",
+            "placeholder_color": "#e8e4dc",
+            "category_name": "Bird",
+            "category_description": "Keep your birds happy & healthy",
+            "category_link": "",
+            "badge_text": "",
+            "product_count": "75+ Products",
+            "glow_color": "#7cffb2",
+            "text_position": "bottom-left",
+            "card_size": "normal"
+          }
+        },
+        "category_77HgAq": {
+          "type": "category",
+          "settings": {
+            "category_image": "shopify://shop_images/Luxury_pet_accessories_in_store_202605041216.jpg",
+            "placeholder_color": "#e8e4dc",
+            "category_name": "Accessories",
+            "category_description": "Gear up in style",
+            "category_link": "",
+            "badge_text": "Trending",
+            "product_count": "320+ Products",
+            "glow_color": "#ffd36e",
+            "text_position": "bottom-left",
+            "card_size": "normal"
+          }
+        }
+      },
+      "block_order": [
+        "category_CWh3Az",
+        "category_RJgQMe",
+        "category_fpgjJR",
+        "category_P6Ua8N",
+        "category_77HgAq"
+      ],
+      "disabled": true,
+      "name": "🐾 Featured Categories",
+      "settings": {
+        "section_title": "Shop by Pet",
+        "section_subtitle": "Find everything your furry, feathered or finned friend needs.",
+        "background_color": "#f8f6f2",
+        "layout_style": "stagger",
+        "card_radius": 18,
+        "show_icons": true,
+        "enable_glow": true
+      }
+    },
+    "best_selling_c3z67P": {
+      "type": "best-selling",
+      "name": "🛒 Best Sellers Slider",
+      "settings": {
+        "section_title": "Best Selling Products",
+        "section_subtitle": "Handpicked favourites your pets will absolutely love.",
+        "view_all_link": "",
+        "product_collection": "all-porduct",
+        "products_limit": 8,
+        "background_color": "#fdf9f4",
+        "accent_color": "#ff7a35",
+        "card_style": "default",
+        "autoplay": false,
+        "autoplay_speed": 4,
+        "show_rating": true,
+        "show_badge": true
+      }
+    },
+    "interactive_66Q9t9": {
+      "type": "interactive",
+      "blocks": {
+        "pet_c6crrc": {
+          "type": "pet",
+          "settings": {
+            "pet_type": "dog",
+            "pet_name": "Max the Dog",
+            "pet_description": "Playful, loyal, and full of energy. Max loves every accessory we carry.",
+            "fun_fact": "Dogs can smell 40× better than humans!",
+            "pet_image": "shopify://shop_images/dog_202605041232_fba5676f-8e15-4cb4-9f30-72eb95df7018.png",
+            "accent_color": "#ff7a35",
+            "shop_all_link": ""
+          }
+        },
+        "pet_qPUUiW": {
+          "type": "pet",
+          "settings": {
+            "pet_type": "cat",
+            "pet_name": "Luna the Cat",
+            "pet_description": "Graceful, curious, and always in style. Luna handpicks only the finest.",
+            "fun_fact": "Cats sleep 12–16 hours every single day.",
+            "pet_image": "shopify://shop_images/cat_202605041232_5396ba7d-d527-494f-b4f7-fa8761d1c37e.png",
+            "accent_color": "#b08cff",
+            "shop_all_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "pet_c6crrc",
+        "pet_qPUUiW"
+      ],
+      "name": "🐾 Pet Showcase",
+      "settings": {
+        "section_title": "Meet Our Happy Pets",
+        "section_subtitle": "Hover over the pins to explore accessories made for your best friend",
+        "background_color": "#f8f5f0",
+        "default_pet": "first"
+      }
+    },
+    "deals_pet_KVdkCh": {
+      "type": "deals-pet",
+      "disabled": true,
+      "name": "🔥 Deals / Offer Banner",
+      "settings": {
+        "tag_line": "⚡ Flash Sale — Limited Time Only",
+        "badge_text": "UP TO 50% OFF",
+        "headline": "Limited Time Pet Care Deals",
+        "subtext": "Grab your favorite pet essentials before the offer ends. Premium care at unbeatable prices.",
+        "countdown_end_date": "2026-12-31",
+        "countdown_end_time": "23:59:59",
+        "cta_text": "🛒 Grab This Deal Now",
+        "cta_url": "",
+        "secondary_cta_text": "Browse All Deals",
+        "secondary_cta_url": "",
+        "product_image": "shopify://shop_images/dog_202605041232.jpg",
+        "primary_color": "#ff4d4d",
+        "accent_color": "#ff8a00",
+        "enable_parallax": true,
+        "enable_badge_glow": true
+      }
+    },
+    "deals_pet_v2_YG7bht": {
+      "type": "deals-pet-v2",
+      "name": "🐾 Deals Offer Banner v2",
+      "settings": {
+        "bg_color": "#f7f4ef",
+        "gradient_color_1": "",
+        "gradient_color_2": "",
+        "overlay_opacity": 30,
+        "tag_text": "⚡ Flash Sale — Limited Time Only",
+        "badge_text": "UP TO 40% OFF",
+        "headline": "Limited Time Pet Essentials Sale",
+        "subtext": "Don't miss exclusive deals on your pet's favorite products. Premium quality, unbeatable prices.",
+        "countdown_end_date": "2026-12-31",
+        "countdown_end_time": "23:59:59",
+        "btn_text": "Shop the Deal Now",
+        "btn_url": "",
+        "secondary_btn_text": "Browse All Deals",
+        "secondary_btn_url": "",
+        "product_image": "shopify://shop_images/discout_for_dog_product_202605041342.jpg",
+        "text_color": "#1a1a2e",
+        "subtext_color": "#5a5a7a",
+        "badge_color_from": "#e8534a",
+        "badge_color_to": "#f4883a",
+        "btn_color_from": "#e8534a",
+        "btn_color_to": "#f4883a",
+        "btn_text_color": "#ffffff",
+        "timer_bg_color": "#ffffff",
+        "timer_text_color": "#1a1a2e",
+        "show_trust_strip": true
+      }
+    },
+    "pet_care_tips_BFWct8": {
+      "type": "pet-care-tips",
+      "blocks": {
+        "tip_card_A8ifKX": {
+          "type": "tip_card",
+          "settings": {
+            "card_image": "shopify://shop_images/Dog_being_brushed_calmly_202605041428.jpg",
+            "card_url": "",
+            "card_title": "Grooming Care",
+            "card_subtext": "Weekly brushing keeps coats healthy and shiny.",
+            "card_tag": "Grooming",
+            "card_icon": "🛁",
+            "overlay_color": "#1c0f00",
+            "overlay_opacity": 50,
+            "text_color": "#ffffff",
+            "tag_color": "#ffffff"
+          }
+        },
+        "tip_card_EByF6w": {
+          "type": "tip_card",
+          "settings": {
+            "card_image": "shopify://shop_images/Pet_eating_from_modern_bowl_202605041428.jpg",
+            "card_url": "",
+            "card_title": "Feeding Guide",
+            "card_subtext": "Balanced nutrition is the foundation of a long, healthy life.",
+            "card_tag": "Nutrition",
+            "card_icon": "🥣",
+            "overlay_color": "#0a1f0a",
+            "overlay_opacity": 50,
+            "text_color": "#ffffff",
+            "tag_color": "#ffffff"
+          }
+        },
+        "tip_card_bJmaKc": {
+          "type": "tip_card",
+          "settings": {
+            "card_image": "shopify://shop_images/Dog_training_interaction_human_pet_202605041429.jpg",
+            "card_url": "",
+            "card_title": "Training Tips",
+            "card_subtext": "Positive reinforcement builds trust and better behaviour.",
+            "card_tag": "Training",
+            "card_icon": "🎾",
+            "overlay_color": "#0a0f1f",
+            "overlay_opacity": 50,
+            "text_color": "#ffffff",
+            "tag_color": "#ffffff"
+          }
+        },
+        "tip_card_ayWQeF": {
+          "type": "tip_card",
+          "settings": {
+            "card_image": "shopify://shop_images/Pet_health_care_interaction_image_202605041429.jpg",
+            "card_url": "",
+            "card_title": "Health Basics",
+            "card_subtext": "Regular vet check-ups keep your best friend thriving.",
+            "card_tag": "Health",
+            "card_icon": "💊",
+            "overlay_color": "#1f0a1a",
+            "overlay_opacity": 50,
+            "text_color": "#ffffff",
+            "tag_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "tip_card_A8ifKX",
+        "tip_card_EByF6w",
+        "tip_card_bJmaKc",
+        "tip_card_ayWQeF"
+      ],
+      "name": "🐾 Pet Care Tips",
+      "settings": {
+        "show_section_intro": true,
+        "eyebrow": "Expert Advice",
+        "heading": "Pet Care, Simplified",
+        "subheading": "Everything your pet needs — from daily grooming to nutrition, training, and wellness.",
+        "section_bg": "#fdfcf9",
+        "section_text_color": "#1c1917",
+        "section_subtext_color": "#78716c",
+        "accent_color": "#d97757",
+        "columns": "4",
+        "card_height": 480,
+        "card_radius": 20,
+        "show_cta": true,
+        "cta_text": "Explore All Pet Care Tips",
+        "cta_url": "",
+        "enable_float_animation": false
+      }
+    }
+  },
+  "order": [
+    "hero_premium_UWwWCP",
+    "custom_hero_kLft9g",
+    "feature_section_93hjcz",
+    "best_selling_c3z67P",
+    "interactive_66Q9t9",
+    "deals_pet_KVdkCh",
+    "deals_pet_v2_YG7bht",
+    "pet_care_tips_BFWct8"
+  ]
+}

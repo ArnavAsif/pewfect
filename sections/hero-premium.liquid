@@ -1,0 +1,1989 @@
+{%- liquid
+  assign s   = section.settings
+  assign sid = 'hero-' | append: section.id
+  assign use_gradient = false
+  if s.gradient_from != blank and s.gradient_to != blank
+    assign use_gradient = true
+  endif
+
+  assign bg_color   = s.bg_color   | default: '#F8F6F2'
+  assign text_color = s.text_color | default: '#1C1917'
+  assign sub_color  = s.sub_color  | default: '#6B6560'
+  assign accent     = s.accent_color | default: '#D97757'
+
+  assign heading_size_d = s.heading_size_desktop | default: 72
+  assign heading_size_m = s.heading_size_mobile  | default: 38
+  assign sub_size_d     = s.sub_size_desktop     | default: 18
+  assign sub_size_m     = s.sub_size_mobile      | default: 15
+
+  assign overlay_dec = s.overlay_opacity | divided_by: 100.0
+
+  assign img_desktop = s.image_desktop
+  assign img_mobile  = s.image_mobile
+  assign img_alt     = s.image_alt | default: 'Happy pet with premium care products'
+
+  assign text_align_d = s.text_align_desktop | default: 'left'
+  assign text_align_m = s.text_align_mobile  | default: 'center'
+
+  assign has_mobile_image = false
+  if img_mobile != blank
+    assign has_mobile_image = true
+  endif
+-%}
+
+<section
+  id="{{ sid }}"
+  class="hero"
+  aria-label="{{ s.heading | default: 'Hero' | escape }}"
+  style="
+    {%- if use_gradient -%}
+      background: linear-gradient({{ s.gradient_angle | default: 135 }}deg,
+        {{ s.gradient_from }}, {{ s.gradient_to }});
+    {%- else -%}
+      background-color: {{ bg_color }};
+    {%- endif -%}
+    --hero-accent:    {{ accent }};
+    --hero-text:      {{ text_color }};
+    --hero-sub:       {{ sub_color }};
+    --hero-hd:        {{ heading_size_d }}px;
+    --hero-hm:        {{ heading_size_m }}px;
+    --hero-sd:        {{ sub_size_d }}px;
+    --hero-sm:        {{ sub_size_m }}px;
+    --hero-tal-d:     {{ text_align_d }};
+    --hero-tal-m:     {{ text_align_m }};
+    --hero-bg:        {{ bg_color }};
+  "
+  data-hero
+>
+
+  {%- comment %} ── GRAIN TEXTURE OVERLAY ── {% endcomment %}
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  {%- comment %} ── AMBIENT BLOBS ── {% endcomment %}
+  <div class="hero__blobs" aria-hidden="true">
+    <div class="hero__blob hero__blob--a"></div>
+    <div class="hero__blob hero__blob--b"></div>
+    <div class="hero__blob hero__blob--c"></div>
+    <div class="hero__blob hero__blob--d"></div>
+  </div>
+
+  {%- comment %} ── GRID ── {% endcomment %}
+  <div class="hero__grid">
+
+    {%- comment %} ════════════════════════════════
+      LEFT — Content Column
+    ════════════════════════════════ {% endcomment %}
+    <div class="hero__content" data-hero-content>
+
+      {%- comment %} Eyebrow tag {% endcomment %}
+      {%- if s.eyebrow != blank %}
+        <div class="hero__eyebrow" data-hero-eyebrow>
+          <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+          <span>{{ s.eyebrow }}</span>
+        </div>
+      {%- endif %}
+
+      {%- comment %} Main heading — words split for animation {% endcomment %}
+      {%- if s.heading != blank %}
+        <h1
+          class="hero__heading"
+          data-hero-heading
+          id="{{ sid }}-heading"
+          aria-label="{{ s.heading | escape }}"
+        >
+          {%- assign heading_words = s.heading | split: ' ' %}
+          {%- for word in heading_words %}
+            <span class="hero__word-wrap" aria-hidden="true">
+              <span class="hero__word">{{ word }}</span>
+            </span>
+            {%- unless forloop.last %}<span class="hero__word-space" aria-hidden="true"> </span>{%- endunless %}
+          {%- endfor %}
+        </h1>
+      {%- endif %}
+
+      {%- comment %} Decorative accent line {% endcomment %}
+      <div class="hero__accent-line" data-hero-line aria-hidden="true">
+        <span class="hero__accent-line-fill"></span>
+      </div>
+
+      {%- comment %} Subheading {% endcomment %}
+      {%- if s.subheading != blank %}
+        <p class="hero__sub" data-hero-sub>
+          {{ s.subheading }}
+        </p>
+      {%- endif %}
+
+      {%- comment %} Optional feature pills {% endcomment %}
+      {%- if s.show_feature_pills %}
+        <div class="hero__pills" data-hero-pills aria-label="Key features">
+          {%- assign pills = s.feature_pills | split: ',' %}
+          {%- for pill in pills %}
+            <span class="hero__pill">
+              <span class="hero__pill-dot" aria-hidden="true"></span>
+              {{ pill | strip }}
+            </span>
+          {%- endfor %}
+        </div>
+      {%- endif %}
+
+      {%- comment %} CTA buttons {% endcomment %}
+      <div class="hero__ctas" data-hero-cta>
+
+        {%- if s.cta_text != blank %}
+          <a
+            href="{{ s.cta_url | default: '/collections/all' }}"
+            class="hero__btn hero__btn--primary"
+            aria-label="{{ s.cta_text | escape }}"
+          >
+            <span class="hero__btn-label">{{ s.cta_text }}</span>
+            <span class="hero__btn-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24"
+                   fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="currentColor" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="hero__btn-glow" aria-hidden="true"></span>
+            <span class="hero__btn-ripple" aria-hidden="true"></span>
+          </a>
+        {%- endif %}
+
+        {%- if s.cta2_text != blank %}
+          <a
+            href="{{ s.cta2_url | default: '/pages/about' }}"
+            class="hero__btn hero__btn--ghost"
+            aria-label="{{ s.cta2_text | escape }}"
+          >
+            <span>{{ s.cta2_text }}</span>
+          </a>
+        {%- endif %}
+
+      </div>
+
+      {%- comment %} Social proof strip {% endcomment %}
+      {%- if s.show_social_proof %}
+        <div class="hero__proof" data-hero-proof>
+          <div class="hero__proof-avatars" aria-hidden="true">
+            {%- for i in (1..5) %}
+              <span class="hero__proof-avatar hero__proof-avatar--{{ i }}"></span>
+            {%- endfor %}
+          </div>
+          <div class="hero__proof-text">
+            <div class="hero__proof-stars" aria-label="5 star rating">
+              {%- for i in (1..5) %}<span aria-hidden="true">★</span>{%- endfor %}
+            </div>
+            <p>{{ s.social_proof_text | default: 'Trusted by 50,000+ pet parents' }}</p>
+          </div>
+        </div>
+      {%- endif %}
+
+    </div>{%- comment %} /.hero__content {% endcomment %}
+
+    {%- comment %} ════════════════════════════════
+      RIGHT — Visual Column
+    ════════════════════════════════ {% endcomment %}
+    <div class="hero__visual" data-hero-visual aria-hidden="true">
+
+      {%- comment %} Decorative rings {% endcomment %}
+      <div class="hero__ring hero__ring--outer"></div>
+      <div class="hero__ring hero__ring--mid"></div>
+      <div class="hero__ring hero__ring--inner"></div>
+
+      {%- comment %} Main image frame {% endcomment %}
+      <div class="hero__img-frame" data-hero-img-frame>
+
+        {%- comment %} Image overlay tint {% endcomment %}
+        {%- if s.overlay_opacity > 0 %}
+          <div
+            class="hero__img-overlay"
+            style="
+              background: {{ s.overlay_color | default: '#F8F6F2' }};
+              opacity:    {{ overlay_dec }};
+            "
+          ></div>
+        {%- endif %}
+
+        {%- comment %}
+          ── IMAGE RENDERING — Bug-fixed logic ──
+          BUG: Original code used `img_mobile | default: img_desktop` in the liquid assign,
+          so `img_mobile != img_desktop` was never true when no mobile image was uploaded.
+          Then CSS hid the desktop image on mobile → blank mobile view.
+          FIX: Track `has_mobile_image` separately, always render a mobile-visible image.
+        {% endcomment %}
+
+        {%- if img_desktop != blank %}
+          {{
+            img_desktop
+            | image_url: width: 1400
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '600, 800, 1000, 1200, 1400',
+              sizes: '(max-width: 767px) 100vw, 52vw',
+              alt: img_alt,
+              class: 'hero__img hero__img--desktop',
+              data-hero-img: ''
+          }}
+        {%- endif %}
+
+        {%- comment %} Mobile image: use mobile-specific if uploaded, else reuse desktop {% endcomment %}
+        {%- if has_mobile_image %}
+          {{
+            img_mobile
+            | image_url: width: 900
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '400, 600, 800, 900',
+              sizes: '100vw',
+              alt: img_alt,
+              class: 'hero__img hero__img--mobile',
+              data-hero-img: ''
+          }}
+        {%- elsif img_desktop != blank %}
+          {%- comment %} Fallback: reuse desktop image for mobile, just different class {% endcomment %}
+          {{
+            img_desktop
+            | image_url: width: 900
+            | image_tag:
+              loading: 'eager',
+              fetchpriority: 'high',
+              widths: '400, 600, 800, 900',
+              sizes: '100vw',
+              alt: img_alt,
+              class: 'hero__img hero__img--mobile',
+              data-hero-img: ''
+          }}
+        {%- else %}
+          {%- comment %} No images at all — show illustrated placeholder {% endcomment %}
+          <div class="hero__img-placeholder" data-hero-img>
+            <div class="hero__placeholder-inner">
+              <span class="hero__placeholder-emoji" aria-hidden="true">🐾</span>
+              <svg viewBox="0 0 480 560" fill="none"
+                   xmlns="http://www.w3.org/2000/svg"
+                   class="hero__placeholder-svg"
+                   aria-hidden="true">
+                <ellipse cx="240" cy="340" rx="180" ry="200" fill="{{ accent }}" opacity="0.08"/>
+                <ellipse cx="165" cy="155" rx="52"  ry="70"  fill="{{ accent }}" opacity="0.14"/>
+                <ellipse cx="315" cy="155" rx="52"  ry="70"  fill="{{ accent }}" opacity="0.14"/>
+                <ellipse cx="110" cy="230" rx="42"  ry="58"  fill="{{ accent }}" opacity="0.10"/>
+                <ellipse cx="370" cy="230" rx="42"  ry="58"  fill="{{ accent }}" opacity="0.10"/>
+                <text x="240" y="370" text-anchor="middle" font-size="120"
+                      fill="{{ accent }}" opacity="0.25">🐶</text>
+                <text x="240" y="490" text-anchor="middle" font-size="15"
+                      fill="{{ sub_color }}" font-weight="600" opacity="0.5">
+                  Upload a hero image in Theme Editor
+                </text>
+              </svg>
+            </div>
+          </div>
+        {%- endif %}
+
+      </div>{%- comment %} /.hero__img-frame {% endcomment %}
+
+      {%- comment %} Floating stat cards {% endcomment %}
+      {%- if s.show_stat_cards %}
+        <div class="hero__stat hero__stat--a" data-hero-float="a" role="img"
+             aria-label="{{ s.stat_a_num | default: '50k+' }} {{ s.stat_a_label | default: 'Happy Pets' }}">
+          <span class="hero__stat-icon-wrap" aria-hidden="true">🐶</span>
+          <div>
+            <span class="hero__stat-num">{{ s.stat_a_num | default: '50k+' }}</span>
+            <span class="hero__stat-label">{{ s.stat_a_label | default: 'Happy Pets' }}</span>
+          </div>
+        </div>
+        <div class="hero__stat hero__stat--b" data-hero-float="b" role="img"
+             aria-label="{{ s.stat_b_num | default: '4.9' }} {{ s.stat_b_label | default: 'Avg Rating' }}">
+          <span class="hero__stat-icon" aria-hidden="true">⭐</span>
+          <div>
+            <span class="hero__stat-num">{{ s.stat_b_num | default: '4.9' }}</span>
+            <span class="hero__stat-label">{{ s.stat_b_label | default: 'Avg Rating' }}</span>
+          </div>
+        </div>
+        {%- if s.show_stat_c %}
+          <div class="hero__stat hero__stat--c" data-hero-float="c" role="img"
+               aria-label="{{ s.stat_c_num | default: '100%' }} {{ s.stat_c_label | default: 'Natural' }}">
+            <span class="hero__stat-icon" aria-hidden="true">🌿</span>
+            <div>
+              <span class="hero__stat-num">{{ s.stat_c_num | default: '100%' }}</span>
+              <span class="hero__stat-label">{{ s.stat_c_label | default: 'Natural' }}</span>
+            </div>
+          </div>
+        {%- endif %}
+      {%- endif %}
+
+      {%- comment %} Decorative paw badge {% endcomment %}
+      <div class="hero__paw-badge" data-hero-paw aria-hidden="true">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="31"
+                  fill="{{ accent }}" opacity="0.10"
+                  stroke="{{ accent }}" stroke-width="1"
+                  stroke-dasharray="5 3"/>
+          <text x="32" y="42" text-anchor="middle" font-size="28">🐾</text>
+        </svg>
+      </div>
+
+      {%- comment %} New badge {% endcomment %}
+      {%- if s.show_new_badge and s.new_badge_text != blank %}
+        <div class="hero__new-badge" data-hero-badge aria-hidden="true">
+          <span>{{ s.new_badge_text }}</span>
+        </div>
+      {%- endif %}
+
+    </div>{%- comment %} /.hero__visual {% endcomment %}
+
+  </div>{%- comment %} /.hero__grid {% endcomment %}
+
+  {%- comment %} ── SCROLL CUE ── {% endcomment %}
+  {%- if s.show_scroll_cue %}
+    <div class="hero__scroll-cue" data-hero-scroll-cue aria-hidden="true">
+      <div class="hero__scroll-mouse">
+        <div class="hero__scroll-dot"></div>
+      </div>
+      <span class="hero__scroll-label">Scroll</span>
+    </div>
+  {%- endif %}
+
+  {%- comment %} ── MOBILE STICKY CTA ── {% endcomment %}
+  {%- if s.cta_text != blank and s.show_mobile_sticky_cta %}
+    <div class="hero__mobile-cta" data-hero-mobile-cta aria-hidden="true">
+      <a href="{{ s.cta_url | default: '/collections/all' }}"
+         class="hero__mobile-cta-btn"
+         tabindex="-1">
+        {{ s.cta_text }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19"
+                stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  {%- endif %}
+
+</section>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   STYLES
+══════════════════════════════════════════════════════════ {% endcomment %}
+<style>
+
+/* ── Utility ──────────────────────────────────────────────── */
+.visually-hidden {
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ── Section base ─────────────────────────────────────────── */
+#{{ sid }} {
+  position:   relative;
+  min-height: 100svh;
+  display:    flex;
+  align-items:center;
+  overflow:   hidden;
+  isolation:  isolate;
+}
+
+/* ── Grain texture ────────────────────────────────────────── */
+.hero__grain {
+  position:       absolute;
+  inset:          0;
+  z-index:        1;
+  pointer-events: none;
+  opacity:        0.030;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ── Ambient blobs ────────────────────────────────────────── */
+.hero__blobs {
+  position:       absolute;
+  inset:          0;
+  z-index:        0;
+  pointer-events: none;
+  overflow:       hidden;
+}
+.hero__blob {
+  position:      absolute;
+  border-radius: 50%;
+  filter:        blur(90px);
+  will-change:   transform;
+}
+.hero__blob--a {
+  width:    560px;
+  height:   560px;
+  top:      -180px;
+  right:    -100px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--hero-accent) 24%, transparent),
+    transparent 68%);
+  animation: blob-drift-a 14s ease-in-out infinite;
+}
+.hero__blob--b {
+  width:    400px;
+  height:   400px;
+  bottom:   -120px;
+  left:     -80px;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--hero-accent) 16%, transparent),
+    transparent 68%);
+  animation: blob-drift-b 18s ease-in-out infinite;
+}
+.hero__blob--c {
+  width:    280px;
+  height:   280px;
+  top:      38%;
+  left:     38%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, #F4C06F 18%, transparent),
+    transparent 68%);
+  animation: blob-drift-c 22s ease-in-out infinite;
+}
+.hero__blob--d {
+  width:    320px;
+  height:   320px;
+  bottom:   15%;
+  right:    10%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--hero-accent) 10%, transparent),
+    transparent 68%);
+  animation: blob-drift-b 26s ease-in-out infinite reverse;
+  animation-delay: -8s;
+}
+@keyframes blob-drift-a {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33%     { transform:translate(-32px,28px) scale(1.07); }
+  66%     { transform:translate(22px,-20px) scale(0.94); }
+}
+@keyframes blob-drift-b {
+  0%,100% { transform:translate(0,0); }
+  50%     { transform:translate(30px,-24px); }
+}
+@keyframes blob-drift-c {
+  0%,100% { transform:translate(0,0) scale(1); }
+  40%     { transform:translate(-20px,32px) scale(1.09); }
+  80%     { transform:translate(24px,12px) scale(0.93); }
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+.hero__grid {
+  position:           relative;
+  z-index:            2;
+  display:            grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap:                0;
+  width:              100%;
+  min-height:         100svh;
+  max-width:          none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LEFT — CONTENT COLUMN
+══════════════════════════════════════════════════════════ */
+.hero__content {
+  display:        flex;
+  flex-direction: column;
+  justify-content:center;
+  padding:        clamp(60px,8vh,110px) clamp(28px,5vw,80px)
+                  clamp(60px,8vh,110px) clamp(28px,6vw,100px);
+  gap:            0;
+  text-align:     var(--hero-tal-d);
+  position:       relative;
+  z-index:        3;
+}
+
+/* Eyebrow */
+.hero__eyebrow {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            8px;
+  font-size:      0.74rem;
+  font-weight:    700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color:          var(--hero-accent);
+  margin-bottom:  22px;
+  width:          fit-content;
+  opacity:        0;
+  will-change:    opacity, transform;
+  {%- if text_align_d == 'center' %}margin-left:auto;margin-right:auto;{%- endif %}
+  {%- if text_align_d == 'right'  %}margin-left:auto;{%- endif %}
+}
+.hero__eyebrow-dot {
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  background:    var(--hero-accent);
+  flex-shrink:   0;
+  animation:     eyebrow-pulse 2.4s ease-in-out infinite;
+}
+@keyframes eyebrow-pulse {
+  0%,100% { transform:scale(1);   box-shadow:0 0 0 0 color-mix(in srgb, var(--hero-accent) 60%, transparent); }
+  50%     { transform:scale(1.2); box-shadow:0 0 0 6px transparent; }
+}
+
+/* Heading */
+.hero__heading {
+  font-size:      var(--hero-hd);
+  font-weight:    800;
+  line-height:    1.07;
+  letter-spacing: -0.038em;
+  color:          var(--hero-text);
+  margin:         0 0 18px;
+  text-wrap:      balance;
+}
+.hero__word-wrap {
+  display:       inline-block;
+  overflow:      hidden;
+  vertical-align:bottom;
+  line-height:   1.14;
+}
+.hero__word {
+  display:    inline-block;
+  opacity:    0;
+  transform:  translateY(110%);
+  will-change:opacity, transform;
+}
+.hero__word-space {
+  display: inline-block;
+  width:   0.28em;
+}
+
+/* Accent line */
+.hero__accent-line {
+  width:         72px;
+  height:        3px;
+  border-radius: 3px;
+  background:    color-mix(in srgb, var(--hero-accent) 25%, transparent);
+  margin-bottom: 20px;
+  overflow:      hidden;
+  {%- if text_align_d == 'center' %}margin-left:auto;margin-right:auto;{%- endif %}
+  {%- if text_align_d == 'right'  %}margin-left:auto;{%- endif %}
+}
+.hero__accent-line-fill {
+  display:       block;
+  height:        100%;
+  background:    var(--hero-accent);
+  border-radius: inherit;
+  width:         0%;
+  will-change:   width;
+}
+
+/* Subheading */
+.hero__sub {
+  font-size:   var(--hero-sd);
+  color:       var(--hero-sub);
+  line-height: 1.74;
+  margin:      0 0 30px;
+  font-weight: 400;
+  max-width:   440px;
+  opacity:     0;
+  transform:   translateY(18px);
+  will-change: opacity, transform;
+  {%- if text_align_d == 'center' %}margin-left:auto;margin-right:auto;{%- endif %}
+  {%- if text_align_d == 'right'  %}margin-left:auto;{%- endif %}
+}
+
+/* Feature pills */
+.hero__pills {
+  display:      flex;
+  flex-wrap:    wrap;
+  gap:          8px;
+  margin-bottom:28px;
+  opacity:      0;
+  transform:    translateY(14px);
+  will-change:  opacity, transform;
+  {%- if text_align_d == 'center' %}justify-content:center;{%- endif %}
+  {%- if text_align_d == 'right'  %}justify-content:flex-end;{%- endif %}
+}
+.hero__pill {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       6px 14px;
+  border-radius: 100px;
+  background:    color-mix(in srgb, var(--hero-accent) 10%, transparent);
+  border:        1.5px solid color-mix(in srgb, var(--hero-accent) 22%, transparent);
+  color:         var(--hero-accent);
+  font-size:     0.76rem;
+  font-weight:   600;
+  letter-spacing:0.04em;
+  white-space:   nowrap;
+  transition:    background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+}
+.hero__pill:hover {
+  background:   color-mix(in srgb, var(--hero-accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--hero-accent) 40%, transparent);
+  transform:    translateY(-1px);
+}
+.hero__pill-dot {
+  width:         5px;
+  height:        5px;
+  border-radius: 50%;
+  background:    var(--hero-accent);
+  opacity:       0.7;
+  flex-shrink:   0;
+}
+
+/* CTA buttons */
+.hero__ctas {
+  display:      flex;
+  align-items:  center;
+  gap:          14px;
+  flex-wrap:    wrap;
+  opacity:      0;
+  transform:    translateY(16px) scale(0.97);
+  will-change:  opacity, transform;
+  margin-bottom:34px;
+  {%- if text_align_d == 'center' %}justify-content:center;{%- endif %}
+  {%- if text_align_d == 'right'  %}justify-content:flex-end;{%- endif %}
+}
+.hero__btn {
+  position:        relative;
+  display:         inline-flex;
+  align-items:     center;
+  gap:             10px;
+  text-decoration: none;
+  font-weight:     700;
+  letter-spacing:  0.04em;
+  border-radius:   100px;
+  cursor:          pointer;
+  overflow:        hidden;
+  white-space:     nowrap;
+  border:          none;
+}
+.hero__btn--primary {
+  background: linear-gradient(
+    135deg,
+    var(--hero-accent),
+    color-mix(in srgb, var(--hero-accent) 72%, #F4C06F)
+  );
+  color:      #fff;
+  padding:    16px 36px;
+  font-size:  1rem;
+  box-shadow:
+    0 6px 22px color-mix(in srgb, var(--hero-accent) 40%, transparent),
+    0 2px 6px rgba(0,0,0,0.08);
+  transition:
+    transform  0.38s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.30s ease;
+}
+.hero__btn--primary:hover,
+.hero__btn--primary:focus-visible {
+  transform:  translateY(-3px) scale(1.025);
+  box-shadow:
+    0 16px 40px color-mix(in srgb, var(--hero-accent) 52%, transparent),
+    0 4px 12px rgba(0,0,0,0.10);
+  outline:none;
+}
+.hero__btn--primary:focus-visible {
+  outline:        3px solid var(--hero-accent);
+  outline-offset: 4px;
+}
+.hero__btn--primary:active { transform:scale(0.97); }
+
+.hero__btn-label { position:relative; z-index:1; }
+.hero__btn-arrow {
+  position:   relative;
+  z-index:    1;
+  display:    flex;
+  align-items:center;
+  transition: transform 0.28s ease;
+}
+.hero__btn--primary:hover .hero__btn-arrow,
+.hero__btn--primary:focus-visible .hero__btn-arrow {
+  transform: translateX(4px);
+}
+.hero__btn-glow {
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 55%);
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:    0;
+}
+
+/* Ripple on click */
+.hero__btn-ripple {
+  position:      absolute;
+  inset:         0;
+  border-radius: inherit;
+  pointer-events:none;
+  z-index:       0;
+  overflow:      hidden;
+}
+.hero__btn--primary:active .hero__btn-ripple::after {
+  content:       '';
+  position:      absolute;
+  top:           50%;
+  left:          50%;
+  width:         0;
+  height:        0;
+  background:    rgba(255,255,255,0.35);
+  border-radius: 50%;
+  transform:     translate(-50%,-50%);
+  animation:     btn-ripple 0.5s ease-out forwards;
+}
+@keyframes btn-ripple {
+  to { width:240px; height:240px; opacity:0; }
+}
+
+.hero__btn--ghost {
+  background:  transparent;
+  color:       var(--hero-text);
+  border:      2px solid color-mix(in srgb, var(--hero-text) 20%, transparent);
+  padding:     14px 28px;
+  font-size:   0.92rem;
+  transition:
+    background  0.28s ease,
+    border-color 0.28s ease,
+    color       0.28s ease,
+    transform   0.30s cubic-bezier(0.34,1.56,0.64,1);
+}
+.hero__btn--ghost:hover,
+.hero__btn--ghost:focus-visible {
+  background:   color-mix(in srgb, var(--hero-text) 6%, transparent);
+  border-color: color-mix(in srgb, var(--hero-text) 50%, transparent);
+  transform:    translateY(-2px);
+  outline:      none;
+}
+.hero__btn--ghost:focus-visible {
+  outline:        2px solid var(--hero-text);
+  outline-offset: 3px;
+}
+
+/* Social proof */
+.hero__proof {
+  display:     flex;
+  align-items: center;
+  gap:         14px;
+  opacity:     0;
+  will-change: opacity, transform;
+  {%- if text_align_d == 'center' %}justify-content:center;{%- endif %}
+  {%- if text_align_d == 'right'  %}justify-content:flex-end;{%- endif %}
+}
+.hero__proof-avatars {
+  display:   flex;
+  flex-wrap: nowrap;
+}
+.hero__proof-avatar {
+  width:          38px;
+  height:         38px;
+  border-radius:  50%;
+  border:         2.5px solid color-mix(in srgb, var(--hero-bg,#F8F6F2) 90%, transparent);
+  overflow:       hidden;
+  margin-left:    -11px;
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+  flex-shrink:    0;
+  font-size:      1rem;
+}
+.hero__proof-avatar:first-child { margin-left:0; }
+/* Tinted avatar placeholders */
+.hero__proof-avatar--1 { background: #FDDCB5; }
+.hero__proof-avatar--2 { background: #C8E6D4; }
+.hero__proof-avatar--3 { background: #D4C5F0; }
+.hero__proof-avatar--4 { background: #FCC8C8; }
+.hero__proof-avatar--5 { background: #C8E0F4; }
+.hero__proof-avatar--1::after { content:'🐶'; }
+.hero__proof-avatar--2::after { content:'🐱'; }
+.hero__proof-avatar--3::after { content:'🐰'; }
+.hero__proof-avatar--4::after { content:'🐹'; }
+.hero__proof-avatar--5::after { content:'🦜'; }
+
+.hero__proof-text { display:flex; flex-direction:column; gap:2px; }
+.hero__proof-stars {
+  color:          #F4B942;
+  font-size:      0.80rem;
+  letter-spacing: 1px;
+  line-height:    1;
+  display:        flex;
+  gap:            1px;
+}
+.hero__proof-text p {
+  font-size:   0.77rem;
+  color:       var(--hero-sub);
+  margin:      0;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RIGHT — VISUAL COLUMN
+══════════════════════════════════════════════════════════ */
+.hero__visual {
+  position:        relative;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         clamp(40px,6vh,80px) clamp(24px,4vw,60px);
+  overflow:        visible;
+}
+
+/* Decorative rings */
+.hero__ring {
+  position:      absolute;
+  border-radius: 50%;
+  border-style:  solid;
+  pointer-events:none;
+  will-change:   transform;
+}
+.hero__ring--outer {
+  width:        90%;
+  height:       90%;
+  border-width: 1.5px;
+  border-color:
+    color-mix(in srgb, var(--hero-accent) 18%, transparent)
+    transparent
+    color-mix(in srgb, var(--hero-accent) 10%, transparent)
+    transparent;
+  animation: ring-spin-slow 30s linear infinite;
+}
+.hero__ring--mid {
+  width:        66%;
+  height:       66%;
+  border-width: 1px;
+  border-color:
+    transparent
+    color-mix(in srgb, var(--hero-accent) 14%, transparent)
+    transparent
+    color-mix(in srgb, var(--hero-accent) 8%, transparent);
+  animation: ring-spin-slow 20s linear infinite reverse;
+}
+.hero__ring--inner {
+  width:        42%;
+  height:       42%;
+  border-width: 1px;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--hero-accent) 12%, transparent);
+  animation: ring-spin-slow 12s linear infinite;
+}
+@keyframes ring-spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+/* Image frame */
+.hero__img-frame {
+  position:      relative;
+  width:         min(500px, 90%);
+  aspect-ratio:  4 / 5;
+  border-radius: 40% 60% 55% 45% / 45% 40% 60% 55%;
+  overflow:      hidden;
+  will-change:   transform;
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.06),
+    0 32px 80px rgba(0,0,0,0.14),
+    inset 0 0 0 1px rgba(255,255,255,0.55);
+  animation: frame-morph 12s ease-in-out infinite;
+  z-index:   2;
+}
+@keyframes frame-morph {
+  0%,100% { border-radius: 40% 60% 55% 45% / 45% 40% 60% 55%; }
+  25%     { border-radius: 55% 45% 40% 60% / 60% 55% 45% 40%; }
+  50%     { border-radius: 45% 55% 60% 40% / 40% 60% 55% 45%; }
+  75%     { border-radius: 60% 40% 45% 55% / 55% 45% 40% 60%; }
+}
+
+.hero__img-overlay {
+  position:      absolute;
+  inset:         0;
+  z-index:       2;
+  pointer-events:none;
+  mix-blend-mode:multiply;
+}
+
+/*
+  ── IMAGE VISIBILITY — Bug-fixed ──
+  Desktop image: show on desktop, hidden on mobile (via media query).
+  Mobile image:  hidden on desktop, visible on mobile (via media query).
+  When no separate mobile image is uploaded, we output the desktop image
+  TWICE (different classes) so the mobile class shows correctly on small screens.
+*/
+.hero__img {
+  position:        absolute;
+  inset:           0;
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: center top;
+  display:         block;
+  will-change:     transform;
+  transform:       scale(1.05);
+}
+.hero__img--mobile { display: none; }  /* hidden on desktop by default */
+
+/* Placeholder */
+.hero__img-placeholder {
+  position: absolute;
+  inset:    0;
+  display:  flex;
+  align-items:    center;
+  justify-content:center;
+}
+.hero__placeholder-inner {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            8px;
+  position:       relative;
+}
+.hero__placeholder-emoji {
+  font-size: 3.5rem;
+  position:  absolute;
+  top:       50%;
+  left:      50%;
+  transform: translate(-50%,-50%);
+  z-index:   2;
+}
+.hero__placeholder-svg { width:260px; height:auto; }
+
+/* Floating stat cards */
+.hero__stat {
+  position:        absolute;
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  background:      rgba(255,255,255,0.76);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border:          1px solid rgba(255,255,255,0.88);
+  border-radius:   18px;
+  padding:         12px 18px;
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.08),
+    0 1px 4px rgba(0,0,0,0.04);
+  z-index:         10;
+  opacity:         0;
+  will-change:     opacity, transform;
+}
+.hero__stat--a {
+  top:   12%;
+  right: -4%;
+  /* BUG FIX: CSS float animation removed here;
+     GSAP controls entrance, CSS animation runs after via JS adding a class */
+}
+.hero__stat--b {
+  bottom: 14%;
+  left:   -7%;
+}
+.hero__stat--c {
+  top:   50%;
+  right: -8%;
+  transform: translateY(-50%);
+}
+/* Float animations applied via .is-floating class (added by JS after GSAP entrance) */
+.hero__stat--a.is-floating { animation: stat-float-a 5s ease-in-out infinite 0.4s; }
+.hero__stat--b.is-floating { animation: stat-float-b 6s ease-in-out infinite; }
+.hero__stat--c.is-floating { animation: stat-float-a 7s ease-in-out infinite 1s; }
+@keyframes stat-float-a {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(-10px); }
+}
+@keyframes stat-float-b {
+  0%,100% { transform:translateY(0); }
+  50%     { transform:translateY(10px); }
+}
+.hero__stat-num {
+  display:     block;
+  font-size:   1.18rem;
+  font-weight: 800;
+  color:       var(--hero-text);
+  line-height: 1;
+}
+.hero__stat-label {
+  display:     block;
+  font-size:   0.68rem;
+  color:       var(--hero-sub);
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top:  1px;
+}
+.hero__stat-icon {
+  font-size:   1.3rem;
+  line-height: 1;
+}
+.hero__stat-icon-wrap {
+  font-size:   1.3rem;
+  line-height: 1;
+}
+
+/* Paw badge
+   BUG FIX: Removed always-on spin animation from CSS.
+   GSAP sets initial scale(0), then animates in.
+   Spin is applied via .is-spinning class after entrance. */
+.hero__paw-badge {
+  position:    absolute;
+  bottom:      9%;
+  right:       5%;
+  z-index:     10;
+  opacity:     0;
+  will-change: opacity, transform;
+}
+.hero__paw-badge.is-spinning {
+  animation: paw-spin 18s linear infinite;
+}
+@keyframes paw-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* New badge */
+.hero__new-badge {
+  position:        absolute;
+  top:             8%;
+  left:            -2%;
+  background:      linear-gradient(135deg, var(--hero-accent), color-mix(in srgb, var(--hero-accent) 72%, #F4C06F));
+  color:           #fff;
+  font-size:       0.68rem;
+  font-weight:     700;
+  letter-spacing:  0.12em;
+  text-transform:  uppercase;
+  padding:         6px 14px;
+  border-radius:   100px;
+  box-shadow:      0 4px 16px color-mix(in srgb, var(--hero-accent) 40%, transparent);
+  z-index:         10;
+  opacity:         0;
+  will-change:     opacity, transform;
+}
+
+/* ── Scroll cue ─────────────────────────────────────────── */
+.hero__scroll-cue {
+  position:       absolute;
+  bottom:         clamp(20px,4vh,36px);
+  left:           50%;
+  transform:      translateX(-50%);
+  z-index:        5;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            7px;
+  opacity:        0;
+  will-change:    opacity;
+  animation:      scroll-cue-show 0.8s 2.8s ease forwards;
+}
+@keyframes scroll-cue-show { to { opacity:1; } }
+.hero__scroll-mouse {
+  width:          22px;
+  height:         34px;
+  border:         2px solid color-mix(in srgb, var(--hero-text) 30%, transparent);
+  border-radius:  100px;
+  display:        flex;
+  justify-content:center;
+  padding-top:    5px;
+}
+.hero__scroll-dot {
+  width:         4px;
+  height:        6px;
+  border-radius: 100px;
+  background:    var(--hero-accent);
+  animation:     scroll-dot 2s ease-in-out infinite;
+}
+@keyframes scroll-dot {
+  0%,100% { transform:translateY(0); opacity:1; }
+  80%     { transform:translateY(12px); opacity:0; }
+}
+.hero__scroll-label {
+  font-size:      0.65rem;
+  font-weight:    600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          color-mix(in srgb, var(--hero-text) 38%, transparent);
+}
+
+/* Mobile sticky CTA */
+.hero__mobile-cta {
+  display:  none; /* shown only on mobile via media query */
+  position: fixed;
+  bottom:   0;
+  left:     0;
+  right:    0;
+  z-index:  100;
+  padding:  12px 16px max(12px, env(safe-area-inset-bottom));
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(0,0,0,0.08);
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+}
+.hero__mobile-cta.is-visible {
+  transform: translateY(0);
+}
+.hero__mobile-cta-btn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  width:           100%;
+  padding:         16px;
+  border-radius:   14px;
+  background:      linear-gradient(135deg, var(--hero-accent),
+                   color-mix(in srgb, var(--hero-accent) 72%, #F4C06F));
+  color:           #fff;
+  font-weight:     700;
+  font-size:       1rem;
+  letter-spacing:  0.04em;
+  text-decoration: none;
+  box-shadow:      0 4px 16px color-mix(in srgb, var(--hero-accent) 40%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Tablet  ≤ 1100px
+══════════════════════════════════════════════════════════ */
+@media (max-width:1100px) {
+  .hero__grid { grid-template-columns:1fr 1fr; }
+  .hero__img-frame { width:min(420px,92%); }
+  .hero__stat--a { right:-2%; }
+  .hero__stat--b { left:-4%; }
+  .hero__stat--c { display:none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile  ≤ 767px
+   BUG FIX: Added `display:block` for .hero__img--mobile here.
+   Added `display:none` for .hero__img--desktop here.
+   Now the mobile fallback image (output as .hero__img--mobile even when
+   it's the same desktop image) always shows on mobile.
+══════════════════════════════════════════════════════════ */
+@media (max-width:767px) {
+  #{{ sid }} { min-height:auto; padding:0; }
+
+  .hero__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows:    auto auto;
+    min-height:            auto;
+  }
+
+  /* Image section stacks above content on mobile */
+  .hero__visual {
+    order:      -1;
+    padding:    32px 24px 16px;
+    min-height: 56vw;
+  }
+
+  .hero__img-frame {
+    width:        min(280px,84vw);
+    aspect-ratio: 1 / 1;
+    border-radius:50% !important; /* Override morph animation */
+    animation:    none;
+  }
+
+  /* ── KEY BUG FIX: swap image classes on mobile ── */
+  .hero__img--desktop { display: none !important; }
+  .hero__img--mobile  { display: block !important; }
+
+  .hero__ring           { display:none; }
+  .hero__blob--b,
+  .hero__blob--c,
+  .hero__blob--d        { display:none; }
+  .hero__blob--a        { width:260px; height:260px; top:-70px; right:-50px; }
+
+  .hero__content {
+    padding:     22px 20px 36px;
+    align-items: {{ text_align_m }};
+    text-align:  var(--hero-tal-m);
+  }
+  .hero__heading { font-size:var(--hero-hm); }
+  .hero__sub     { font-size:var(--hero-sm); max-width:100%; }
+
+  .hero__eyebrow {
+    {%- if text_align_m == 'center' %}
+      margin-left:auto;
+      margin-right:auto;
+    {%- endif %}
+  }
+
+  .hero__pills {
+    {%- if text_align_m == 'center' %}
+      justify-content:center;
+    {%- endif %}
+  }
+
+  .hero__ctas {
+    flex-direction: column;
+    width:          100%;
+    align-items:    stretch;
+    {%- if text_align_m == 'center' %}justify-content:center;{%- endif %}
+  }
+  .hero__btn { justify-content:center; text-align:center; }
+  .hero__btn--primary { padding:17px 28px; font-size:1rem; }
+  .hero__btn--ghost   { padding:15px 28px; }
+
+  .hero__proof {
+    flex-direction: column;
+    gap:            8px;
+    align-items:    center;
+    text-align:     center;
+    {%- if text_align_m == 'center' %}justify-content:center;{%- endif %}
+  }
+
+  .hero__stat { display:none; }
+  .hero__paw-badge { bottom:3%; right:3%; }
+  .hero__scroll-cue { display:none; }
+  .hero__new-badge  { top:5%; left:auto; right:4%; }
+
+  /* Show sticky mobile CTA */
+  .hero__mobile-cta { display:block; }
+}
+
+/* ── Reduced-motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce) {
+  .hero__blob,
+  .hero__ring,
+  .hero__stat,
+  .hero__scroll-dot,
+  .hero__paw-badge,
+  .hero__img,
+  .hero__img-frame,
+  .hero__eyebrow-dot {
+    animation: none !important;
+    transition: none !important;
+  }
+  .hero__eyebrow,
+  .hero__word,
+  .hero__sub,
+  .hero__pills,
+  .hero__ctas,
+  .hero__proof {
+    opacity:   1 !important;
+    transform: none !important;
+  }
+  .hero__accent-line-fill { width:100% !important; }
+  .hero__stat     { opacity:1 !important; }
+  .hero__paw-badge{ opacity:1 !important; }
+  .hero__new-badge{ opacity:1 !important; }
+}
+</style>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   JAVASCRIPT  —  GSAP cinematic load + scroll
+══════════════════════════════════════════════════════════ {% endcomment %}
+
+<script>
+/* ── Load GSAP + ScrollTrigger once per page ─────────────── */
+(function () {
+  if (window.__heroGsap) return;
+  window.__heroGsap = 'loading';
+  const G = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  const S = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
+  function load(src, cb) {
+    const el = document.createElement('script');
+    el.src = src; el.defer = true; el.onload = cb;
+    document.head.appendChild(el);
+  }
+  load(G, () => load(S, () => {
+    window.__heroGsap = 'ready';
+    document.dispatchEvent(new CustomEvent('hero:gsap-ready'));
+  }));
+}());
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  const sid    = '{{ sid }}';
+  const noMo   = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const mobile = () => window.matchMedia('(max-width:767px)').matches;
+  const S      = (sel, ctx) => (ctx || document).querySelector(sel);
+  const SA     = (sel, ctx) => [...(ctx || document).querySelectorAll(sel)];
+
+  const hero = document.getElementById(sid);
+  if (!hero) return;
+
+  /* ── DOM refs ─────────────────────────────────────────── */
+  const eyebrow   = S('[data-hero-eyebrow]',   hero);
+  const words     = SA('.hero__word',           hero);
+  const acLine    = S('.hero__accent-line-fill',hero);
+  const sub       = S('[data-hero-sub]',        hero);
+  const pills     = S('[data-hero-pills]',      hero);
+  const cta       = S('[data-hero-cta]',        hero);
+  const proof     = S('[data-hero-proof]',      hero);
+  const imgFrame  = S('[data-hero-img-frame]',  hero);
+  const heroImgs  = SA('[data-hero-img]',       hero);
+  const stats     = SA('[data-hero-float]',     hero);
+  const pawBadge  = S('[data-hero-paw]',        hero);
+  const badge     = S('[data-hero-badge]',      hero);
+  const visual    = S('[data-hero-visual]',     hero);
+  const mobileCta = S('[data-hero-mobile-cta]', document);
+
+  let ctx = null;
+
+  /* ══════════════════════════════════════════════════════
+     REDUCED MOTION FALLBACK
+  ══════════════════════════════════════════════════════ */
+  function revealAll() {
+    const els = [eyebrow, sub, pills, cta, proof, badge];
+    els.forEach(el => {
+      if (!el) return;
+      el.style.opacity   = '1';
+      el.style.transform = 'none';
+    });
+    words.forEach(w => { w.style.opacity = '1'; w.style.transform = 'none'; });
+    stats.forEach(s => {
+      s.style.opacity = '1';
+      s.classList.add('is-floating');
+    });
+    if (pawBadge) {
+      pawBadge.style.opacity   = '1';
+      pawBadge.style.transform = 'none';
+      pawBadge.classList.add('is-spinning');
+    }
+    if (acLine) acLine.style.width = '100%';
+  }
+
+  /* ══════════════════════════════════════════════════════
+     MAIN ANIMATION
+  ══════════════════════════════════════════════════════ */
+  function initAnimations() {
+    if (!window.gsap) { revealAll(); return; }
+    if (noMo())       { revealAll(); return; }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    ctx = gsap.context(() => {
+
+      /* ─── 1. SET INITIAL STATES ─────────────────────────
+         BUG FIX: gsap.set() BEFORE gsap.to/fromTo to guarantee
+         start values are applied before animation begins.
+      ─────────────────────────────────────────────────── */
+      if (pawBadge) {
+        gsap.set(pawBadge, { scale: 0.4, opacity: 0 }); /* ← was set AFTER gsap.to — now correct */
+      }
+      if (badge) {
+        gsap.set(badge, { scale: 0.7, opacity: 0, y: -10 });
+      }
+
+      /* ─── 2. ENTRANCE TIMELINE ──────────────────────── */
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      if (eyebrow) {
+        tl.fromTo(eyebrow,
+          { opacity: 0, y: -12 },
+          { opacity: 1, y:  0, duration: 0.65 },
+          0.05
+        );
+      }
+
+      if (words.length) {
+        tl.to(words, {
+          opacity:  1,
+          y:        '0%',
+          duration: 0.65,
+          stagger: { each: 0.07, ease: 'power2.out' },
+          ease:    'power3.out',
+        }, eyebrow ? 0.28 : 0.12);
+      }
+
+      if (acLine) {
+        tl.to(acLine, {
+          width:    '100%',
+          duration: 0.72,
+          ease:     'power2.inOut',
+        }, '-=0.30');
+      }
+
+      if (sub) {
+        tl.to(sub, { opacity: 1, y: 0, duration: 0.60 }, '-=0.42');
+      }
+
+      if (pills) {
+        tl.to(pills, { opacity: 1, y: 0, duration: 0.50 }, '-=0.38');
+      }
+
+      if (cta) {
+        tl.to(cta, {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.65,
+          ease:     'back.out(1.6)',
+        }, '-=0.40');
+      }
+
+      if (proof) {
+        tl.to(proof, { opacity: 1, y: 0, duration: 0.50 }, '-=0.35');
+      }
+
+      /* Image frame */
+      if (imgFrame) {
+        gsap.fromTo(imgFrame,
+          { opacity: 0, scale: 0.88, y: 36 },
+          { opacity: 1, scale: 1,    y: 0,
+            duration: 1.25, delay: 0.10, ease: 'power3.out' }
+        );
+      }
+
+      /* Stat cards — staggered with floating applied after */
+      if (stats.length) {
+        gsap.fromTo(stats,
+          { opacity: 0, y: 20, scale: 0.90 },
+          {
+            opacity:  1,
+            y:        0,
+            scale:    1,
+            duration: 0.60,
+            stagger:  0.18,
+            delay:    0.85,
+            ease:     'back.out(1.4)',
+            onComplete() {
+              /* Add CSS float animation AFTER GSAP entrance is done */
+              stats.forEach(s => s.classList.add('is-floating'));
+            },
+          }
+        );
+      }
+
+      /* Paw badge
+         BUG FIX: gsap.set was after gsap.to in original.
+         Now initial state is set above; here we only animate TO final state.
+         CSS spin class added after entrance completes to avoid z-index/transform conflict. */
+      if (pawBadge) {
+        gsap.to(pawBadge, {
+          opacity:         1,
+          scale:           1,
+          duration:        0.60,
+          delay:           1.20,
+          ease:            'back.out(2)',
+          transformOrigin: 'center center',
+          onComplete() {
+            pawBadge.classList.add('is-spinning');
+          },
+        });
+      }
+
+      /* New badge */
+      if (badge) {
+        gsap.to(badge, {
+          opacity:  1,
+          scale:    1,
+          y:        0,
+          duration: 0.55,
+          delay:    1.40,
+          ease:     'back.out(1.8)',
+        });
+      }
+
+      /* ─── 3. IMAGE SLOW ZOOM (continuous) ─────────── */
+      const primaryHeroImg = S('.hero__img--desktop', hero) || S('[data-hero-img]', hero);
+      if (primaryHeroImg && !mobile()) {
+        gsap.fromTo(primaryHeroImg,
+          { scale: 1.05 },
+          { scale: 1.12, duration: 14, ease: 'none', yoyo: true, repeat: -1 }
+        );
+      }
+
+      /* ─── 4. SCROLL PARALLAX ───────────────────────── */
+      if (!mobile()) {
+        const contentEl = S('[data-hero-content]', hero);
+        if (contentEl) {
+          gsap.to(contentEl, {
+            yPercent: -16,
+            ease:     'none',
+            scrollTrigger: {
+              trigger: hero,
+              start:   'top top',
+              end:     'bottom top',
+              scrub:   1.2,
+            },
+          });
+        }
+
+        if (visual) {
+          gsap.to(visual, {
+            yPercent: -7,
+            ease:     'none',
+            scrollTrigger: {
+              trigger: hero,
+              start:   'top top',
+              end:     'bottom top',
+              scrub:   0.8,
+            },
+          });
+        }
+
+        /* Hero fade on scroll-out */
+        gsap.to(hero, {
+          opacity: 0.60,
+          scale:   0.97,
+          ease:    'none',
+          scrollTrigger: {
+            trigger: hero,
+            start:   'bottom 80%',
+            end:     'bottom top',
+            scrub:   true,
+          },
+        });
+      }
+
+      /* ─── 5. HOVER — image zoom ─────────────────────── */
+      if (imgFrame && !mobile()) {
+        const img = S('.hero__img--desktop', hero) || S('[data-hero-img]', hero);
+        if (img) {
+          imgFrame.addEventListener('mouseenter', () => {
+            gsap.to(img, { scale: 1.15, duration: 0.80, ease: 'power2.out', overwrite: 'auto' });
+          });
+          imgFrame.addEventListener('mouseleave', () => {
+            gsap.to(img, { scale: 1.05, duration: 0.90, ease: 'power2.inOut', overwrite: 'auto' });
+          });
+        }
+      }
+
+      /* ─── 6. CTA SUBTLE PULSE ───────────────────────
+         BUG FIX: original had no `overwrite` and conflicted with hover CSS transform.
+         Now using a simpler box-shadow pulse instead of scale, avoiding transform conflicts.
+      ─────────────────────────────────────────────── */
+      const primaryBtn = S('.hero__btn--primary', hero);
+      if (primaryBtn && !mobile()) {
+        gsap.to(primaryBtn, {
+          boxShadow: [
+            '0 6px 22px color-mix(in srgb, var(--hero-accent) 40%, transparent), 0 2px 6px rgba(0,0,0,0.08)',
+            '0 10px 32px color-mix(in srgb, var(--hero-accent) 60%, transparent), 0 4px 12px rgba(0,0,0,0.10)',
+          ],
+          duration: 2.2,
+          ease:     'sine.inOut',
+          yoyo:     true,
+          repeat:   -1,
+        });
+      }
+
+    }, hero);
+  }
+
+  /* ── Mobile sticky CTA ──────────────────────────────── */
+  function initMobileCta() {
+    if (!mobileCta || !mobile()) return;
+    mobileCta.removeAttribute('aria-hidden');
+    const btn = S('.hero__mobile-cta-btn', mobileCta);
+    if (btn) btn.removeAttribute('tabindex');
+
+    let ticking = false;
+    const heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
+
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrolled = window.scrollY > heroBottom * 0.3;
+          mobileCta.classList.toggle('is-visible', scrolled);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  /* ── Boot ───────────────────────────────────────────── */
+  function boot() {
+    if (window.__heroGsap === 'ready') {
+      initAnimations();
+    } else {
+      document.addEventListener('hero:gsap-ready', initAnimations, { once: true });
+    }
+    initMobileCta();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+
+  /* ── Shopify Theme Editor ───────────────────────────── */
+  document.addEventListener('shopify:section:unload', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    if (ctx) ctx.revert();
+    ScrollTrigger?.getAll().forEach(t => t.kill());
+  });
+  document.addEventListener('shopify:section:load', e => {
+    if (e.detail.sectionId !== '{{ section.id }}') return;
+    boot();
+  });
+
+}());
+</script>
+
+
+{%- comment %} ══════════════════════════════════════════════════════════
+   SCHEMA
+══════════════════════════════════════════════════════════ {% endcomment %}
+{% schema %}
+{
+  "name": "🐾 Hero — Premium",
+  "tag":  "section",
+  "class":"section-hero-premium",
+  "limit": 1,
+
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "✏️ Content"
+    },
+    {
+      "type":    "text",
+      "id":      "eyebrow",
+      "label":   "Eyebrow Tag",
+      "default": "✦ New Collection 2025"
+    },
+    {
+      "type":    "textarea",
+      "id":      "heading",
+      "label":   "Main Heading",
+      "default": "Care They Deserve. Style They Love.",
+      "info":    "Each word animates individually. Keep it punchy — 6–10 words ideal."
+    },
+    {
+      "type":    "textarea",
+      "id":      "subheading",
+      "label":   "Subheading",
+      "default": "Premium essentials for your happy, healthy pets."
+    },
+    {
+      "type":    "text",
+      "id":      "cta_text",
+      "label":   "Primary Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type":  "url",
+      "id":    "cta_url",
+      "label": "Primary Button Link"
+    },
+    {
+      "type":    "text",
+      "id":      "cta2_text",
+      "label":   "Secondary Button Text (optional)",
+      "default": "Our Story"
+    },
+    {
+      "type":  "url",
+      "id":    "cta2_url",
+      "label": "Secondary Button Link"
+    },
+
+    {
+      "type": "header",
+      "content": "🖼 Images"
+    },
+    {
+      "type":  "image_picker",
+      "id":    "image_desktop",
+      "label": "Hero Image — Desktop",
+      "info":  "Portrait orientation works best (4:5 ratio). Min 1200px tall. Use WebP."
+    },
+    {
+      "type":  "image_picker",
+      "id":    "image_mobile",
+      "label": "Hero Image — Mobile (optional)",
+      "info":  "Square or portrait (1:1 or 3:4). If not set, desktop image is used on mobile automatically."
+    },
+    {
+      "type":    "text",
+      "id":      "image_alt",
+      "label":   "Image Alt Text",
+      "default": "Happy pet with premium care products"
+    },
+    {
+      "type":    "range",
+      "id":      "overlay_opacity",
+      "label":   "Image Overlay Opacity",
+      "min":     0,
+      "max":     60,
+      "step":    5,
+      "unit":    "%",
+      "default": 0
+    },
+    {
+      "type":    "color",
+      "id":      "overlay_color",
+      "label":   "Overlay Tint Color",
+      "default": "#F8F6F2"
+    },
+
+    {
+      "type": "header",
+      "content": "🎨 Background"
+    },
+    {
+      "type":    "color",
+      "id":      "bg_color",
+      "label":   "Background Color",
+      "default": "#F8F6F2",
+      "info":    "Used when no gradient is set."
+    },
+    {
+      "type":    "color",
+      "id":      "gradient_from",
+      "label":   "Gradient — Start Color",
+      "info":    "Leave blank to use solid background color."
+    },
+    {
+      "type":    "color",
+      "id":      "gradient_to",
+      "label":   "Gradient — End Color"
+    },
+    {
+      "type":    "range",
+      "id":      "gradient_angle",
+      "label":   "Gradient Angle",
+      "min":     0,
+      "max":     360,
+      "step":    15,
+      "unit":    "°",
+      "default": 135
+    },
+
+    {
+      "type": "header",
+      "content": "🔤 Typography & Colors"
+    },
+    {
+      "type":    "color",
+      "id":      "text_color",
+      "label":   "Heading Color",
+      "default": "#1C1917"
+    },
+    {
+      "type":    "color",
+      "id":      "sub_color",
+      "label":   "Subheading Color",
+      "default": "#6B6560"
+    },
+    {
+      "type":    "color",
+      "id":      "accent_color",
+      "label":   "Accent Color",
+      "default": "#D97757"
+    },
+    {
+      "type":    "range",
+      "id":      "heading_size_desktop",
+      "label":   "Heading Size — Desktop",
+      "min":     42,
+      "max":     120,
+      "step":    2,
+      "unit":    "px",
+      "default": 72
+    },
+    {
+      "type":    "range",
+      "id":      "heading_size_mobile",
+      "label":   "Heading Size — Mobile",
+      "min":     28,
+      "max":     60,
+      "step":    2,
+      "unit":    "px",
+      "default": 38
+    },
+    {
+      "type":    "range",
+      "id":      "sub_size_desktop",
+      "label":   "Subheading Size — Desktop",
+      "min":     14,
+      "max":     28,
+      "step":    1,
+      "unit":    "px",
+      "default": 18
+    },
+    {
+      "type":    "range",
+      "id":      "sub_size_mobile",
+      "label":   "Subheading Size — Mobile",
+      "min":     13,
+      "max":     22,
+      "step":    1,
+      "unit":    "px",
+      "default": 15
+    },
+    {
+      "type":    "select",
+      "id":      "text_align_desktop",
+      "label":   "Text Align — Desktop",
+      "options": [
+        { "value":"left",   "label":"Left"   },
+        { "value":"center", "label":"Center" },
+        { "value":"right",  "label":"Right"  }
+      ],
+      "default": "left"
+    },
+    {
+      "type":    "select",
+      "id":      "text_align_mobile",
+      "label":   "Text Align — Mobile",
+      "options": [
+        { "value":"left",   "label":"Left"   },
+        { "value":"center", "label":"Center" }
+      ],
+      "default": "center"
+    },
+
+    {
+      "type": "header",
+      "content": "💊 Feature Pills"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_feature_pills",
+      "label":   "Show Feature Pills",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "feature_pills",
+      "label":   "Pills (comma-separated)",
+      "default": "Vet Approved, Free Shipping, 30-Day Returns, Eco Friendly"
+    },
+
+    {
+      "type": "header",
+      "content": "⭐ Social Proof"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_social_proof",
+      "label":   "Show Social Proof Strip",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "social_proof_text",
+      "label":   "Proof Text",
+      "default": "Trusted by 50,000+ pet parents"
+    },
+
+    {
+      "type": "header",
+      "content": "📊 Floating Stat Cards"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_stat_cards",
+      "label":   "Show Stat Cards",
+      "default": true
+    },
+    {
+      "type":    "text",
+      "id":      "stat_a_num",
+      "label":   "Stat A — Number",
+      "default": "50k+"
+    },
+    {
+      "type":    "text",
+      "id":      "stat_a_label",
+      "label":   "Stat A — Label",
+      "default": "Happy Pets"
+    },
+    {
+      "type":    "text",
+      "id":      "stat_b_num",
+      "label":   "Stat B — Number",
+      "default": "4.9"
+    },
+    {
+      "type":    "text",
+      "id":      "stat_b_label",
+      "label":   "Stat B — Label",
+      "default": "Avg Rating"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_stat_c",
+      "label":   "Show Third Stat Card",
+      "default": false
+    },
+    {
+      "type":    "text",
+      "id":      "stat_c_num",
+      "label":   "Stat C — Number",
+      "default": "100%"
+    },
+    {
+      "type":    "text",
+      "id":      "stat_c_label",
+      "label":   "Stat C — Label",
+      "default": "Natural"
+    },
+
+    {
+      "type": "header",
+      "content": "🏷 New / Promo Badge"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_new_badge",
+      "label":   "Show Promo Badge",
+      "default": false
+    },
+    {
+      "type":    "text",
+      "id":      "new_badge_text",
+      "label":   "Badge Text",
+      "default": "🆕 Just Arrived"
+    },
+
+    {
+      "type": "header",
+      "content": "✨ Extras"
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_scroll_cue",
+      "label":   "Show Scroll Cue",
+      "default": true
+    },
+    {
+      "type":    "checkbox",
+      "id":      "show_mobile_sticky_cta",
+      "label":   "Show Sticky CTA on Mobile",
+      "default": true,
+      "info":    "A fixed button appears at the bottom of the screen on mobile devices as the user scrolls."
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name":     "🐾 Hero — Premium",
+      "category": "Hero",
+      "settings": {
+        "eyebrow":              "✦ New Collection 2025",
+        "heading":              "Care They Deserve. Style They Love.",
+        "subheading":           "Premium essentials for your happy, healthy pets.",
+        "cta_text":             "Shop Now",
+        "cta2_text":            "Our Story",
+        "image_alt":            "Happy dog enjoying premium pet products",
+        "overlay_opacity":      0,
+        "overlay_color":        "#F8F6F2",
+        "bg_color":             "#F8F6F2",
+        "gradient_angle":       135,
+        "text_color":           "#1C1917",
+        "sub_color":            "#6B6560",
+        "accent_color":         "#D97757",
+        "heading_size_desktop": 72,
+        "heading_size_mobile":  38,
+        "sub_size_desktop":     18,
+        "sub_size_mobile":      15,
+        "text_align_desktop":   "left",
+        "text_align_mobile":    "center",
+        "show_feature_pills":   true,
+        "feature_pills":        "Vet Approved, Free Shipping, 30-Day Returns, Eco Friendly",
+        "show_social_proof":    true,
+        "social_proof_text":    "Trusted by 50,000+ pet parents",
+        "show_stat_cards":      true,
+        "stat_a_num":           "50k+",
+        "stat_a_label":         "Happy Pets",
+        "stat_b_num":           "4.9",
+        "stat_b_label":         "Avg Rating",
+        "show_stat_c":          false,
+        "stat_c_num":           "100%",
+        "stat_c_label":         "Natural",
+        "show_new_badge":       false,
+        "new_badge_text":       "🆕 Just Arrived",
+        "show_scroll_cue":      true,
+        "show_mobile_sticky_cta": true
+      }
+    }
+  ]
+}
+{% endschema %}
