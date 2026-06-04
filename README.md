@@ -38,8 +38,8 @@
 ## 🖥️ Preview
 
 <table>
-  <tr style="display: flex">
-    <td align="center" width="65%">
+  <tr>
+    <td align="center" width="65%" valign="top">
       <strong>🖥️ Desktop View</strong><br/><br/>
       <img src="assets/hero-desktop.png" alt="Desktop Preview" width="100%" />
     </td>
